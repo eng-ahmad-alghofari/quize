@@ -1,0 +1,1497 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>الاختبار الشامل لمسابقة وزارة الخارجية السورية</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- خطوط عربية متناسقة وواضحة -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Cairo', 'Tajawal', sans-serif;
+            background-color: #121316;
+            color: #e2e4e9;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+        .canvas-card {
+            background-color: #1a1c20;
+            border: 1px solid #282b30;
+        }
+        .option-btn {
+            background-color: #1e2025;
+            border: 1px solid #2e3238;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .option-btn:hover:not(:disabled) {
+            background-color: #272a30;
+            border-color: #3f444d;
+            transform: translateY(-1px);
+        }
+        .option-btn.correct {
+            background-color: rgba(16, 185, 129, 0.15) !important;
+            border-color: #10b981 !important;
+            color: #34d399 !important;
+            box-shadow: 0 0 12px rgba(16, 185, 129, 0.2);
+        }
+        .option-btn.incorrect {
+            background-color: rgba(239, 68, 68, 0.15) !important;
+            border-color: #ef4444 !important;
+            color: #f87171 !important;
+            box-shadow: 0 0 12px rgba(239, 68, 68, 0.2);
+        }
+        .nav-chip {
+            transition: all 0.2s ease;
+        }
+        .nav-chip.active {
+            background-color: #2563eb;
+            color: #ffffff;
+            border-color: #3b82f6;
+            box-shadow: 0 2px 8px rgba(37, 99, 235, 0.4);
+        }
+        .q-matrix-btn.current {
+            outline: 2px solid #3b82f6;
+            outline-offset: 2px;
+        }
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #121316;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #2b2e34;
+            border-radius: 9999px;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between selection:bg-blue-600 selection:text-white">
+
+    <!-- الشريط العلوي والتنقل -->
+    <header class="w-full border-b border-[#26282e] bg-[#16181c] px-4 py-3 sticky top-0 z-50 shadow-lg">
+        <div class="max-w-6xl mx-auto flex flex-col gap-3">
+            
+            <!-- السطر الأول: الإجراءات، العنوان، والعداد التراكمي -->
+            <div class="flex flex-wrap items-center justify-between gap-3">
+                <div class="flex items-center gap-2">
+                    <button onclick="copyShareLink()" class="text-xs bg-[#202227] hover:bg-[#2a2d33] text-blue-300 border border-[#32363e] px-3 py-1.5 rounded-full transition font-medium flex items-center gap-1.5 shadow-sm">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/>
+                        </svg>
+                        مشاركة
+                    </button>
+                    <button onclick="resetCurrentQuiz()" class="text-xs bg-[#202227] hover:bg-[#2e1d1d] text-rose-300 border border-[#3e2d2d] px-3 py-1.5 rounded-full transition font-medium flex items-center gap-1.5 shadow-sm">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                        </svg>
+                        إعادة الاختبار
+                    </button>
+                    <div id="toast" class="hidden text-xs bg-emerald-950 border border-emerald-600 text-emerald-300 px-2.5 py-1 rounded-md">
+                        تم نسخ الرابط!
+                    </div>
+                </div>
+
+                <div class="text-center">
+                    <h1 class="text-sm sm:text-base md:text-lg font-bold text-gray-100 flex items-center justify-center gap-2">
+                        <span>مسابقة وزارة الخارجية السورية - بنك الاختبار الشامل</span>
+                    </h1>
+                </div>
+
+                <!-- العداد والوقت المفتوح -->
+                <div class="flex items-center gap-2 sm:gap-3">
+                    <div class="flex items-center gap-1.5 bg-[#1f2228] border border-[#353a42] text-amber-300 text-xs sm:text-sm font-semibold px-2.5 py-1 rounded-full">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <span id="open-timer">الوقت مفتوح</span>
+                    </div>
+
+                    <div class="flex items-center gap-1 bg-[#12281c] border border-[#1b5e20] text-emerald-400 text-xs sm:text-sm font-bold px-2.5 py-1 rounded-full">
+                        <span id="header-correct">0</span>
+                        <span class="text-xs">✔</span>
+                    </div>
+                    <div class="flex items-center gap-1 bg-[#2e1515] border border-[#7f1d1d] text-rose-400 text-xs sm:text-sm font-bold px-2.5 py-1 rounded-full">
+                        <span id="header-incorrect">0</span>
+                        <span class="text-xs">✖</span>
+                    </div>
+                    <div class="text-xs sm:text-sm font-medium text-gray-300 bg-[#202227] px-2.5 py-1 rounded-full border border-[#32363e]">
+                        <span id="header-q-index">1</span> / <span id="header-q-total">25</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ألسنة الأقسام الثلاثة حصراً حسب الملفات المرفقة -->
+            <div class="flex items-center gap-2 overflow-x-auto pb-1 text-xs sm:text-sm scrollbar-none">
+                <button onclick="switchSection(0)" id="sec-tab-0" class="nav-chip active flex-shrink-0 px-3.5 py-1.5 rounded-full border border-[#33373f] font-medium bg-[#1e2025] text-gray-300 hover:text-white">
+                    القسم 1: المهارات التنظيمية (25)
+                </button>
+                <button onclick="switchSection(1)" id="sec-tab-1" class="nav-chip flex-shrink-0 px-3.5 py-1.5 rounded-full border border-[#33373f] font-medium bg-[#1e2025] text-gray-300 hover:text-white">
+                    القسم 2: الإدارة العامة وأسس الدولة (25)
+                </button>
+                <button onclick="switchSection(2)" id="sec-tab-2" class="nav-chip flex-shrink-0 px-3.5 py-1.5 rounded-full border border-[#33373f] font-medium bg-[#1e2025] text-gray-300 hover:text-white">
+                    القسم 3: الهيكل التنظيمي والإداري ومينتزبرغ (32)
+                </button>
+            </div>
+
+            <!-- شريط التقدم للقسم الحالي -->
+            <div class="w-full bg-[#202227] h-1.5 rounded-full overflow-hidden">
+                <div id="section-progress" class="bg-blue-600 h-full w-[4%] transition-all duration-300 ease-out"></div>
+            </div>
+        </div>
+    </header>
+
+    <!-- منطقة المحتوى الرئيسية -->
+    <main class="max-w-4xl w-full mx-auto p-4 sm:p-6 flex-grow flex flex-col justify-center">
+
+        <!-- صندوق السؤال التفاعلي -->
+        <div id="quiz-box" class="space-y-6">
+
+            <div class="flex flex-wrap items-center justify-between gap-2 border-b border-[#26282e] pb-3">
+                <div class="flex items-center gap-2">
+                    <span id="section-tag" class="text-xs font-semibold px-2.5 py-1 rounded bg-blue-950/70 border border-blue-700/60 text-blue-300">
+                        القسم 1: المهارات التنظيمية
+                    </span>
+                    <span class="text-xs text-gray-400 font-medium">
+                        السؤال رقم <span id="q-number-title">1</span> من <span id="q-total-title">25</span>
+                    </span>
+                </div>
+                <button onclick="toggleMatrixModal()" class="text-xs bg-[#202227] hover:bg-[#2b2e35] text-gray-300 border border-[#353941] px-2.5 py-1 rounded-md transition flex items-center gap-1.5">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/>
+                    </svg>
+                    فهرس أسئلة القسم (Matrix)
+                </button>
+            </div>
+
+            <!-- نص السؤال -->
+            <div>
+                <h2 id="question-text" class="text-base sm:text-lg md:text-xl font-bold leading-relaxed text-gray-100">
+                    جاري تحميل السؤال...
+                </h2>
+            </div>
+
+            <!-- شبكة الخيارات الأربعة -->
+            <div id="options-container" class="grid grid-cols-1 gap-3 pt-1">
+                <!-- يتم توليد الأزرار برمجياً -->
+            </div>
+
+            <!-- صندوق الشرح والتعليل المعرفي -->
+            <div id="explanation-box" class="hidden rounded-xl border p-4 text-sm leading-relaxed transition-all duration-300">
+                <div class="flex items-start gap-3">
+                    <div id="explanation-icon" class="text-xl">💡</div>
+                    <div class="flex-1">
+                        <h4 id="explanation-title" class="font-bold text-sm mb-1">السند والتعليل المعرفي:</h4>
+                        <p id="explanation-text" class="text-gray-300 text-xs sm:text-sm"></p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- شاشة ملخص نتائج القسم -->
+        <div id="summary-box" class="hidden canvas-card rounded-2xl p-6 sm:p-10 text-center space-y-6 shadow-2xl">
+            <div class="text-5xl">📊</div>
+            <h2 id="summary-title" class="text-2xl sm:text-3xl font-extrabold text-white">ملخص أداء القسم</h2>
+            <p id="summary-subtitle" class="text-gray-400 text-sm max-w-lg mx-auto">
+                تم الانتهاء من أسئلة هذا القسم. يمكنك استعراض نتيجتك أو مراجعة الأسئلة الخاطئة فقط.
+            </p>
+
+            <div class="grid grid-cols-3 gap-3 max-w-lg mx-auto py-2">
+                <div class="bg-[#12281c] border border-[#1b5e20] p-4 rounded-xl">
+                    <span id="sum-correct" class="block text-2xl font-black text-emerald-400">0</span>
+                    <span class="text-xs text-gray-300">إجابة صحيحة</span>
+                </div>
+                <div class="bg-[#2e1515] border border-[#7f1d1d] p-4 rounded-xl">
+                    <span id="sum-wrong" class="block text-2xl font-black text-rose-400">0</span>
+                    <span class="text-xs text-gray-300">إجابة خاطئة</span>
+                </div>
+                <div class="bg-[#162744] border border-[#1e40af] p-4 rounded-xl">
+                    <span id="sum-percent" class="block text-2xl font-black text-blue-400">0%</span>
+                    <span class="text-xs text-gray-300">النسبة المئوية</span>
+                </div>
+            </div>
+
+            <div class="bg-[#202227] border border-[#32363e] p-3 rounded-xl max-w-md mx-auto text-xs text-gray-300">
+                إجمالي الاختبار الكامل (82 سؤالاً): 
+                <span id="overall-total-score" class="font-bold text-white">0 / 82</span>
+            </div>
+
+            <div class="flex flex-wrap justify-center gap-3 pt-2">
+                <button onclick="resumeCurrentSection()" class="px-5 py-2.5 bg-[#25282f] hover:bg-[#30343d] text-gray-200 font-medium rounded-xl text-xs sm:text-sm border border-[#3a3f47] transition">
+                    مراجعة أسئلة القسم
+                </button>
+                <button id="summary-wrong-only-btn" onclick="reviewWrongOnly()" class="px-5 py-2.5 bg-rose-950 hover:bg-rose-900 text-rose-200 font-medium rounded-xl text-xs sm:text-sm border border-rose-800 transition">
+                    مراجعة الأخطاء فقط ✖
+                </button>
+                <button id="summary-next-sec-btn" onclick="goToNextSection()" class="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-xl text-xs sm:text-sm shadow-md transition">
+                    الانتقال للقسم التالي
+                </button>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- شريط التحكم السفلي -->
+    <footer class="w-full border-t border-[#26282e] bg-[#16181c] px-4 py-3 sticky bottom-0 z-40">
+        <div class="max-w-4xl mx-auto flex items-center justify-between">
+            <button id="prev-btn" onclick="handlePrev()" disabled class="px-5 py-2 text-xs sm:text-sm font-semibold rounded-lg bg-[#202227] text-gray-500 border border-[#32363e] disabled:opacity-30 disabled:cursor-not-allowed hover:enabled:bg-[#2a2d33] hover:enabled:text-white transition">
+                السابق
+            </button>
+            
+            <span class="text-xs text-gray-400 hidden sm:inline-block">
+                الوقت مفتوح - يمكنك التخطي والعودة لأي سؤال بحرية تامة
+            </span>
+
+            <button id="next-btn" onclick="handleNext()" class="px-7 py-2 text-xs sm:text-sm font-semibold rounded-lg bg-blue-600 hover:bg-blue-700 text-white shadow transition">
+                التالي
+            </button>
+        </div>
+    </footer>
+
+    <!-- نافذة فهرس الأسئلة (Matrix Modal) -->
+    <div id="matrix-modal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="canvas-card w-full max-w-md rounded-2xl p-5 border border-[#353941] shadow-2xl space-y-4">
+            <div class="flex items-center justify-between border-b border-[#282b30] pb-3">
+                <h3 class="font-bold text-sm text-gray-200">فهرس أسئلة القسم الحالي</h3>
+                <button onclick="toggleMatrixModal()" class="text-gray-400 hover:text-white text-lg font-bold">&times;</button>
+            </div>
+            <p class="text-xs text-gray-400">انقر على رقم السؤال للانتقال المباشر أو التخطي والرجوع إليه لاحقاً:</p>
+            <div id="matrix-grid" class="grid grid-cols-5 gap-2 max-h-64 overflow-y-auto p-1">
+                <!-- مربعات الأسئلة -->
+            </div>
+            <div class="flex items-center justify-between text-xs pt-2 border-t border-[#282b30] text-gray-400">
+                <div class="flex items-center gap-1"><span class="w-3 h-3 rounded bg-emerald-950 border border-emerald-500 inline-block"></span> صحيح</div>
+                <div class="flex items-center gap-1"><span class="w-3 h-3 rounded bg-rose-950 border border-rose-500 inline-block"></span> خاطئ</div>
+                <div class="flex items-center gap-1"><span class="w-3 h-3 rounded bg-[#202227] border border-[#32363e] inline-block"></span> لم يُحل</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- بنك الأسئلة والمحرك البرمجي -->
+    <script>
+        // بنك الأسئلة الحصري المكون من الأقسام الثلاثة للملفات الثلاثة فقط
+        const rawQuizData = [
+            // ================= القسم الأول: المهارات التنظيمية (25 سؤالاً مطابقة لملف المهارات التنظيمية وملف اجوبة المهارات التنظيمية.txt) =================
+            {
+                sectionId: 0,
+                sectionName: "القسم 1: المهارات التنظيمية",
+                questions: [
+                    {
+                        q: "سؤال 1: التنظيم المادي لا يشمل مكتب مرتب وحسب، وإنما يتوسع ليضم تنظيم وترتيب غرف أو طوابق أو مبان بأكملها.",
+                        options: ["صحيح", "غير صحيح", "أحيانا", "المسألة نسبية"],
+                        originalCorrect: 0, // 1-1
+                        reason: "وفق مفتاح إجابات المهارات التنظيمية المعتمد (1-1): التنظيم المادي يتجاوز ترتيب المكتب ليشمل التخطيط المكاني لبيئة العمل والغرف والمباني بأكملها."
+                    },
+                    {
+                        q: "سؤال 2: هناك حاجة لشخص ذو مهارات تنظيمية عالية لتصميم أماكن العمل على نحو مناسب، ومن ثم يلقى على عاتق الأفراد العاملين مسؤولية الحفاظ عليها.",
+                        options: ["صحيح ... هي مسؤولية جميع العاملين", "غير صحيح .. مسؤلية العاملين محدودة", "أحيانا ... و في بعض الأماكن", "المسألة نسبية ... حسب قدرات و مهارات العاملين"],
+                        originalCorrect: 0, // 2-1
+                        reason: "وفق مفتاح الأجوبة (2-1): التصميم يحتاج لخبير ذي مهارات تنظيمية، ولكن استدامة التنظيم والحفاظ عليه مسؤولية تشاركية تقع على عاتق جميع العاملين."
+                    },
+                    {
+                        q: "سؤال 3: من دون وجود خطة واضحة في عالم الأعمال:",
+                        options: ["يتحوّل الهدف إلى مجرد أمنية", "لا علاقة للأهداف بالخطط", "يتطور الهدف إلى استراتيجية", "تبقى الأهداف كما هي"],
+                        originalCorrect: 0, // 3-1
+                        reason: "وفق مفتاح الأجوبة (3-1): الخطة هي الجسر التنفيذي للهدف، وبدون خطة واضحة يتحول الهدف إلى مجرد أمنية غير قابلة للتحقيق."
+                    },
+                    {
+                        q: "سؤال 4: يُقصد بالتخطيط في سياق المشاريع:",
+                        options: [
+                            "تحديد المصادر الضرورية والفترة الزمنية للمشروع التي تغني عن الخطط البديلة",
+                            "تحديد المصادر الضرورية والفترة الزمنية للمشروع، وضع خطط بديلة في حال حدوث أي خلل أو مشكلات",
+                            "تحديد المصادر الثانوية والفترة الزمنية للمشروع، وضع خطط بديلة في حال حدوث أي خلل أو مشكلات",
+                            "الاكتفاء بتحديد المصادر الرئيسية و الثانوية والفترة الزمنية للمشروع."
+                        ],
+                        originalCorrect: 1, // 4-2
+                        reason: "وفق مفتاح الأجوبة (4-2): التخطيط للمشاريع يتضمن حصر المصادر والجدول الزمني إضافة إلى وضع خطط طوارئ وبدائل لأي مشكلات."
+                    },
+                    {
+                        q: "سؤال 5: التخطيط لا يقتصر فقط على مجالات الأعمال:",
+                        options: [
+                            "أي غرفة ستقوم بتنظيفها هو نوع من التخطيط، كذلك المهمات اليومية و الزيارات.",
+                            "التخطيط عملية تقتصر على الأعمال فقط",
+                            "التخطيط وظيفة من وظائف الإدارة فقط",
+                            "التخطيط عملية تقوم بها الإدارات العليا و ينفذها الآخرون"
+                        ],
+                        originalCorrect: 0, // 5-1
+                        reason: "وفق مفتاح الأجوبة (5-1): التخطيط مهارة تنظيمية حياتية تشمل المهام اليومية، تنظيم الغرف، والزيارات."
+                    },
+                    {
+                        q: "سؤال 6: يعتبر سوء إدارة الوقت أحد أهم أسباب الفشل في جميع مناحي الحياة:",
+                        options: [
+                            "ليس صحيحا ... هذا ينطبق فقط على أوقات العمل",
+                            "إدارة الوقت شيء غير واقعي ... فكل شخص يعرف ما له و ما عليه",
+                            "الشخص الذي لا يحسن استغلال وقته بفعالية، لن يكون منظما بما فيه الكفاية، وستجده غارقًا في الفوضى على الدوام",
+                            "هناك فرق بين إدارة وقت العمل و تنظيم العمل"
+                        ],
+                        originalCorrect: 2, // 6-3
+                        reason: "وفق مفتاح الأجوبة (6-3): العجز عن استغلال الوقت بفعالية يحرم الشخص من التنظيم ويجعله غارقاً في الفوضى وتراكم المهام."
+                    },
+                    {
+                        q: "سؤال 7: الفشل في تحديد المصادر الموجودة، أو التي تحتاج إليها لتنفيذ مشروع ما:",
+                        options: [
+                            "يعني مصادر مهدورة، وهو أمر لن ترغب في أن يحدث لك سواء على المستوى المهني أو الشخصي",
+                            "يبقى في إطار التجربة و إعادة التجربة لزيادة الخبرة",
+                            "يساهم في عملية استثمار الوقت في المرة القادمة",
+                            "يعني مصادر مهدورة و هو أمر طبيعي الحدوث و يمكن أن يتكرر"
+                        ],
+                        originalCorrect: 0, // 7-1
+                        reason: "وفق مفتاح الأجوبة (7-1): عدم حصر وتحديد الموارد اللازمة يترجم مباشرة إلى هدر مالي ومادي وبشري غير مرغوب فيه."
+                    },
+                    {
+                        q: "سؤال 8: لا يسعك في العمل أن تتكفل بجميع جوانب المشروع بمفردك لذلك:",
+                        options: [
+                            "يجب أن تكون قادرًا على تكليف الآخرين من زملائك في العمل ببعض المهام والأعمال لتحقيق إنتاجية أفضل في وقت أقل",
+                            "تأجيل العمل و عدم تفويض الآخرين يحمي من الوقوع في الأخطاء غير المتوقعة",
+                            "تفويض الأعمال مؤشر على انخفاض المهارات و هذا لا يجوز إظهاره في العمل",
+                            "تفويض الأعمال يجب أن يكون في حدود عدم إطلاع الآخرين على مهارات جديدة"
+                        ],
+                        originalCorrect: 0, // 8-1
+                        reason: "وفق مفتاح الأجوبة (8-1): التفويض وتكليف الزملاء المؤهلين مهارة تنظيمية جوهرية لرفع الإنتاجية وكسب الوقت."
+                    },
+                    {
+                        q: "سؤال 9: تفويض الآخرين يتطلب معرفة الشخص الأمثل لإنجاز مهمة معينة على أفضل وجه.",
+                        options: ["موافق", "غير موافق", "أحيانا", "كل ماذكر غير صحيح"],
+                        originalCorrect: 0, // 9-1
+                        reason: "وفق مفتاح الأجوبة (9-1): نجاح التفويض يعتمد أساساً على اختيار الشخص الأنسب والأكفأ لكل مهمة محددة."
+                    },
+                    {
+                        q: "سؤال 10: من المهارات التنظيمية:",
+                        options: [
+                            "وضع قائمة مهام ساعية",
+                            "وضع قائمة مهام يومية",
+                            "وضع قائمة مهام ثابتة",
+                            "وضع قائمة مهام متوقعة الإنجاز"
+                        ],
+                        originalCorrect: 1, // 10-2
+                        reason: "وفق مفتاح الأجوبة (10-2): إعداد قائمة المهام اليومية (Daily To-Do List) مهارة تنظيمية أساسية لترتيب الأولويات."
+                    },
+                    {
+                        q: "سؤال 11: وضع قائمة مهام عامة غير مخصصة ليوم واحد:",
+                        options: [
+                            "تساعد في إعداد القائمة اليومية. و توفر الكثير من الوقت في التفكير فيما يتوجب عليك إنجازه كل يوم",
+                            "لا تساعد في إعداد القائمة اليومية. و هي مضيعة للوقت و تشتت التفكير",
+                            "تساعد في إعداد القائمة اليومية. و لكنها تشتت التفكير بين الحاضر والمستقبل",
+                            "لا تساعد في إعداد القائمة اليومية. و لكنها مهمة لتحديد استراتيجبات مستقبلية"
+                        ],
+                        originalCorrect: 0, // 11-1
+                        reason: "وفق مفتاح الأجوبة (11-1): القائمة العامة بمثابة بنك للأهداف والمشاريع الذي تُشتق منه القوائم اليومية وتوفر وقت التفكير اليومي."
+                    },
+                    {
+                        q: "سؤال 12: فعل دفتر الملاحظات :",
+                        options: [
+                            "الاعتماد على الذاكرة أهم من الورقة والقلم",
+                            "تدوين الملاحظات بشكل مستمر يساهم في بناء بنك معلومات مهم",
+                            "يستخدم دفتر الملاحظات أثناء الاجتماعات واللقاءات الرسمية",
+                            "يستخدم دفتر الملاحظات كمرشد أو دليل حول الأعمال الرئيسية"
+                        ],
+                        originalCorrect: 1, // 12-2
+                        reason: "وفق مفتاح الأجوبة (12-2): التدوين المستمر للأفكار والملاحظات يفرغ الذهن من التشويش ويبني بنك معلومات غني."
+                    },
+                    {
+                        q: "سؤال 13: استعن بمنظم سنوي لكتابة مخططاتك على المدى البعيد كالسفر أو المشاريع أو غيرها، واحرص على تحديثه باستمرار:",
+                        options: [
+                            "ترف إداري لا لزوم له و هو شكل دون مضمون",
+                            "مهم و هو دليل عمل يساعد في تنظيم الأداء",
+                            "ربما يفيد بعض الأشخاص الذين لا يعتمدون على ذاكرتهم الشخصية",
+                            "ترف إداري لكنه يعطي انطباعا بالاهتمام و الدقة"
+                        ],
+                        originalCorrect: 1, // 13-2
+                        reason: "وفق مفتاح الأجوبة (13-2): المنظم السنوي دليل عملي ضروري يساعد على تنظيم المواعيد والالتزامات على المدى البعيد."
+                    },
+                    {
+                        q: "سؤال 14: كما تنظف منزلك من الغبار والقمامة، نظف عقلك أيضًا من الأفكار السلبية والمشاعر المرهقة كالتوتر والقلق فهذا يحسن من المهارات التنظيمية:",
+                        options: ["موافق", "غير موافق", "إحيانا", "لا شيء مما ذكر"],
+                        originalCorrect: 0, // 14-1
+                        reason: "وفق مفتاح الأجوبة (14-1): التخلص من التوتر والمشاعر السلبية يمنح الذهن صفاءً يعزز القدرة على الترتيب واتخاذ القرار."
+                    },
+                    {
+                        q: "سؤال 15: الأرشفة وترتيب الملفات من أهم أعمال المهارات التنظيمية:",
+                        options: ["أحيانا", "دائما", "حسب نوعية العمل", "حسب نوعية الأشخاص"],
+                        originalCorrect: 1, // 15-2
+                        reason: "وفق مفتاح الأجوبة (15-2): الأرشفة وترتيب الملفات دائماً من أهم المهارات التنظيمية لضمان سرعة الوصول للمعلومات."
+                    },
+                    {
+                        q: "سؤال 16: خصص مكانًا في مكتبك للمهام المنجزة وتلك التي لم تنته بعد:",
+                        options: ["موافق", "غير موافق", "المسألة تتعلق بنوعية العمل", "المسألة تتعلق ببيئة العمل"],
+                        originalCorrect: 0, // 16-1
+                        reason: "وفق مفتاح الأجوبة (16-1): الفصل المكاني بين المعاملات المنجزة وتلك التي قيد الإنجاز يمنع الفوضى وضياع الأوراق."
+                    },
+                    {
+                        q: "سؤال 17: تعد الرعاية الذاتية من اساسيات مهارات التنظيم:",
+                        options: [
+                            "كونها تحقق التوازن الصحي",
+                            "كونها تحقق الكاريزما الجيدة",
+                            "كونها تحقق الحيوية و النشاط",
+                            "كونها تمنع الترهل و البدانة"
+                        ],
+                        originalCorrect: 0, // 17-1
+                        reason: "وفق مفتاح الأجوبة (17-1): الرعاية الذاتية تحقق التوازن الصحي والبدني والذهني الضروري للحفاظ على الطاقة والتركيز التنظيمي."
+                    },
+                    {
+                        q: "سؤال 18: المهارات التنظيمية هي:",
+                        options: [
+                            "إدارة الوقت ، الجرأة ، الجدولة ، تنظيم الموارد",
+                            "إدارة الوقت ، القدرة على التخطيط ، الشخصنة ، تنظيم الموارد",
+                            "إدارة الوقت ، القدرة على التخطيط ، الجدولة ، تنظيم الموارد",
+                            "إدارة الوقت ، القدرة على التخطيط ، الجدولة ، الرؤية"
+                        ],
+                        originalCorrect: 2, // 18-3
+                        reason: "وفق مفتاح الأجوبة (18-3): المنظومة الرباعية للمهارات التنظيمية تتكون من: إدارة الوقت، التخطيط، الجدولة، وتنظيم الموارد."
+                    },
+                    {
+                        q: "سؤال 19: من أسس المهارات التنظيمية هو:",
+                        options: [
+                            "الإلمام بالمهمة ... لا سيما عندما تكلف بها",
+                            "الإلمام بالمهمة ... لا سيما عندما تخبر عن هذه المهمة",
+                            "الإلمام بالمهمة ... لا سيما عندما يتوجب عليك القيام بها",
+                            "الإلمام بالمهمة ... لا سيما عندما تبدأ بالقيام بها"
+                        ],
+                        originalCorrect: 2, // 19-3
+                        reason: "وفق مفتاح الأجوبة (19-3): الإلمام الكامل بالمهمة يصبح حاسماً بشكل خاص عندما يتوجب عليك القيام بها وتنفيذها."
+                    },
+                    {
+                        q: "سؤال 20: من أسس المهارات التنظيمية هو:",
+                        options: [
+                            "المراجعة ... بمعنى الإطلاع وترتيب الأولويات",
+                            "المراجعة .... بمعنى معرفة ما هو مطلوب",
+                            "المراجعة ... بمعنى إعادة معرفة ما هو مطلوب للتنفيذ",
+                            "المراجعة ... بمعنى تذكر ما هو مطلوب للتنفيذ"
+                        ],
+                        originalCorrect: 0, // 20-1
+                        reason: "وفق مفتاح الأجوبة (20-1): المراجعة تعني الاطلاع المستمر وإعادة تقييم وترتيب الأولويات حسب المستجدات."
+                    },
+                    {
+                        q: "سؤال 21: المهارات التنظيمية محصورة بـ:",
+                        options: [
+                            "القيادات العليا فقط",
+                            "القيادة العليا و الوسطى",
+                            "القيادات العليا و الدنيا",
+                            "جميع أفراد المنشأة"
+                        ],
+                        originalCorrect: 3, // 21-4
+                        reason: "وفق مفتاح الأجوبة (21-4): المهارات التنظيمية ضرورية لكافة العاملين وجميع أفراد المنشأة وليست حكراً على مستوى إداري معين."
+                    },
+                    {
+                        q: "سؤال 22: تبدأ المهارات التنظيمية من تنظيم الحياة الشخصية:",
+                        options: ["موافق", "غير موافق", "المسألة نسبية", "كل ما ذكر صحيح"],
+                        originalCorrect: 0, // 22-1
+                        reason: "وفق مفتاح الأجوبة (22-1): التنظيم الذاتي والشخصي هو الأساس المتين الذي تنطلق منه مهارات التنظيم المؤسسي والمهني."
+                    },
+                    {
+                        q: "سؤال 23: من المهارات التنظيمية:",
+                        options: [
+                            "مراجعة الخيارات وتحديد أكثر المهام أهمية من أجل ترتيب الأولويات",
+                            "تنفيذ ما تم التخطيط له دون مراعاة التغيرات الحاصلة",
+                            "تحديد مواقیت و مواعيد ثابتة للأعمال لا تقبل التعديل",
+                            "الاعتماد على العلميات أكثر من المدخلات و المخرجات"
+                        ],
+                        originalCorrect: 0, // 23-1
+                        reason: "وفق مفتاح الأجوبة (23-1): المهارة التنظيمية تستوجب تحليل الخيارات المتاحة واختيار المهام الأكثر أهمية لترتيب الأولويات."
+                    },
+                    {
+                        q: "سؤال 24: المفتاح الرئيسي للقيام بجميع الأشياء هو أن يكون لديك الثقة بأنك فعلت الشيء المناسب:",
+                        options: ["صحيح", "غير صحيح", "أحيانا", "مطلقا"],
+                        originalCorrect: 0, // 24-1
+                        reason: "وفق مفتاح الأجوبة (24-1): الثقة في صحة القرار والخطوة المتخذة يمنح الشخص العزيمة والهدوء لتنفيذ الأعمال بنجاح."
+                    },
+                    {
+                        q: "سؤال 25: من المهارات التنظيمية:",
+                        options: [
+                            "الاهتمام بالبدايات أكثر من النهايات",
+                            "الاهتمام بالبدايات أقل من النهايات",
+                            "الاهتمام بالبدايات و النهايات",
+                            "ولا واحدة مما ذكر"
+                        ],
+                        originalCorrect: 2, // 25-3
+                        reason: "وفق مفتاح الأجوبة (25-3): المهارة التنظيمية تقتضي الاهتمام المتوازن بالبدايات (التخطيط والتحضير) والنهايات (الإنجاز وضبط الجودة والتقييم)."
+                    }
+                ]
+            },
+
+            // ================= القسم الثاني: الإدارة العامة وأسس الدولة (25 سؤالاً كاملة من ملف أسئلة الإدارة العامة.pdf) =================
+            {
+                sectionId: 1,
+                sectionName: "القسم 2: الإدارة العامة وأسس الدولة",
+                questions: [
+                    {
+                        q: "سؤال 1: الإدارة العامة تهتم:",
+                        options: [
+                            "بكافة النشاطات المرتبطة بالأعمال الحكومية",
+                            "بكافة النشاطات المرتبطة بالقطاع الخاص",
+                            "بكافة النشاطات المرتبطة بالقطاعين الخاص و العام",
+                            "بكافة النشاطات المرتبطة بالأمور الخدمية فقط"
+                        ],
+                        originalCorrect: 0,
+                        reason: "الإدارة العامة (Public Administration) تختص بتنفيذ السياسة العامة للدولة وتختص بأنشطة القطاع والأجهزة الحكومية."
+                    },
+                    {
+                        q: "سؤال 2: من خصائص الإدارة العامة الأساسية:",
+                        options: [
+                            "الهدف اللارسمية، الهيكل التنظيمي، المسؤولية",
+                            "الهدف، الرسمية، الهيكل التنظيمي، المسؤولية",
+                            "الهدف، اللارسمية، الهيكل الوظيفي، المسؤولية",
+                            "الهدف، الرسمية، الهيكل الوظيفي، المسؤولية العامة فقط"
+                        ],
+                        originalCorrect: 1,
+                        reason: "خصائص الإدارة العامة الأساسية: وجود هدف عام، والصفة الرسمية، والهيكل التنظيمي الهرمي، والمسؤولية والمساءلة القانونية."
+                    },
+                    {
+                        q: "سؤال 3: يتحكم في الإدارة العامة والذي يعطيها صفة الرسمية:",
+                        options: [
+                            "الإدارات الرسمية العليا",
+                            "الجهات الرسمية القائمة عليها",
+                            "القوانين العامة والمراسيم التشريعية والقرارات الحكومية",
+                            "ولا شيء مما ذكر"
+                        ],
+                        originalCorrect: 2,
+                        reason: "تستمد الإدارة العامة صفة الإلزام والرسمية من القوانين والمراسيم التشريعية والقرارات الحكومية النافذة في الدولة."
+                    },
+                    {
+                        q: "سؤال 4: الإدارة العامة تخضع لـ:",
+                        options: [
+                            "لرؤية ورسالة المستوى الإداري الأعلى",
+                            "لسلطة القائمين على العمل الإداري في الدولة",
+                            "لمجلس الشعب ومجلس الوزراء فقط",
+                            "للسلطة العامة للدولة، والتي تعمل ضمن سياسة يضعها القانون العام"
+                        ],
+                        originalCorrect: 3,
+                        reason: "تخضع الإدارة العامة للسلطة العامة للدولة، وتعمل وتنفذ أنشطتها ضمن السياسة العامة التي يضعها ويحددها القانون العام."
+                    },
+                    {
+                        q: "سؤال 5: من وظائف الإدارة العامة الكلاسيكية:",
+                        options: [
+                            "التخطيط والتنظيم",
+                            "الثواب والعقاب",
+                            "الترفيع والنقل",
+                            "التدوير والإحلال الوظيفي"
+                        ],
+                        originalCorrect: 0,
+                        reason: "التخطيط والتنظيم هما الوظائف الأساسية الأولى للعملية الإدارية العامة إلى جانب التوجيه والرقابة."
+                    },
+                    {
+                        q: "سؤال 6: من وظائف الإدارة العامة التنفيذية والتقييمية:",
+                        options: [
+                            "الاستقالات والاستقطاب",
+                            "التوجيه والرقابة",
+                            "الترفيع والنقل",
+                            "التدوير والإحلال الوظيفي"
+                        ],
+                        originalCorrect: 1,
+                        reason: "التوجيه والرقابة يمثلان وظيفتي المتابعة والإشراف للتأكد من سير الأعمال وفق الأنظمة وتحقيق الأهداف العامة."
+                    },
+                    {
+                        q: "سؤال 7: تعد الإدارة العامة من أهم الوسائل والوظائف التي:",
+                        options: [
+                            "تقدم الدعم للدول، وتُعتبر من الخدمات العامة الحديثة",
+                            "تقدّم الدعم للشركات الخاصة، وتُعتبر من الخدمات العامة الحديثة",
+                            "تقدم الدعم لكل شخص مهتم، وتُعتبر من الخدمات العامة الحديثة",
+                            "ولا شيء مما ذكر"
+                        ],
+                        originalCorrect: 0,
+                        reason: "الإدارة العامة هي الأداة التنفيذية التي تدعم كيان الدولة وتقدم الخدمات العامة الحديثة لكافة المواطنين."
+                    },
+                    {
+                        q: "سؤال 8: ساعدت الإدارة العامة على تقديم:",
+                        options: [
+                            "خدمات لفئة من الأفراد في المجتمع، في أقل وقت وتكلفة ممكنة مع التميز بجودة عالية",
+                            "خدمات لبعض الأفراد في المجتمع، في أقل وقت وتكلفة ممكنة مع التميز بجودة عالية",
+                            "خدمات لكافة الأفراد في المجتمع، في أقل وقت وتكلفة ممكنة مع التميز بجودة عالية",
+                            "ولا شيء مما ذكر"
+                        ],
+                        originalCorrect: 2,
+                        reason: "الخدمة العامة موجهة دستورياً وقانونياً لكافة أفراد المجتمع دون تمييز وبأعلى كفاءة وجودة ممكنة."
+                    },
+                    {
+                        q: "سؤال 9: العاملون في الإدارة العامة:",
+                        options: [
+                            "محكومين بالقوانين والتشريعات الناظمة في الدولة",
+                            "لهم مطلق الحرية باتخاذ القرارات إسوة بالقطاع الخاص",
+                            "يتمتعون بهامش كبير من الحرية في اتخاذ القرارات دون قيود",
+                            "يحق لهم تغيير ما يرونه غير مناسب في العمل وفق اجتهادهم الشخصي"
+                        ],
+                        originalCorrect: 0,
+                        reason: "يخضع الموظف العام لمبدأ المشروعية؛ حيث إنه محكوم بالقوانين والمراسيم والأنظمة واللوائح الرسمية النافذة."
+                    },
+                    {
+                        q: "سؤال 10: ينعدم مبدأ المنافسة بين القطاعات العامة المختلفة في الدولة:",
+                        options: ["صحيح", "خطأ", "المسألة نسبية", "أحياناً"],
+                        originalCorrect: 0,
+                        reason: "صحيح؛ فالقطاعات الحكومية لا تتنافس تجارياً فيما بينها، بل تتكامل وتتعاون لتحقيق الصالح العام للدولة والمجتمع."
+                    },
+                    {
+                        q: "سؤال 11: جميع الأجهزة العامة للدولة تعمل بالتعاون فيما بينها لتحقيق المصلحة العامة:",
+                        options: ["كل الأحيان", "معظم الأحيان", "بعض الأحيان", "غير صحيح"],
+                        originalCorrect: 0,
+                        reason: "وفق الفلسفة الإدارية والتشريعية للدولة: تعمل كافة الأجهزة العامة بتعاون وتكامل في كل الأحيان لخدمة المصلحة الوطنية."
+                    },
+                    {
+                        q: "سؤال 12: ينعدم مبدأ المنافسة بالإدارة العامة بعكس إدارة الأعمال:",
+                        options: ["صحيح", "غير صحيح", "أحيانا", "ولا شيء مما ذكر"],
+                        originalCorrect: 0,
+                        reason: "صحيح؛ فإدارة الأعمال محكومة بالمنافسة على الحصص السوقية والأرباح، في حين تقوم الإدارة العامة على تقديم الخدمة العامة واحتكارها لصالح المجتمع."
+                    },
+                    {
+                        q: "سؤال 13: أنواع الإدارة الرئيسية الكبرى في التصنيف الإداري:",
+                        options: [
+                            "الإدارة العامة وإدارة الأعمال",
+                            "الإدارة الشمولية والإدارة التخصصية",
+                            "الإدارة الجماعية والإدارة الشخصية",
+                            "الإدارة المعقدة والإدارة البسيطة"
+                        ],
+                        originalCorrect: 0,
+                        reason: "الفرعان الرئيسيان في العلوم الإدارية هما: الإدارة العامة (القطاع الحكومي) وإدارة الأعمال (القطاع الخاص)."
+                    },
+                    {
+                        q: "سؤال 14: تهدف الإدارة العامة لتحقيق النفع لجميع الأفراد بينما إدارة الأعمال تسعى لتحقيق الأرباح:",
+                        options: [
+                            "ما قيل صحيح",
+                            "الاثنتين تسعيان لتحقيق النفع العام",
+                            "الاثنتين تسعيان لتحقيق الأرباح بشكل مباشر",
+                            "الإدارة العامة لا يهمها تحقيق الأرباح"
+                        ],
+                        originalCorrect: 0,
+                        reason: "ما قيل صحيح تماماً؛ فالإدارة العامة غايتها النفع العام والمصلحة الاجتماعية، بينما إدارة الأعمال دافعها الأساسي تعظيم الأرباح."
+                    },
+                    {
+                        q: "سؤال 15: العناصر الأساسية للإدارة العامة:",
+                        options: [
+                            "القوى البشرية العاملة ، الموارد المادية، الأهداف العامة",
+                            "الإدارة العليا و الوسطى و الدنيا",
+                            "السياسات والإجراءات و البرامج",
+                            "الأهداف و الرؤية و الرسالة"
+                        ],
+                        originalCorrect: 0,
+                        reason: "ترتكز الإدارة العامة على: القوى البشرية (الموظفون)، الموارد المادية والمالية، والأهداف والسياسات العامة للدولة."
+                    },
+                    {
+                        q: "سؤال 16: الوظيفة في المنظمات العامة توصف بأنها:",
+                        options: [
+                            "دائمة وهي تحقق ما يعرف بالأمن أو الاستقرار الوظيفي",
+                            "مؤقتة ولا تحقق ما يعرف بالأمن أو الاستقرار الوظيفي",
+                            "مؤقتة وهي تحقق ما يعرف بالأمن أو الاستقرار الوظيفي",
+                            "دائمة ولا تحقق ما يعرف بالأمن أو الاستقرار الوظيفي"
+                        ],
+                        originalCorrect: 0,
+                        reason: "تتميز الوظيفة العامة بالديمومة والأمان والاستقرار الوظيفي والتقاعدي، بخلاف وظائف القطاع الخاص المعرضة لتقلبات السوق."
+                    },
+                    {
+                        q: "سؤال 17: من ناحية المساواة في الإدارة العامة:",
+                        options: [
+                            "يوجد نظام موحد ومطبق على جميع العاملين",
+                            "غير محقق بسبب غياب نظام موحد يطبق على جميع العاملين",
+                            "يوجد نظام موحد لكن لا يطبق على جميع العاملين",
+                            "يوجد نظام موحد فيما يخص الإدارات الوسطى و الدنيا فقط"
+                        ],
+                        originalCorrect: 0,
+                        reason: "تحكم الإدارة العامة قوانين وأنظمة خدمة مدنية موحدة (كالقانون الأساسي للعاملين بالدولة) تطبق بعدالة على الجميع."
+                    },
+                    {
+                        q: "سؤال 18: تدخل الاعتبارات السياسية والاجتماعية في عملية اتخاذ القرارات في الإدارة العامة يكون:",
+                        options: ["دائما", "غالبا", "أحيانا", "مطلقا"],
+                        originalCorrect: 0,
+                        reason: "الإدارة العامة وثيقة الصلة بالسلطة التنفيذية والسياسات العامة؛ فالاعتبارات السياسية والاجتماعية تؤثر فيها دائماً."
+                    },
+                    {
+                        q: "سؤال 19: هل يمكن الاعتماد على المعايير الاقتصادية فقط في عمليات التقييم بالإدارة العامة؟",
+                        options: ["غير موافق", "موافق", "أحيانا", "نادرا"],
+                        originalCorrect: 0,
+                        reason: "غير موافق؛ فالإدارة العامة لا تقيم بالأرباح والعائد المالي فقط، بل تقاس بالرضا المجتمعي، والعدالة، والاستقرار والأمن."
+                    },
+                    {
+                        q: "سؤال 20: الأساس المالي للقطاع العام متنوع الإيرادات والنفقات بعكس إدارة الأعمال:",
+                        options: [
+                            "صحيح",
+                            "غير صحيح",
+                            "يتقاطعان بالإيرادات و يختلفان بالنفقات",
+                            "يتقاطعان بالنفقات و يختلفان بالإيرادات"
+                        ],
+                        originalCorrect: 0,
+                        reason: "صحيح؛ فموازنة الدولة تتغذى من الضرائب والرسوم والأملاك العامة وتُنفق على الصحة والدفاع والتعليم والخدمات بتنوع واسع."
+                    },
+                    {
+                        q: "سؤال 21: تطور مفهوم الإدارة العامة بتطور المجتمعات وتقدمها وبتطور وظيفة الدولة الحديثة:",
+                        options: ["موافق", "غير موافق", "مختلف على ذلك", "كل ما سبق خاطئ"],
+                        originalCorrect: 0,
+                        reason: "انتقلت الدولة من المفهوم الحارس (الأمن والدفاع فقط) إلى الدولة التنموية والخدمية التي تدير وتطور المجتمع."
+                    },
+                    {
+                        q: "سؤال 22: تعتبر الإدارة العامة من دعائم الدولة التي تستند إليها في تنفيذ وظائفها وتحقيقها بنسبة:",
+                        options: ["صحيح 100%", "صحيح 75%", "صحيح 50%", "صحيح 25%"],
+                        originalCorrect: 0,
+                        reason: "الإدارة العامة هي الهيكل التنفيذي للدولة بنسبة 100%، وبدونها لا يمكن للدولة أن تنفذ أي تشريع أو تجبي إيراداً أو تقدم خدمة."
+                    },
+                    {
+                        q: "سؤال 23: يرتبط نجاح أية منظمة في مجتمع ما بمدى النجاح والكفاءة التي تحققها الإدارة العامة فيه:",
+                        options: ["موافق", "غير موافق", "القضية نسبية", "كل ما ذكر صحيح"],
+                        originalCorrect: 0,
+                        reason: "نجاح كافة المنظمات المجتمعية والخاصة مرهون بسلامة البنية التشريعية والخدمية والأمنية التي تديرها الإدارة العامة."
+                    },
+                    {
+                        q: "سؤال 24: الإدارة العامة هي الركيزة الأساسية للدولة الحديثة بعد أن أصبحت:",
+                        options: ["دولة خدمات", "دولة صناعية", "دولة متحكمة", "دولة متطورة"],
+                        originalCorrect: 0,
+                        reason: "تحولت وظيفة الدولة الحديثة إلى 'دولة خدمات'، وتعد الإدارة العامة الأداة الحيوية المسؤولة عن تقديم هذه الخدمات للمواطنين."
+                    },
+                    {
+                        q: "سؤال 25: أوجه الشبه والاختلاف بين الإدارة العامة (الحكومية) والخاصة (إدارة الأعمال):",
+                        options: [
+                            "أن هناك اختلافاً من حيث الدرجة وليس من حيث الجوهر الأساسي (مع وجود فروق في الهدف والنطاق)",
+                            "لا يوجد اختلاف بينهما وإنما الاختلاف في الشكل والإطار الخارجي فقط",
+                            "أن هناك اختلافاً جوهرياً وعميقاً يمنع تشابههما إطلاقاً",
+                            "لا يوجد رأي موحد و ثابت حول الموضوع"
+                        ],
+                        originalCorrect: 0,
+                        reason: "المبدأ الإداري المقارن: العمليات الإدارية (تخطيط، تنظيم، رقابة) واحدة، والاختلاف هو في الدرجة والغايات والقواعد القانونية الملزمة."
+                    }
+                ]
+            },
+
+            // ================= القسم الثالث: الهيكل التنظيمي والإداري ومينتزبرغ (32 سؤالاً تفصيلياً مستخرجاً بالكامل من ملف أسئلة شائعة حول الهيكل التنظيمي الإداري.pdf) =================
+            {
+                sectionId: 2,
+                sectionName: "القسم 3: الهيكل التنظيمي والإداري ومينتزبرغ",
+                questions: [
+                    {
+                        q: "سؤال 1: ما هو الهيكل التنظيمي الإداري للمؤسسة وفق التعريف المعتمد؟",
+                        options: [
+                            "هو الإطار الرسمي الذي يحدد التسلسل الهرمي للسلطة داخل المؤسسة، ويوضح توزيع الأدوار والمسؤوليات وتدفق المعلومات لضمان تحقيق الأهداف الاستراتيجية",
+                            "هو المخطط الهندسي والمعماري لمبنى الوزارة وتوزيع المكاتب وغرف الاجتماعات",
+                            "هو جدول الرواتب والمكافآت الشهرية الممنوحة للعاملين في القطاع الحكومي",
+                            "هو السجل الأرشيفي لحفظ المعاملات والمراسلات القديمة في المؤسسة"
+                        ],
+                        originalCorrect: 0,
+                        reason: "الهيكل التنظيمي بمثابة 'الهيكل العظمي' للمؤسسة الذي يضمن سير العمل بانتظام وتوضيح التسلسل الهرمي وتدفق المعلومات."
+                    },
+                    {
+                        q: "سؤال 2: ما هو مفهوم الهيكل التنظيمي من حيث العلاقات الإدارية الداخلية؟",
+                        options: [
+                            "النظام الذي يحكم العلاقات الداخلية في المؤسسة، حيث يحدد من يتبع لمن (Who reports to whom) وآليات اتخاذ القرار والتنسيق الفعال",
+                            "آلية اختيار السفراء وممثلي البعثات الدبلوماسية في الخارج",
+                            "نظام الحسابات المالية وتدقيق النفقات والمشتريات الحكومية",
+                            "قواعد البروتوكول والمراسم والتشريفات في اللقاءات الرسمية"
+                        ],
+                        originalCorrect: 0,
+                        reason: "مفهوم الهيكل التنظيمي يعنى بالنظام الحاكم للعلاقات وتجميع الأفراد وتحديد خطوط التبعية وآليات القرار مركزية أو لا مركزية."
+                    },
+                    {
+                        q: "سؤال 3: ما معنى مصطلح 'الهيكل الإداري' مقارنة بالهيكل التنظيمي؟",
+                        options: [
+                            "يركز بدقة على الجانب الإداري والقيادي وتوزيع الصلاحيات والسلطات وتحديد طبقات الإدارة (عليا، وسطى، تنفيذية)",
+                            "يركز فقط على توزيع المهام والعمليات الفنية التقنية دون الجوانب القيادية",
+                            "خاص بالشركات التجارية المساهمة ولا ينطبق على الإدارات والوزارات العامة",
+                            "يعبر عن قائمة الأجهزة الحاسوبية والتقنية المتوفرة لدى المؤسسة"
+                        ],
+                        originalCorrect: 0,
+                        reason: "الهيكل الإداري يركز على الجانب القيادي وتوزيع السلطات والصلاحيات (Authority) وطبقات الإدارة الثلاث."
+                    },
+                    {
+                        q: "سؤال 4: ما هي 'الهيكلة الإدارية' (Process of Restructuring)؟",
+                        options: [
+                            "العملية نفسها التي يتم من خلالها تصميم أو إعادة تصميم الهيكل التنظيمي عبر تحليل الوضع وتحديد الفجوات وإعادة توزيع المهام",
+                            "عملية تشييد وتجديد المقرات الإنشائية والمعمارية التابعة للوزارة",
+                            "إجراء الامتحانات والمقابلات الشفهية للمتقدمين للمسابقات الحكومية",
+                            "الأرشفة الإلكترونية للوثائق والمعاملات الورقية القديمة"
+                        ],
+                        originalCorrect: 0,
+                        reason: "الهيكلة الإدارية هي العملية (Process) المستمرة لتصميم أو إعادة تصميم الهيكل لرفع الكفاءة ولمواكبة التوسع أو التحول الرقمي."
+                    },
+                    {
+                        q: "سؤال 5: متى تلجأ المؤسسات والشركات عادةً إلى إجراء الهيكلة الإدارية؟",
+                        options: [
+                            "عند التوسع، أو دمج الأقسام، أو الرغبة في التحول الرقمي، أو رفع كفاءة الأداء ومعالجة الفجوات",
+                            "فقط عند انتهاء السنة المالية وتقديم الحسابات الختامية",
+                            "عند تغيير المفروشات والديكورات الداخلية للمكاتب",
+                            "عند توقيع اتفاقيات وبروتوكولات تعاون دولية مؤقتة"
+                        ],
+                        originalCorrect: 0,
+                        reason: "تحدث إعادة الهيكلة عند حدوث تحولات تنظيمية كبرى كالتوسع والدمج والتحول الرقمي ومعالجة الخلل التنسيقي."
+                    },
+                    {
+                        q: "سؤال 6: يحتوي الهيكل التنظيمي عادةً على عناصر أساسية؛ أي من الآتي يمثل حزمة هذه العناصر؟",
+                        options: [
+                            "المسميات الوظيفية، الأقسام والوحدات، خطوط السلطة، نطاق الإشراف، وقنوات الاتصال",
+                            "دفاتر الشيكات، عقود الإيجار، وتراخيص البناء الحكومي",
+                            "أعمار الموظفين، وسجلات الإجازات المرضية، والشهادات الجامعية",
+                            "موازنة الدولة، وجداول الرواتب، ونظام التقاعد"
+                        ],
+                        originalCorrect: 0,
+                        reason: "المحتويات الخمسة الأساسية للهيكل التنظيمي هي: المسميات، الأقسام، خطوط السلطة، نطاق الإشراف، وقنوات الاتصال."
+                    },
+                    {
+                        q: "سؤال 7: ماذا يقصد بـ 'خطوط السلطة' (Reporting Lines) في محتويات الهيكل التنظيمي؟",
+                        options: [
+                            "المسارات التي توضح من المشرف ومن المرؤوس وسلسلة التبعية الإدارية",
+                            "الأسلاك والشبكات الهاتفية الداخلية التي تربط المكاتب",
+                            "القوانين التي تحدد العلاقة بين السلطة التنفيذية والتشريعية",
+                            "الحدود الجغرافية التي تمتد إليها صلاحيات السفارة"
+                        ],
+                        originalCorrect: 0,
+                        reason: "خطوط السلطة (Reporting Lines) توضح التسلسل القيادي: من يوجه التعليمات لمن، ومن يرفع التقارير لمن."
+                    },
+                    {
+                        q: "سؤال 8: ما هو المقصود بـ 'نطاق الإشراف' (Span of Control)؟",
+                        options: [
+                            "عدد الموظفين الذين يشرف عليهم مدير واحد إشرافاً مباشراً وفعالاً",
+                            "المساحة المادية المخصصة لمكتب المدير في المبنى",
+                            "عدد الساعات التي يقضيها المدير في التفتيش على الأقسام",
+                            "المخصصات المالية المتاحة تحت تصرف رئيس القسم"
+                        ],
+                        originalCorrect: 0,
+                        reason: "نطاق الإشراف يحدد عدد المرؤوسين المباشرين التابعين لمدير واحد، وتحديده يؤثر على طول الهيكل التنظيمي."
+                    },
+                    {
+                        q: "سؤال 9: ما هي الخطوة الأولى المعتمدة في منهجية إنشاء وتصميم الهيكل التنظيمي؟",
+                        options: [
+                            "تحديد أهداف واستراتيجية المؤسسة أولاً",
+                            "شراء البرامج والمنظومات الإلكترونية لرسم المخططات",
+                            "حصر الموظفين وتوزيع المكاتب والغرف الإدارية",
+                            "طباعة بطاقات المسميات الوظيفية والأختام الرسمية"
+                        ],
+                        originalCorrect: 0,
+                        reason: "القاعدة الإدارية الأساسية: 'الهيكل يتبع الاستراتيجية'، لذلك تبدأ الخطوات بدراسة أهداف واستراتيجية المؤسسة."
+                    },
+                    {
+                        q: "سؤال 10: ما هو الترتيب المنطقي لخطوات إنشاء الهيكل التنظيمي وفق الورقة المعتمدة؟",
+                        options: [
+                            "تحديد الأهداف -> حصر المهام -> تجميع المهام في أقسام -> تحديد العلاقات والصلاحيات -> رسم المخطط وتوثيقه ومراجعته",
+                            "رسم المخطط -> حصر الموظفين -> تحديد الرواتب -> دمج الأقسام -> تحديد الأهداف",
+                            "توزيع الصلاحيات -> شراء البرامج -> تعيين المدراء -> تحديد المهام -> تقييم الأداء",
+                            "حصر الميزانية -> تعيين رؤساء الأقسام -> وضع الاستراتيجية -> رسم المخطط"
+                        ],
+                        originalCorrect: 0,
+                        reason: "التسلسل العلمي المعتمد: تحديد الاستراتيجية، حصر الأنشطة، تجميعها وظيفياً، تحديد الصلاحيات والتبعية، ثم رسم وتوثيق المخطط ومراجعته دورياً."
+                    },
+                    {
+                        q: "سؤال 11: كيف يُرسم الهيكل التنظيمي عادة في المؤسسات؟",
+                        options: [
+                            "على شكل مخطط بياني (Chart) يبدأ من الأعلى (الرئيس/الوزير) ويتفرع لأسفل (المدراء ثم الموظفون)",
+                            "على شكل دوائر متداخلة أفقية دون تحديد أي تدرج قيادي",
+                            "على شكل جدول مالي يضم حسابات الإيرادات والنفقات",
+                            "على شكل خريطة جغرافية توضح فروع المؤسسة في المحافظات"
+                        ],
+                        originalCorrect: 0,
+                        reason: "يرسم على شكل مخطط شجري هرمي يبدأ من قمة السلطة ويتفرع هبوطاً نحو المستويات الوسطى والتنفيذية."
+                    },
+                    {
+                        q: "سؤال 12: في المخططات التنظيمية، تُستخدم الرموز لتمثيل العلاقات؛ ماذا تمثل 'المربعات' و'الخطوط الصلبة'؟",
+                        options: [
+                            "المربعات تمثل الوظائف أو الأقسام، والخطوط الصلبة تمثل السلطة الرئاسية المباشرة",
+                            "المربعات تمثل المكاتب الإنشائية، والخطوط الصلبة تمثل ممرات المشاة",
+                            "المربعات تمثل المعاملات المنجزة، والخطوط الصلبة تمثل أوقات الدوام",
+                            "المربعات تمثل الدرجات المالية، والخطوط الصلبة تمثل المكافآت"
+                        ],
+                        originalCorrect: 0,
+                        reason: "المربعات ترمز للوظائف والأقسام، والخطوط المتصلة الصلبة تدل على السلطة المباشرة والأوامر التنفيذية."
+                    },
+                    {
+                        q: "سؤال 13: إلى ماذا تشير 'الخطوط المتقطعة' في رسم الهيكل التنظيمي؟",
+                        options: [
+                            "العلاقات الاستشارية والوظائف المساندة غير الإلزامية",
+                            "الوظائف الشاغرة التي لم يُعين فيها موظفون بعد",
+                            "الموظفون الذين صدرت بحقهم عقوبات مسلكية",
+                            "قنوات الاتصال المخصصة للطوارئ والأزمات فقط"
+                        ],
+                        originalCorrect: 0,
+                        reason: "الخط المتقطع في الهياكل التنظيمية يعبر عن التنسيق الاستشاري (Advisory) الذي لا يتضمن سلطة رئاسية مباشرة."
+                    },
+                    {
+                        q: "سؤال 14: من أشهر البرامج والتطبيقات المتخصصة عالمياً في رسم الهياكل التنظيمية والمخططات البيانية المعقدة:",
+                        options: [
+                            "Microsoft Visio و Lucidchart",
+                            "Adobe Audition و Premiere",
+                            "Python و Android Studio",
+                            "VLC Media Player و WinRAR"
+                        ],
+                        originalCorrect: 0,
+                        reason: "وفق ملف الهيكل التنظيمي: أشهر البرامج المتخصصة عالمياً للرسوم المعقدة هي Microsoft Visio و Lucidchart."
+                    },
+                    {
+                        q: "سؤال 15: للشركات الناشئة والمؤسسات البسيطة، يمكن رسم الهياكل التنظيمية بسهولة باستخدام أدوات مثل:",
+                        options: [
+                            "Canva أو Miro",
+                            "AutoCAD أو MATLAB",
+                            "MySQL أو Oracle Database",
+                            "Sublime Text أو Visual Studio"
+                        ],
+                        originalCorrect: 0,
+                        reason: "وفق الملف: توفر أدوات مثل Canva و Miro قوالب مرنة وسريعة للشركات الناشئة لإنشاء المخططات ومشاركتها."
+                    },
+                    {
+                        q: "سؤال 16: تعتمد المؤسسات الكبرى والمتقدمة على تقنيات تولد الهيكل التنظيمي تلقائياً وتحدثه دورياً استناداً إلى:",
+                        options: [
+                            "أنظمة الموارد البشرية المتكاملة (HRMS)",
+                            "منظومات المراقبة بالكاميرات التلفزيونية",
+                            "برامج معالجة الصور الرقمية وتعديلها",
+                            "سجلات الحضور والانصراف الورقية اليومية"
+                        ],
+                        originalCorrect: 0,
+                        reason: "أنظمة (HRMS) المتطورة تولد وتحدث الهيكل تلقائياً بالاعتماد على قواعد بيانات الموظفين والوظائف."
+                    },
+                    {
+                        q: "سؤال 17: ما هو 'الهيكل الوظيفي' (Functional Structure)؟",
+                        options: [
+                            "تقسيم المنظمة وتجميع الوظائف حسب التخصص الفني والمهني (مثل: الشؤون المالية، الموارد البشرية، الشؤون القانونية)",
+                            "تقسيم المنظمة حسب الدول والمناطق الجغرافية فقط",
+                            "إسناد كل موظف لمديرين اثنين في آن واحد",
+                            "إلغاء الإدارات المركزية والاعتماد كلياً على الفرق المتنقلة"
+                        ],
+                        originalCorrect: 0,
+                        reason: "الهيكل الوظيفي هو النمط التقليدي الأكثر انتشاراً ويقوم على تجميع الأعمال المتشابهة في تخصص واحد."
+                    },
+                    {
+                        q: "سؤال 18: يُعرف 'الهيكل القطاعي' (Divisional Structure) بأنه التقسيم القائم على أساس:",
+                        options: [
+                            "المنتج أو الخدمة أو المنطقة الجغرافية أو فئات العملاء",
+                            "المستوى الأكاديمي وسنوات الخبرة للعاملين",
+                            "التسلسل الزمني لأقدمية الموظفين في الدولة",
+                            "التقارب الفكري والسياسي بين أفراد المؤسسة"
+                        ],
+                        originalCorrect: 0,
+                        reason: "الهيكل القطاعي يقسم المؤسسة لوحدات شبه مستقلة تركز على منطقة جغرافية أو خط خدمة أو قطاع متعاملين محدد."
+                    },
+                    {
+                        q: "سؤال 19: ما هي السمة الفريدة لـ 'الهيكل المصفوفي' (Matrix Structure)؟",
+                        options: [
+                            "يجمع بين الهيكل الوظيفي والقطاعي، ويكون للموظف فيه مديران اثنان (مدير وظيفي ومدير مشروع)",
+                            "يخلو تماماً من أي تسلسل هرمي أو إداري للموظفين",
+                            "يمنع الاتصال بين الأقسام إلا بموافقة مجلس الوزراء",
+                            "يقتصر العمل فيه على الأرشيف والتوثيق الورقي"
+                        ],
+                        originalCorrect: 0,
+                        reason: "في الهيكل المصفوفي يرتبط الموظف بمرجعين: رئيسه الوظيفي التخصصي، ومدير المشروع أو القطاع المكلف به."
+                    },
+                    {
+                        q: "سؤال 20: ما هو 'الهيكل المسطح' (Flat Structure) وما فائدته للمؤسسات؟",
+                        options: [
+                            "تقليل المستويات الإدارية الوسيطة لزيادة سرعة اتخاذ القرارات والتواصل المباشر والمرونة",
+                            "زيادة عدد المشرفين والمدراء لإحكام الرقابة الفردية على كل موظف",
+                            "تجميد تفويض الصلاحيات وحصرها بيد المدير التنفيذي فقط",
+                            "إلزام الموظف بالحصول على توقيعات متعددة لكل معاملة بسيطة"
+                        ],
+                        originalCorrect: 0,
+                        reason: "الهيكل المسطح يقلص المستويات الهرمية ويزيل الحواجز الروتينية مما يسرع اتخاذ القرارات ويناسب البيئات الديناميكية."
+                    },
+                    {
+                        q: "سؤال 21: الهيكل التنظيمي الحديث الذي يعتمد على التعهيد (Outsourcing) والعمل عن بُعد والشركاء يسمى:",
+                        options: [
+                            "الهيكل الشبكي (Network Structure)",
+                            "الهيكل الهرمي البيروقراطي",
+                            "الهيكل العسكري الصارم",
+                            "الهيكل التقليدي المغلق"
+                        ],
+                        originalCorrect: 0,
+                        reason: "الهيكل الشبكي يعتمد على مركز قيادي رئيسي يتعاقد مع جهات وفرق خارجية لإنجاز المهام بمرونة وتكلفة أقل."
+                    },
+                    {
+                        q: "سؤال 22: الهيكل الحديث الذي يلغي الهرمية الصارمة ويركز على مجموعات عمل مرنة تتشكل وتتغير حسب متطلبات المشروع هو:",
+                        options: [
+                            "الهيكل الفريقي (Team-based Structure)",
+                            "الهيكل القطاعي الجغرافي",
+                            "الهيكل الوظيفي المغلق",
+                            "الهيكل المركزي الفردي"
+                        ],
+                        originalCorrect: 0,
+                        reason: "الهيكل الفريقي (Team-based) يعتمد على فرق عمل متعددة التخصصات تتمتع بالاستقلالية والسرعة في إنجاز الأهداف."
+                    },
+                    {
+                        q: "سؤال 23: وفقاً لنظرية المفكر التنظيمي الشهير 'هنري مينتزبرغ'، تتكون أي مؤسسة من:",
+                        options: [
+                            "خمسة أجزاء رئيسية (The Five Basic Parts of Organization)",
+                            "ثلاث إدارات مالية وقانونية فقط",
+                            "سبع لجان تنسيقية مشتركة",
+                            "مستويين: إدارة عليا وعمال تنفيذيين"
+                        ],
+                        originalCorrect: 0,
+                        reason: "وضع مينتزبرغ نظريته الشهيرة في التقسيمات الخماسية التي تحلل بنية وتشريح أي منظمة ومصادر القوة فيها."
+                    },
+                    {
+                        q: "سؤال 24: من يمثل 'القمة الاستراتيجية' (Strategic Apex) في التقسيمات الخمسة لمينتزبرغ؟",
+                        options: [
+                            "الإدارة العليا (الوزير، معاونو الوزير، والقيادات المسؤولة عن الرؤية والسياسة الكبرى)",
+                            "الكوادر الميدانية القائمة بتقديم الخدمات المباشرة",
+                            "المحللون التقنيون المسؤولون عن برمجة المنظومات",
+                            "طاقم الخدمات المعاونة والسكرتاريا والسائقين"
+                        ],
+                        originalCorrect: 0,
+                        reason: "القمة الاستراتيجية تضم القيادة العليا التي تتحمل المسؤولية الشاملة وتضمن تحقيق المنظمة لأهدافها الاستراتيجية."
+                    },
+                    {
+                        q: "سؤال 25: ما هو الدور الوظيفي لـ 'الخط الأوسط' (Middle Line) وفق نموذج مينتزبرغ؟",
+                        options: [
+                            "المدراء الذين يربطون القمة الاستراتيجية بالقاعدة التشغيلية وينقلون الأوامر ويشرفون على التنفيذ",
+                            "تقديم المشورة القانونية المستقلة لرئيس الدولة والوزراء",
+                            "تصميم البرمجيات وتدريب الموظفين الجدد حصراً",
+                            "تنظيف وصيانة المقرات الإدارية والبعثات الدبلوماسية"
+                        ],
+                        originalCorrect: 0,
+                        reason: "الخط الأوسط يضم مدراء الإدارات ورؤساء الأقسام، وهو حلقة الوصل الحيوية بين توجيهات القمة وتنفيذ القاعدة."
+                    },
+                    {
+                        q: "سؤال 26: ماذا تمثل 'القاعدة التشغيلية' (Operating Core) في تحليل مينتزبرغ للمنظمات؟",
+                        options: [
+                            "الموظفون التنفيذيون الذين ينتجون ويقدمون الخدمات والمنتجات الأساسية للمؤسسة بشكل مباشر",
+                            "مجلس الإدارة والوزراء ومعاونيهم المشرفين على التخطيط",
+                            "لجان التدقيق والتفتيش المالي الخارجي",
+                            "المستشارون القانونيون في السفارات والبعثات"
+                        ],
+                        originalCorrect: 0,
+                        reason: "القاعدة التشغيلية تمثل الأساس والعمق التنفيذي للمنظمة (مثل الموظفين القائمين بإصدار وتصديق المعاملات القنصلية للمواطنين)."
+                    },
+                    {
+                        q: "سؤال 27: من هم أعضاء 'الهيكل الفني' (Technostructure) في نموذج مينتزبرغ؟",
+                        options: [
+                            "المحللون والخبراء الذين يضعون المعايير ويصممون الإجراءات ويخططون ويدربون العاملين لضبط الجودة",
+                            "الحراس والسائقون وعمال الصيانة الكهربائية",
+                            "المدراء التنفيذيون في البعثات الدبلوماسية الخارجية",
+                            "أعضاء مجلس الشعب واللجان البرلمانية الرقابية"
+                        ],
+                        originalCorrect: 0,
+                        reason: "الهيكل الفني يضم المتخصصين الذين يضعون المعايير التنظيمية وهندسة الإجراءات دون أن يكونوا جزءاً من خط السلطة التنفيذي المباشر."
+                    },
+                    {
+                        q: "سؤال 28: ماذا يقصد بـ 'طاقم الدعم' (Support Staff) في التقسيم الخماسي لمينتزبرغ؟",
+                        options: [
+                            "الوحدات التي تقدم الخدمات المساندة غير المباشرة (مثل العلاقات العامة، الشؤون القانونية، الخدمات الإدارية)",
+                            "القيادات الاستراتيجية التي تصدر الأوامر السيادية",
+                            "المتعاملون والمواطنون الذين يراجعون المؤسسة لطلب الخدمة",
+                            "الأجهزة الرقابية التابعة للجهاز المركزي للرقابة المالية"
+                        ],
+                        originalCorrect: 0,
+                        reason: "طاقم الدعم يقدم خدمات مساندة خارج تيار الإنتاج الأساسي لكنها حيوية لتسهيل عمل المنظمة واستمراريتها."
+                    },
+                    {
+                        q: "سؤال 29: هل يوجد في الفكر الإداري الحديث 'أفضل هيكل تنظيمي' بالمطلق؟",
+                        options: [
+                            "لا يوجد هيكل 'أفضل' بالمطلق، بل يوجد هيكل 'أنسب' يخدم استراتيجية المؤسسة الحالية وحجمها وبيئتها",
+                            "نعم، الهيكل الهرمي الوظيفي الصارم هو الأفضل دائماً لجميع المنظمات",
+                            "نعم، الهيكل المسطح يجب تطبيقه في كل المؤسسات سواء كانت صغيرة أو كبرى",
+                            "نعم، الهيكل الشبكي هو الأفضل والوحيد المناسب للوزارات الحكومية"
+                        ],
+                        originalCorrect: 0,
+                        reason: "وفق ورقة الهيكل التنظيمي: الهيكل الأفضل هو الذي يخدم استراتيجية المنظمة وحجمها وطبيعة نشاطها."
+                    },
+                    {
+                        q: "سؤال 30: ما الفرق بين 'المسمى الوظيفي' (Job Title) و'المسمى الإداري' (Administrative Title)؟",
+                        options: [
+                            "المسمى الوظيفي يصف الدور الفني وطبيعة التخصص، بينما المسمى الإداري يصف المستوى في السلم الهرمي وحجم الصلاحيات",
+                            "المسمى الوظيفي يمنح للمدراء، والمسمى الإداري يمنح لطلاب الجامعات",
+                            "المسمى الوظيفي مؤقت دائماً، بينما المسمى الإداري دائم ولا يتغير إطلاقاً",
+                            "لا يوجد فرق بينهما وهما مصطلحان مترادفان تماماً في اللوائح الإدارية"
+                        ],
+                        originalCorrect: 0,
+                        reason: "الوظيفي يصف التخصص (محاسب، باحث، مترجم)، بينما الإداري يصف المنصب في الهرم (مدير، رئيس قسم، معاون)."
+                    },
+                    {
+                        q: "سؤال 31: عند دمج الاسمين في بطاقة عمل مثل 'مدير مبيعات' أو 'رئيس قسم الترجمة'، فإن الشق الأول يعبر عن:",
+                        options: [
+                            "المسمى الإداري والصلاحية في السلم الهرمي",
+                            "المسمى الوظيفي والتخصص المهني الفني",
+                            "نطاق الإشراف الجغرافي للموظف",
+                            "نوع العقد الوظيفي والدرجة المالية"
+                        ],
+                        originalCorrect: 0,
+                        reason: "'مدير' أو 'رئيس قسم' يمثل المستوى الإداري، بينما 'مبيعات' أو 'ترجمة' يمثل التخصص الفني والوظيفي."
+                    },
+                    {
+                        q: "سؤال 32: أي من أنواع الهياكل التنظيمية يُعد الأنسب للمؤسسات الناشئة والمرنة وفق الورقة؟",
+                        options: [
+                            "الهيكل المسطح (Flat Structure) نظراً لمرونته وسرعة اتخاذ القرار فيه",
+                            "الهيكل الهرمي متعدد الطبقات المعقد",
+                            "الهيكل البيروقراطي المغلق شديد المركزية",
+                            "الهيكل القطاعي المتشعب جغرافياً"
+                        ],
+                        originalCorrect: 0,
+                        reason: "تناسب الهياكل المسطحة المؤسسات الصغيرة والناشئة لمرونتها وغياب التعقيدات الإدارية والبيروقراطية المفرطة."
+                    }
+                ]
+            }
+        ];
+
+        // خوارزمية الخلط العشوائي الحقيقي (Fisher-Yates Shuffle Engine)
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        // تجهيز مصفوفة الأسئلة بعد خلط الأسئلة وخلط الخيارات عشوائياً لكل قسم
+        let quizData = [];
+
+        function prepareQuizEngine() {
+            quizData = rawQuizData.map(sec => {
+                // عمل نسخة من أسئلة القسم وخلط ترتيب الأسئلة عشوائياً
+                const questionsCopy = [...sec.questions];
+                shuffleArray(questionsCopy);
+
+                // خلط الخيارات الأربعة لكل سؤال عشوائياً وتتبع الجواب الصحيح بدقة
+                const preparedQuestions = questionsCopy.map(qObj => {
+                    const optionsWithFlag = qObj.options.map((optText, origIdx) => ({
+                        text: optText,
+                        isCorrect: (origIdx === qObj.originalCorrect)
+                    }));
+
+                    shuffleArray(optionsWithFlag);
+
+                    const finalOptions = optionsWithFlag.map(o => o.text);
+                    const finalCorrectIndex = optionsWithFlag.findIndex(o => o.isCorrect);
+
+                    return {
+                        q: qObj.q,
+                        options: finalOptions,
+                        correct: finalCorrectIndex,
+                        reason: qObj.reason
+                    };
+                });
+
+                return {
+                    sectionId: sec.sectionId,
+                    sectionName: sec.sectionName,
+                    questions: preparedQuestions
+                };
+            });
+        }
+
+        // حالة التطبيق وتتبع التقدم
+        let activeSection = 0; // 0, 1, 2
+        let currentQuestionIdx = 0; 
+        let wrongIndicesList = [];
+
+        // تتبع الإجابات: 3 أقسام بعدد أسئلتها الفعلي (25، 25، 32)
+        let userProgress = [
+            new Array(25).fill(null),
+            new Array(25).fill(null),
+            new Array(32).fill(null)
+        ];
+
+        // إحصائيات عامة
+        let totalCorrect = 0;
+        let totalIncorrect = 0;
+
+        // مراجع عناصر الواجهة
+        const headerCorrectEl = document.getElementById("header-correct");
+        const headerIncorrectEl = document.getElementById("header-incorrect");
+        const headerQIndexEl = document.getElementById("header-q-index");
+        const headerQTotalEl = document.getElementById("header-q-total");
+        const sectionProgressEl = document.getElementById("section-progress");
+        const sectionTagEl = document.getElementById("section-tag");
+        const qNumberTitleEl = document.getElementById("q-number-title");
+        const qTotalTitleEl = document.getElementById("q-total-title");
+        const questionTextEl = document.getElementById("question-text");
+        const optionsContainerEl = document.getElementById("options-container");
+        const explanationBoxEl = document.getElementById("explanation-box");
+        const explanationTitleEl = document.getElementById("explanation-title");
+        const explanationTextEl = document.getElementById("explanation-text");
+        const explanationIconEl = document.getElementById("explanation-icon");
+        const prevBtn = document.getElementById("prev-btn");
+        const nextBtn = document.getElementById("next-btn");
+        const quizBoxEl = document.getElementById("quiz-box");
+        const summaryBoxEl = document.getElementById("summary-box");
+        const matrixGridEl = document.getElementById("matrix-grid");
+        const matrixModalEl = document.getElementById("matrix-modal");
+
+        function initApp() {
+            prepareQuizEngine();
+            renderSectionTabs();
+            loadQuestion(0);
+        }
+
+        function renderSectionTabs() {
+            for (let i = 0; i < 3; i++) {
+                const tab = document.getElementById(`sec-tab-${i}`);
+                if (i === activeSection) {
+                    tab.classList.add("active");
+                } else {
+                    tab.classList.remove("active");
+                }
+            }
+        }
+
+        function switchSection(secIndex) {
+            activeSection = secIndex;
+            currentQuestionIdx = 0;
+            renderSectionTabs();
+            resumeCurrentSection();
+            loadQuestion(0);
+        }
+
+        function loadQuestion(idx) {
+            currentQuestionIdx = idx;
+            const currentSecData = quizData[activeSection];
+            const secTotal = currentSecData.questions.length;
+            const qItem = currentSecData.questions[idx];
+            const state = userProgress[activeSection][idx];
+
+            sectionTagEl.textContent = currentSecData.sectionName;
+            qNumberTitleEl.textContent = idx + 1;
+            qTotalTitleEl.textContent = secTotal;
+            headerQIndexEl.textContent = idx + 1;
+            headerQTotalEl.textContent = secTotal;
+
+            const pct = ((idx + 1) / secTotal) * 100;
+            sectionProgressEl.style.width = `${pct}%`;
+
+            questionTextEl.textContent = qItem.q;
+
+            // إمكانية التخطي أو الرجوع والتالي بحرية تامة
+            prevBtn.disabled = (idx === 0);
+            if (idx === secTotal - 1) {
+                nextBtn.textContent = state ? "عرض ملخص القسم" : "إنهاء القسم";
+            } else {
+                nextBtn.textContent = "التالي";
+            }
+
+            optionsContainerEl.innerHTML = "";
+            const letters = ["أ", "ب", "ج", "د"];
+
+            qItem.options.forEach((optText, optIdx) => {
+                const btn = document.createElement("button");
+                btn.className = "option-btn w-full text-right p-4 rounded-xl flex items-center justify-between text-sm sm:text-base font-medium";
+
+                btn.innerHTML = `
+                    <div class="flex items-center gap-3">
+                        <span class="w-7 h-7 flex-shrink-0 flex items-center justify-center rounded-lg bg-[#272a30] text-gray-300 font-bold text-xs sm:text-sm">
+                            ${letters[optIdx]}
+                        </span>
+                        <span class="text-gray-200">${optText}</span>
+                    </div>
+                `;
+
+                if (state !== null) {
+                    btn.disabled = true;
+                    if (optIdx === qItem.correct) {
+                        btn.classList.add("correct");
+                    }
+                    if (optIdx === state.selectedIndex && !state.isCorrect) {
+                        btn.classList.add("incorrect");
+                    }
+                } else {
+                    btn.onclick = () => handleAnswer(optIdx);
+                }
+
+                optionsContainerEl.appendChild(btn);
+            });
+
+            if (state !== null) {
+                displayExplanation(state.isCorrect, qItem.reason);
+            } else {
+                explanationBoxEl.classList.add("hidden");
+            }
+
+            updateGlobalStats();
+        }
+
+        function handleAnswer(selectedIdx) {
+            const qItem = quizData[activeSection].questions[currentQuestionIdx];
+            const isCorrect = (selectedIdx === qItem.correct);
+
+            userProgress[activeSection][currentQuestionIdx] = {
+                selectedIndex: selectedIdx,
+                isCorrect: isCorrect
+            };
+
+            recalcStats();
+            loadQuestion(currentQuestionIdx);
+        }
+
+        function displayExplanation(isCorrect, reason) {
+            explanationBoxEl.classList.remove("hidden");
+            if (isCorrect) {
+                explanationBoxEl.className = "rounded-xl border p-4 text-sm leading-relaxed transition-all duration-300 bg-emerald-950/40 border-emerald-700/60 text-emerald-300";
+                explanationTitleEl.textContent = "إجابة صحيحة ومطابقة للسند الإداري! ✨";
+                explanationTitleEl.className = "font-bold text-sm mb-1 text-emerald-400";
+                explanationIconEl.textContent = "✔";
+            } else {
+                explanationBoxEl.className = "rounded-xl border p-4 text-sm leading-relaxed transition-all duration-300 bg-rose-950/40 border-rose-800/60 text-rose-300";
+                explanationTitleEl.textContent = "إجابة خاطئة! السند المعرفي المعتمد:";
+                explanationTitleEl.className = "font-bold text-sm mb-1 text-rose-400";
+                explanationIconEl.textContent = "✖";
+            }
+            explanationTextEl.textContent = reason;
+        }
+
+        function recalcStats() {
+            totalCorrect = 0;
+            totalIncorrect = 0;
+            for (let s = 0; s < quizData.length; s++) {
+                for (let q = 0; q < quizData[s].questions.length; q++) {
+                    const st = userProgress[s][q];
+                    if (st !== null) {
+                        if (st.isCorrect) totalCorrect++;
+                        else totalIncorrect++;
+                    }
+                }
+            }
+            updateGlobalStats();
+        }
+
+        function updateGlobalStats() {
+            headerCorrectEl.textContent = totalCorrect;
+            headerIncorrectEl.textContent = totalIncorrect;
+        }
+
+        function handleNext() {
+            const secTotal = quizData[activeSection].questions.length;
+            if (currentQuestionIdx < secTotal - 1) {
+                loadQuestion(currentQuestionIdx + 1);
+            } else {
+                showSectionSummary();
+            }
+        }
+
+        function handlePrev() {
+            if (currentQuestionIdx > 0) {
+                loadQuestion(currentQuestionIdx - 1);
+            }
+        }
+
+        function showSectionSummary() {
+            quizBoxEl.classList.add("hidden");
+            document.querySelector("footer").classList.add("hidden");
+            summaryBoxEl.classList.remove("hidden");
+
+            const secTotal = quizData[activeSection].questions.length;
+            let secCorrect = 0;
+            let secWrong = 0;
+            wrongIndicesList = [];
+
+            for (let i = 0; i < secTotal; i++) {
+                const item = userProgress[activeSection][i];
+                if (item !== null) {
+                    if (item.isCorrect) secCorrect++;
+                    else {
+                        secWrong++;
+                        wrongIndicesList.push(i);
+                    }
+                }
+            }
+
+            document.getElementById("summary-title").textContent = `ملخص: ${quizData[activeSection].sectionName}`;
+            document.getElementById("sum-correct").textContent = secCorrect;
+            document.getElementById("sum-wrong").textContent = secWrong;
+            const pct = Math.round((secCorrect / secTotal) * 100);
+            document.getElementById("sum-percent").textContent = `${pct}%`;
+
+            const totalExamQuestions = 25 + 25 + 32; // 82 سؤالاً
+            const totalAnswered = totalCorrect + totalIncorrect;
+            document.getElementById("overall-total-score").textContent = `${totalCorrect} صحيحة من أصل ${totalAnswered} مجابة (من إجمالي ${totalExamQuestions} سؤال)`;
+
+            const wrongBtn = document.getElementById("summary-wrong-only-btn");
+            if (wrongIndicesList.length > 0) {
+                wrongBtn.classList.remove("hidden");
+            } else {
+                wrongBtn.classList.add("hidden");
+            }
+
+            const nextSecBtn = document.getElementById("summary-next-sec-btn");
+            if (activeSection < 2) {
+                nextSecBtn.textContent = `الانتقال إلى القسم ${activeSection + 2}`;
+                nextSecBtn.classList.remove("hidden");
+            } else {
+                nextSecBtn.textContent = "العودة للقسم الأول للمراجعة الشاملة";
+            }
+        }
+
+        function resumeCurrentSection() {
+            summaryBoxEl.classList.add("hidden");
+            quizBoxEl.classList.remove("hidden");
+            document.querySelector("footer").classList.remove("hidden");
+        }
+
+        function reviewWrongOnly() {
+            if (wrongIndicesList.length > 0) {
+                resumeCurrentSection();
+                loadQuestion(wrongIndicesList[0]);
+            }
+        }
+
+        function goToNextSection() {
+            if (activeSection < 2) {
+                switchSection(activeSection + 1);
+            } else {
+                switchSection(0);
+            }
+        }
+
+        function toggleMatrixModal() {
+            if (matrixModalEl.classList.contains("hidden")) {
+                populateMatrixGrid();
+                matrixModalEl.classList.remove("hidden");
+            } else {
+                matrixModalEl.classList.add("hidden");
+            }
+        }
+
+        function populateMatrixGrid() {
+            matrixGridEl.innerHTML = "";
+            const secTotal = quizData[activeSection].questions.length;
+            for (let i = 0; i < secTotal; i++) {
+                const btn = document.createElement("button");
+                btn.className = "q-matrix-btn text-xs font-bold py-2 rounded-lg border text-center transition flex flex-col items-center justify-center";
+                
+                const state = userProgress[activeSection][i];
+                if (i === currentQuestionIdx) {
+                    btn.classList.add("current");
+                }
+
+                if (state === null) {
+                    btn.classList.add("bg-[#202227]", "border-[#353941]", "text-gray-300", "hover:bg-[#2b2e35]");
+                } else if (state.isCorrect) {
+                    btn.classList.add("bg-emerald-950/70", "border-emerald-600", "text-emerald-300");
+                } else {
+                    btn.classList.add("bg-rose-950/70", "border-rose-600", "text-rose-300");
+                }
+
+                btn.textContent = (i + 1);
+                btn.onclick = () => {
+                    toggleMatrixModal();
+                    resumeCurrentSection();
+                    loadQuestion(i);
+                };
+
+                matrixGridEl.appendChild(btn);
+            }
+        }
+
+        function resetCurrentQuiz() {
+            userProgress = [
+                new Array(25).fill(null),
+                new Array(25).fill(null),
+                new Array(32).fill(null)
+            ];
+            totalCorrect = 0;
+            totalIncorrect = 0;
+            prepareQuizEngine();
+            switchSection(0);
+        }
+
+        function copyShareLink() {
+            const toast = document.getElementById("toast");
+            try {
+                const dummy = document.createElement("input");
+                document.body.appendChild(dummy);
+                dummy.value = window.location.href;
+                dummy.select();
+                document.execCommand("copy");
+                document.body.removeChild(dummy);
+
+                toast.classList.remove("hidden");
+                setTimeout(() => toast.classList.add("hidden"), 2500);
+            } catch (e) {
+                console.error("تعذر النسخ");
+            }
+        }
+
+        window.onload = function() {
+            initApp();
+        };
+    </script>
+</body>
+</html>

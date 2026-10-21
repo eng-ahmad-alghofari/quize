@@ -1,0 +1,1507 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>الاختبار التفاعلي الشامل - مسابقة وزارة الخارجية السورية</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- خطوط عربية متناسقة وواضحة -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Cairo', 'Tajawal', sans-serif;
+            background-color: #121316;
+            color: #e2e4e9;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+        .canvas-card {
+            background-color: #1a1c20;
+            border: 1px solid #282b30;
+        }
+        .option-btn {
+            background-color: #1e2025;
+            border: 1px solid #2e3238;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .option-btn:hover:not(:disabled) {
+            background-color: #272a30;
+            border-color: #3f444d;
+            transform: translateY(-1px);
+        }
+        .option-btn.correct {
+            background-color: rgba(16, 185, 129, 0.15) !important;
+            border-color: #10b981 !important;
+            color: #34d399 !important;
+            box-shadow: 0 0 12px rgba(16, 185, 129, 0.2);
+        }
+        .option-btn.incorrect {
+            background-color: rgba(239, 68, 68, 0.15) !important;
+            border-color: #ef4444 !important;
+            color: #f87171 !important;
+            box-shadow: 0 0 12px rgba(239, 68, 68, 0.2);
+        }
+        .nav-chip {
+            transition: all 0.2s ease;
+        }
+        .nav-chip.active {
+            background-color: #2563eb;
+            color: #ffffff;
+            border-color: #3b82f6;
+            box-shadow: 0 2px 8px rgba(37, 99, 235, 0.4);
+        }
+        .q-matrix-btn.current {
+            outline: 2px solid #3b82f6;
+            outline-offset: 2px;
+        }
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #121316;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #2b2e34;
+            border-radius: 9999px;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between selection:bg-blue-600 selection:text-white">
+
+    <!-- الشريط العلوي والتنقل -->
+    <header class="w-full border-b border-[#26282e] bg-[#16181c] px-4 py-3 sticky top-0 z-50 shadow-lg">
+        <div class="max-w-6xl mx-auto flex flex-col gap-3">
+            
+            <!-- السطر الأول: الإجراءات، العنوان، العداد والمؤقت -->
+            <div class="flex flex-wrap items-center justify-between gap-3">
+                <div class="flex items-center gap-2">
+                    <button onclick="copyShareLink()" class="text-xs bg-[#202227] hover:bg-[#2a2d33] text-blue-300 border border-[#32363e] px-3 py-1.5 rounded-full transition font-medium flex items-center gap-1.5 shadow-sm">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/>
+                        </svg>
+                        مشاركة
+                    </button>
+                    <div id="toast" class="hidden text-xs bg-emerald-950 border border-emerald-600 text-emerald-300 px-2.5 py-1 rounded-md">
+                        تم نسخ الرابط!
+                    </div>
+                </div>
+
+                <div class="text-center">
+                    <h1 class="text-sm sm:text-base md:text-lg font-bold text-gray-100 flex items-center justify-center gap-2">
+                        <span>مسابقة وزارة الخارجية السورية - المعهد الدبلوماسي والتنمية الإدارية</span>
+                    </h1>
+                </div>
+
+                <!-- العداد والمؤقت -->
+                <div class="flex items-center gap-2 sm:gap-3">
+                    <div class="flex items-center gap-1.5 bg-[#1f2228] border border-[#353a42] text-amber-300 text-xs sm:text-sm font-semibold px-2.5 py-1 rounded-full">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <span id="exam-timer">60:00</span>
+                    </div>
+
+                    <div class="flex items-center gap-1 bg-[#12281c] border border-[#1b5e20] text-emerald-400 text-xs sm:text-sm font-bold px-2.5 py-1 rounded-full">
+                        <span id="header-correct">0</span>
+                        <span class="text-xs">✔</span>
+                    </div>
+                    <div class="flex items-center gap-1 bg-[#2e1515] border border-[#7f1d1d] text-rose-400 text-xs sm:text-sm font-bold px-2.5 py-1 rounded-full">
+                        <span id="header-incorrect">0</span>
+                        <span class="text-xs">✖</span>
+                    </div>
+                    <div class="text-xs sm:text-sm font-medium text-gray-300 bg-[#202227] px-2.5 py-1 rounded-full border border-[#32363e]">
+                        <span id="header-q-index">1</span> / 25
+                    </div>
+                </div>
+            </div>
+
+            <!-- ألسنة الأقسام الثلاثة -->
+            <div class="flex items-center gap-2 overflow-x-auto pb-1 text-xs sm:text-sm scrollbar-none">
+                <button onclick="switchSection(0)" id="sec-tab-0" class="nav-chip active flex-shrink-0 px-3.5 py-1.5 rounded-full border border-[#33373f] font-medium bg-[#1e2025] text-gray-300 hover:text-white">
+                    القسم 1: الحوكمة والعمل الدبلوماسي (25)
+                </button>
+                <button onclick="switchSection(1)" id="sec-tab-1" class="nav-chip flex-shrink-0 px-3.5 py-1.5 rounded-full border border-[#33373f] font-medium bg-[#1e2025] text-gray-300 hover:text-white">
+                    القسم 2: إدارة العمليات والمؤسسات الحكومية (25)
+                </button>
+                <button onclick="switchSection(2)" id="sec-tab-2" class="nav-chip flex-shrink-0 px-3.5 py-1.5 rounded-full border border-[#33373f] font-medium bg-[#1e2025] text-gray-300 hover:text-white">
+                    القسم 3: محاضرات المعهد الدبلوماسي والهندرة (25)
+                </button>
+            </div>
+
+            <!-- شريط التقدم للقسم الحالي -->
+            <div class="w-full bg-[#202227] h-1.5 rounded-full overflow-hidden">
+                <div id="section-progress" class="bg-blue-600 h-full w-[4%] transition-all duration-300 ease-out"></div>
+            </div>
+        </div>
+    </header>
+
+    <!-- منطقة المحتوى الرئيسية -->
+    <main class="max-w-4xl w-full mx-auto p-4 sm:p-6 flex-grow flex flex-col justify-center">
+
+        <!-- صندوق السؤال التفاعلي -->
+        <div id="quiz-box" class="space-y-6">
+
+            <div class="flex flex-wrap items-center justify-between gap-2 border-b border-[#26282e] pb-3">
+                <div class="flex items-center gap-2">
+                    <span id="section-tag" class="text-xs font-semibold px-2.5 py-1 rounded bg-blue-950/70 border border-blue-700/60 text-blue-300">
+                        القسم الأول
+                    </span>
+                    <span class="text-xs text-gray-400 font-medium">
+                        السؤال رقم <span id="q-number-title">1</span> من 25
+                    </span>
+                </div>
+                <button onclick="toggleMatrixModal()" class="text-xs bg-[#202227] hover:bg-[#2b2e35] text-gray-300 border border-[#353941] px-2.5 py-1 rounded-md transition flex items-center gap-1.5">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/>
+                    </svg>
+                    فهرس أسئلة القسم
+                </button>
+            </div>
+
+            <!-- نص السؤال -->
+            <div>
+                <h2 id="question-text" class="text-base sm:text-lg md:text-xl font-bold leading-relaxed text-gray-100">
+                    جاري تحميل السؤال...
+                </h2>
+            </div>
+
+            <!-- شبكة الخيارات الأربعة -->
+            <div id="options-container" class="grid grid-cols-1 gap-3 pt-1">
+                <!-- يتم توليد الأزرار برمجياً -->
+            </div>
+
+            <!-- صندوق الشرح والتعليل المعرفي -->
+            <div id="explanation-box" class="hidden rounded-xl border p-4 text-sm leading-relaxed transition-all duration-300">
+                <div class="flex items-start gap-3">
+                    <div id="explanation-icon" class="text-xl">💡</div>
+                    <div class="flex-1">
+                        <h4 id="explanation-title" class="font-bold text-sm mb-1">السند الأكاديمي والمهني:</h4>
+                        <p id="explanation-text" class="text-gray-300 text-xs sm:text-sm"></p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- شاشة ملخص نتائج القسم -->
+        <div id="summary-box" class="hidden canvas-card rounded-2xl p-6 sm:p-10 text-center space-y-6 shadow-2xl">
+            <div class="text-5xl">📊</div>
+            <h2 id="summary-title" class="text-2xl sm:text-3xl font-extrabold text-white">ملخص أداء القسم</h2>
+            <p id="summary-subtitle" class="text-gray-400 text-sm max-w-lg mx-auto">
+                تم الانتهاء من أسئلة هذا القسم بنجاح. يمكنك استعراض نتيجتك أو مراجعة الأسئلة الخاطئة فقط.
+            </p>
+
+            <div class="grid grid-cols-3 gap-3 max-w-lg mx-auto py-2">
+                <div class="bg-[#12281c] border border-[#1b5e20] p-4 rounded-xl">
+                    <span id="sum-correct" class="block text-2xl font-black text-emerald-400">0</span>
+                    <span class="text-xs text-gray-300">إجابة صحيحة</span>
+                </div>
+                <div class="bg-[#2e1515] border border-[#7f1d1d] p-4 rounded-xl">
+                    <span id="sum-wrong" class="block text-2xl font-black text-rose-400">0</span>
+                    <span class="text-xs text-gray-300">إجابة خاطئة</span>
+                </div>
+                <div class="bg-[#162744] border border-[#1e40af] p-4 rounded-xl">
+                    <span id="sum-percent" class="block text-2xl font-black text-blue-400">0%</span>
+                    <span class="text-xs text-gray-300">النسبة المئوية</span>
+                </div>
+            </div>
+
+            <div class="bg-[#202227] border border-[#32363e] p-3 rounded-xl max-w-md mx-auto text-xs text-gray-300">
+                إجمالي الاختبار الكامل (75 سؤالاً): 
+                <span id="overall-total-score" class="font-bold text-white">0 / 75</span>
+            </div>
+
+            <div class="flex flex-wrap justify-center gap-3 pt-2">
+                <button onclick="resumeCurrentSection()" class="px-5 py-2.5 bg-[#25282f] hover:bg-[#30343d] text-gray-200 font-medium rounded-xl text-xs sm:text-sm border border-[#3a3f47] transition">
+                    مراجعة أسئلة القسم
+                </button>
+                <button id="summary-wrong-only-btn" onclick="reviewWrongOnly()" class="px-5 py-2.5 bg-rose-950 hover:bg-rose-900 text-rose-200 font-medium rounded-xl text-xs sm:text-sm border border-rose-800 transition">
+                    مراجعة الأخطاء فقط ✖
+                </button>
+                <button id="summary-next-sec-btn" onclick="goToNextSection()" class="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-xl text-xs sm:text-sm shadow-md transition">
+                    الانتقال للقسم التالي
+                </button>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- شريط التحكم السفلي -->
+    <footer class="w-full border-t border-[#26282e] bg-[#16181c] px-4 py-3 sticky bottom-0 z-40">
+        <div class="max-w-4xl mx-auto flex items-center justify-between">
+            <button id="prev-btn" onclick="handlePrev()" disabled class="px-5 py-2 text-xs sm:text-sm font-semibold rounded-lg bg-[#202227] text-gray-500 border border-[#32363e] disabled:opacity-30 disabled:cursor-not-allowed hover:enabled:bg-[#2a2d33] hover:enabled:text-white transition">
+                رجوع
+            </button>
+            
+            <span class="text-xs text-gray-400 hidden sm:inline-block">
+                اختر إجابة واحدة لمعرفة السند المعرفي الفوري
+            </span>
+
+            <button id="next-btn" onclick="handleNext()" class="px-7 py-2 text-xs sm:text-sm font-semibold rounded-lg bg-blue-600 hover:bg-blue-700 text-white shadow transition">
+                التالي
+            </button>
+        </div>
+    </footer>
+
+    <!-- نافذة فهرس الأسئلة (Drawer Matrix) -->
+    <div id="matrix-modal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="canvas-card w-full max-w-md rounded-2xl p-5 border border-[#353941] shadow-2xl space-y-4">
+            <div class="flex items-center justify-between border-b border-[#282b30] pb-3">
+                <h3 class="font-bold text-sm text-gray-200">فهرس أسئلة القسم الحالي (25 سؤال)</h3>
+                <button onclick="toggleMatrixModal()" class="text-gray-400 hover:text-white text-lg font-bold">&times;</button>
+            </div>
+            <p class="text-xs text-gray-400">انقر على رقم السؤال للانتقال المباشر إليه:</p>
+            <div id="matrix-grid" class="grid grid-cols-5 gap-2 max-h-64 overflow-y-auto p-1">
+                <!-- مربعات الأسئلة الـ 25 -->
+            </div>
+            <div class="flex items-center justify-between text-xs pt-2 border-t border-[#282b30] text-gray-400">
+                <div class="flex items-center gap-1"><span class="w-3 h-3 rounded bg-emerald-950 border border-emerald-500 inline-block"></span> صحيح</div>
+                <div class="flex items-center gap-1"><span class="w-3 h-3 rounded bg-rose-950 border border-rose-500 inline-block"></span> خاطئ</div>
+                <div class="flex items-center gap-1"><span class="w-3 h-3 rounded bg-[#202227] border border-[#32363e] inline-block"></span> لم يُحل</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- المحرك البرمجي وبنك الأسئلة المتوازن -->
+    <script>
+        // بنك الأسئلة الكامل (75 سؤالاً) مع توازن دقيق في طول الخيارات وصياغتها وتوزيع الإجابة الأصلية
+        const rawQuizData = [
+            // SECTION 1: الحوكمة والعمل الدبلوماسي (25 سؤالاً)
+            {
+                sectionId: 0,
+                sectionName: "الحوكمة والعمل الدبلوماسي",
+                questions: [
+                    {
+                        q: "ما هو السبب المنهجي لعدم تدخل الحوكمة في تفاصيل الإدارة اليومية للمؤسسات الحكومية؟",
+                        options: [
+                            "لأن التفاصيل اليومية تتطلب تفرغاً رقابياً حصرياً من الجهاز المركزي للرقابة المالية",
+                            "لأن الانغماس في التفاصيل الروتينية يضعف فاعلية الحوكمة الإشرافية والتوجيهية ولا يقويها",
+                            "لأن الإجراءات التنفيذية اليومية لا تخضع للمساءلة القانونية بموجب اللوائح الإدارية",
+                            "لأن دور الحوكمة يقتصر دستورياً على توقيع المعاهدات الدبلوماسية مع الدول الخارجية"
+                        ],
+                        originalCorrect: 1, // ب
+                        reason: "لا تتدخل الحوكمة في الإدارة اليومية لأن التحكم في التفاصيل اليومية يضعف الحوكمة التوجيهية والرقابية ولا يقويها."
+                    },
+                    {
+                        q: "ما هو الفارق الجوهري والدقيق بين مصطلحي 'الحكومة' (Government) و'الحوكمة' (Governance)؟",
+                        options: [
+                            "الحكومة هي المنظومة التشريعية القضائية، والحوكمة هي السلطة التنفيذية الميدانية في الوزارات",
+                            "الحكومة تعبر عن السياسات الخارجية، والحوكمة تعبر عن البرامج الانتخابية للأحزاب الوطنية",
+                            "الحكومة تمثل الجهاز أو المؤسسات التي تمارس السلطة، بينما الحوكمة هي آليات الإدارة وصنع القرار",
+                            "الحكومة تختص بإدارة الموارد المالية فقط، بينما الحوكمة تشرف على التعيينات الدبلوماسية حصراً"
+                        ],
+                        originalCorrect: 2, // ج
+                        reason: "الحكومة تعني الهيكل أو المؤسسات الممارسة للسلطة، بينما الحوكمة تعني الآليات والمنهجية التي تُدار بها الدولة والمؤسسات."
+                    },
+                    {
+                        q: "يتحقق ركن 'الشفافية' (Transparency) في إدارة الشأن العام والدبلوماسي من خلال:",
+                        options: [
+                            "حصر المعاملات الرسمية ضمن قنوات ورقية محكمة منعاً لتسريب الخطط الإدارية",
+                            "إتاحة المعلومات المتعلقة بقرارات المؤسسات وإجراءاتها بدقة وفي الوقت المناسب وفق القانون",
+                            "نشر المراسلات والمفاوضات السياسية السرية فوراً في وسائل الإعلام دون أي قيود",
+                            "تفويض الموظف التنفيذي باتخاذ القرارات العامة بناءً على تقديراته الذاتية غير المعلنة"
+                        ],
+                        originalCorrect: 1, // ب
+                        reason: "الشفافية تعني إتاحة المعلومات والبيانات بصورة واضحة ودقيقة وفي الوقت المناسب ضمن الحدود القانونية."
+                    },
+                    {
+                        q: "ما هو الشرط المؤسسي الحاسم لضمان فاعلية لجنة التحقيق في المخالفات تحقيقاً لركن 'المساءلة'؟",
+                        options: [
+                            "أن تكون اللجنة تابعة بالكامل للإدارة الخاضعة للتحقيق لضمان سرية النتائج الداخلية",
+                            "أن تتشكل اللجنة حصراً من أعضاء السلك الدبلوماسي لتفادي أي احتكاك مع القضاء",
+                            "أن تقتصر صلاحيات اللجنة على رفع التوصيات الشفهية إلى الوزير دون محاضر مكتوبة",
+                            "أن تكون اللجنة مستقلة ومحايدة وتخضع لإجراءات واضحة وتستمد سلطتها من القانون حصراً"
+                        ],
+                        originalCorrect: 3, // د
+                        reason: "المساءلة تتطلب وجود لجان تحقيق مستقلة ومحايدة تخضع لإجراءات قانونية واضحة ولا سلطة عليها إلا القانون."
+                    },
+                    {
+                        q: "أي من الحزم التالية تمثل العناصر المؤسسية الجوهرية لمبدأ 'سيادة القانون' (Rule of Law)؟",
+                        options: [
+                            "سمو القانون، المساواة أمامه، استقلال القضاء، واليقين القانوني، والفصل بين السلطات",
+                            "المرونة المطلقة في تجاوز النصوص التشريعية متى اقتضت متطلبات السرعة الإدارية ذلك",
+                            "حصر الرقابة القانونية في الأجهزة التنفيذية التابعة للوزارات دون تدخل المحاكم",
+                            "منح المسؤول الإداري حصانة دائمة من أي تتبع قضائي خلال فترة توليه المنصب العام"
+                        ],
+                        originalCorrect: 0, // أ
+                        reason: "عناصر سيادة القانون: خضوع الجميع للقانون، سمو القانون، استقلال القضاء، عدم التعسف، واليقين القانوني والفصل بين السلطات."
+                    },
+                    {
+                        q: "تتحقق 'المشاركة' (Participation) كركيزة للحوكمة الرشيدة في صياغة السياسات العامة عبر:",
+                        options: [
+                            "إلغاء جلسات التشاور واستبدالها بالتعليمات الإدارية المباشرة والموجزة لسرعة التنفيذ",
+                            "حصر النقاشات في المجالس المغلقة لمنع تشتت الآراء بين أصحاب المصلحة والمجتمع",
+                            "تفعيل الاستشارات العامة، وإشراك المجتمع المدني والنقابات وقنوات الشكاوى والمقترحات",
+                            "تقليص اللقاءات التفاعلية مع المواطنين لحماية هيبة المؤسسات الحكومية في الدولة"
+                        ],
+                        originalCorrect: 2, // ج
+                        reason: "المشاركة تعني إشراك المواطنين وأصحاب المصلحة عبر الاستشارات العامة والانتخابات والنقابات ومنظمات المجتمع المدني."
+                    },
+                    {
+                        q: "ما هو التوصيف العلمي الدقيق الذي يفرق بين مفهومي 'الكفاءة' و'الفعالية' في إدارة الموارد؟",
+                        options: [
+                            "الكفاءة تركز على النزاهة الأخلاقية، والفعالية تركز على تقليل الإنفاق المالي في المؤسسة",
+                            "الكفاءة هي تحقيق أفضل استخدام للموارد المتاحة وترشيدها، والفعالية هي بلوغ الأهداف والنتائج المرجوة",
+                            "الكفاءة تعني الالتزام بمواعيد الدوام، والفعالية تعني أتمتة الوثائق والسجلات الحكومية",
+                            "الكفاءة تختص بالقطاع الخاص الربحي فقط، والفعالية تختص بالوزارات والهيئات الحكومية"
+                        ],
+                        originalCorrect: 1, // ب
+                        reason: "الكفاءة (Efficiency): أفضل استثمار للموارد بأقل كلفة وهدر. الفعالية (Effectiveness): مدى الوصول للنتائج والأهداف المخططة."
+                    },
+                    {
+                        q: "عند وجود مصلحة مالية شخصية لمسؤول في قرار إداري رسمي يتولى دراسته، فإن المعيار الأخلاقي للحوكمة يفرض:",
+                        options: [
+                            "تسريع إقرار المعاملة وتوثيقها باسم موظف بديل دون الحاجة لتسجيل أي إفصاح مالي",
+                            "الإفصاح الفوري عن الحالة والتنحي التام عن اتخاذ القرار وتطبيق قواعد الرقابة التنظيمية",
+                            "الاحتفاظ بسرية المصلحة الشخصية والاعتماد على الضمير المهني المجرد لتفادي أي شبهة",
+                            "تحويل المعاملة مباشرة إلى محكمة الجنايات باعتبار مجرد وجود المصلحة جريمة منتهية"
+                        ],
+                        originalCorrect: 1, // ب
+                        reason: "تضارب المصالح يوجب نظامياً: الإفصاح، التنحي التام عن اتخاذ القرار، وإخضاع الأمر للرقابة والقواعد النظامية."
+                    },
+                    {
+                        q: "أي من الحالات التالية تندرج مباشرة تحت المظلة القانونية لصور الفساد الواجب مكافحتها؟",
+                        options: [
+                            "الرشوة، الاختلاس، المحسوبية، استغلال النفوذ، إساءة استعمال السلطة، وتضارب المصالح",
+                            "استخدام التكنولوجيا في تبسيط الإجراءات وتخفيض خطوات تقديم الخدمات القنصلية",
+                            "إجراء التدقيق المالي الداخلي الدوري وفحص السجلات الحسابية للمؤسسات العامة",
+                            "تطبيق التوصيف الوظيفي الدقيق وإلزام العاملين باحترام التسلسل الرئاسي المعتمد"
+                        ],
+                        originalCorrect: 0, // أ
+                        reason: "صور الفساد تشمل: الرشوة، الاختلاس، المحسوبية، استغلال النفوذ، إساءة استعمال السلطة، الإثراء غير المشروع، وتضارب المصالح."
+                    },
+                    {
+                        q: "ما هو الفرق الوظيفي بين 'الرقابة الداخلية' و'الرقابة الخارجية' في الوزارات الحكومية؟",
+                        options: [
+                            "الداخلية تشرف على السفارات بالخارج، والخارجية تشرف على الإدارات والمكاتب المركزية في العاصمة",
+                            "الداخلية تنفذها إدارات المؤسسة لمتابعة الضوابط، والخارجية تمارسها جهات وهيئات مستقلة خارج المؤسسة",
+                            "الداخلية تنحصر في التفتيش الجنائي، والخارجية تقتصر على تدقيق المراسلات البروتوكولية الدولية",
+                            "الداخلية يمارسها القضاء الإداري حصراً، والخارجية تتولاها مجالس ولجان المجتمع المدني"
+                        ],
+                        originalCorrect: 1, // ب
+                        reason: "الرقابة الداخلية تتم من داخل المؤسسة عبر وحدات التدقيق، بينما الرقابة الخارجية تمارسها أجهزة مستقلة كالجهاز المركزي للرقابة المالية."
+                    },
+                    {
+                        q: "في الجمهورية العربية السورية، يتحدد الدور القانوني الأساسي للجهاز المركزي للرقابة المالية في:",
+                        options: [
+                            "وضع التشريعات الاقتصادية العامة وإدارة السياسة النقدية وسعر الصرف في المصرف المركزي",
+                            "إصدار الأحكام القضائية الجزائية بحق العاملين في السلك الدبلوماسي والقنصلي حصراً",
+                            "حماية المال العام وتعزيز الشفافية والنزاهة والرقابة على أداء المؤسسات وحسن إدارة مواردها",
+                            "تمثيل الحكومة السورية في المؤتمرات والاجتماعات المالية لدى المنظمات الدولية فقط"
+                        ],
+                        originalCorrect: 2, // ج
+                        reason: "الجهاز المركزي للرقابة المالية معني بحماية المال العام، تعزيز الشفافية والنزاهة، والرقابة على الأداء والموارد العامة."
+                    },
+                    {
+                        q: "ما هو الهدف الاستراتيجي لتطبيق 'الحوكمة الإلكترونية' (E-Governance) في المؤسسات؟",
+                        options: [
+                            "تبسيط الإجراءات، تقليل البيروقراطية، رفع الشفافية، تحسين جودة الخدمات، والحد من فرص الفساد",
+                            "تفريغ المؤسسات من الكوادر البشرية ونقل كافة الموظفين إلى مكاتب الإشراف الميداني",
+                            "إلغاء المعاملات الورقية تماماً دون الحاجة إلى تشريعات قانونية تنظم التوقيع الإلكتروني",
+                            "حظر التدقيق المالي على المنصات الرقمية واعتبار البيانات الإلكترونية غير قابلة للمساءلة"
+                        ],
+                        originalCorrect: 0, // أ
+                        reason: "الحوكمة الإلكترونية تسعى لتبسيط الإجراءات، تقليل البيروقراطية، رفع الشفافية والمساءلة، والحد من ثغرات الفساد."
+                    },
+                    {
+                        q: "ما الفارق المنهجي الدقيق بين مفهومي 'الحكومة الإلكترونية' و'الحوكمة الرقمية' (Digital Governance)؟",
+                        options: [
+                            "الحكومة الإلكترونية خاصة بالقطاع المصرفي، بينما الحوكمة الرقمية خاصة بوزارة الخارجية",
+                            "الحكومة الإلكترونية تهتم بأجهزة الحاسوب، بينما الحوكمة الرقمية تقتصر على الهواتف الذكية",
+                            "الحكومة الإلكترونية تقديم الخدمات تقنياً، والحوكمة الرقمية إدارة الدولة والبيانات والسياسات والأمن السيبراني",
+                            "المصطلحان مترادفان تماماً من الناحية العلمية والتنظيمية ولا يوجد أي تمييز بينهما"
+                        ],
+                        originalCorrect: 2, // ج
+                        reason: "الحكومة الإلكترونية هي استخدام التقنية لتقديم الخدمات، أما الحوكمة الرقمية فأوسع وتشمل إدارة البيانات والأمن السيبراني والسياسات في البيئة الرقمية."
+                    },
+                    {
+                        q: "تسعى 'الحوكمة المؤسسية' بصورة رئيسية إلى تحقيق غاية جوهرية تتمثل في:",
+                        options: [
+                            "منع تركز السلطة دون مساءلة، وتحديد الصلاحيات والمسؤوليات وإدارة المخاطر وتحسين الأداء العام",
+                            "تفويض السلطة المطلقة للمدير العام لتمكينه من اتخاذ القرارات المفاجئة دون قيود",
+                            "إلغاء الهياكل التنظيمية واستبدالها بنظام التكليف المؤقت وفق تقديرات القيادة العليا",
+                            "تقليص الإنفاق على التدريب والتطوير المهني لتوجيه الوفورات لصالح المشتريات المادية"
+                        ],
+                        originalCorrect: 0, // أ
+                        reason: "الحوكمة المؤسسية تهدف لمنع تركز السلطة دون رقابة، وضبط الصلاحيات والمسؤوليات وإدارة المخاطر."
+                    },
+                    {
+                        q: "كيف تساهم الحوكمة الرشيدة بصورة مباشرة في دعم مسار التنمية المستدامة في الدولة؟",
+                        options: [
+                            "من خلال زيادة الإنفاق العام العشوائي لتحفيز الاستهلاك الداخلي بغض النظر عن الأولويات",
+                            "من خلال تحسين استخدام الموارد، مكافحة الفساد، بناء مؤسسات خاضعة للمساءلة، وجذب الاستثمارات",
+                            "عبر تعطيل المشاريع المشتركة مع القطاع الخاص لحماية الهيمنة الإدارية للمؤسسات الحكومية",
+                            "عن طريق إخفاء التقارير الاقتصادية السلبية للحفاظ على ثقة المستثمرين والمواطنين ظاهرياً"
+                        ],
+                        originalCorrect: 1, // ب
+                        reason: "الحوكمة تدعم التنمية عبر كفاءة استغلال الموارد، مكافحة الفساد، تعزيز ثقة المواطنين، ودعم الاستثمار والمؤسسات الخاضعة للمساءلة."
+                    },
+                    {
+                        q: "تتجسد مبادئ الحوكمة في الممارسة العملية للموظف في السلك الدبلوماسي من خلال:",
+                        options: [
+                            "الالتزام بالقانون، النزاهة المهنية، كتمان السر الوظيفي، الحياد، واحترام التسلسل الإداري والمسؤولية",
+                            "التصريح بكافة تفاصيل البرقيات الدبلوماسية السرية لوسائل الإعلام تحت غطاء الشفافية التامة",
+                            "التصرف الذاتي وتجاوز توجيهات الوزارة المركزية متى كانت هناك مصلحة خاصة عاجلة",
+                            "الامتناع عن تقديم التوصيات والتقارير المكتوبة تجنباً لتحمل أي مسؤولية إدارية لاحقة"
+                        ],
+                        originalCorrect: 0, // أ
+                        reason: "تتجلى الحوكمة الدبلوماسية في: الالتزام بالقانون، النزاهة، حفظ السرية، الحياد، احترام التسلسل الإداري، والمسؤولية عن التوصيات."
+                    },
+                    {
+                        q: "ما هي المقاربة المؤسسية الفضلى لتطوير الحوكمة في العمل الدبلوماسي لمواكبة التحديات المعاصرة؟",
+                        options: [
+                            "الاعتماد الكامل على السياسات اللحظية وردود الأفعال دون الرجوع للمرجعيات القانونية الدولية",
+                            "ربط الحوكمة بإدارة المخاطر والامتثال (GRC) للتنبؤ بالمتغيرات مع احترام سيادة الدولة والاتفاقيات",
+                            "عزل البعثات الدبلوماسية عن أي متابعة رقابية من الإدارة المركزية لحرية المناورة السياسية",
+                            "إلغاء لجان المخاطر والامتثال لتقليص حجم المراسلات والتقارير الدبلوماسية الروتينية"
+                        ],
+                        originalCorrect: 1, // ب
+                        reason: "الخطة الأمثل هي بناء منظومة (GRC) متكاملة تربط الحوكمة بإدارة المخاطر والامتثال الداخلي والخارجي وفق المتغيرات الجيوسياسية."
+                    },
+                    {
+                        q: "ما هو المصطلح الإنجليزي المعبر بدقة عن مبدأ 'المساءلة' في وثائق الحوكمة الدولية؟",
+                        options: [
+                            "Transparency",
+                            "Inclusion",
+                            "Responsiveness",
+                            "Accountability"
+                        ],
+                        originalCorrect: 3, // د
+                        reason: "المساءلة تقابلها بدقة كلمة Accountability، بينما Transparency تعني الشفافية، وResponsiveness تعني الاستجابة."
+                    },
+                    {
+                        q: "ما هو المصطلح الإنجليزي المعتمد للدلالة على 'سيادة القانون' في المعاهدات والاتفاقيات؟",
+                        options: [
+                            "Public Administration",
+                            "Rule of Law",
+                            "Conflict of Interest",
+                            "Code of Conduct"
+                        ],
+                        originalCorrect: 1, // ب
+                        reason: "سيادة القانون تعني اصطلاحاً: Rule of Law."
+                    },
+                    {
+                        q: "يُعبر مصطلح 'Compliance' في أدبيات الحوكمة ومنظومة (GRC) عن مفهوم:",
+                        options: [
+                            "الامتثال",
+                            "الكفاءة",
+                            "التوافق",
+                            "المشاركة"
+                        ],
+                        originalCorrect: 0, // أ
+                        reason: "Compliance تعني الامتثال للقوانين والأنظمة والمعايير المعتمدة."
+                    },
+                    {
+                        q: "يُترجم مصطلح 'Risk Management' في حقل التنظيم والإدارة الدبلوماسية إلى:",
+                        options: [
+                            "إدارة الأزمات المؤقتة",
+                            "إدارة المخاطر",
+                            "مكافحة الفساد",
+                            "إدارة الموارد البشرية"
+                        ],
+                        originalCorrect: 1, // ب
+                        reason: "Risk Management تعني إدارة المخاطر."
+                    },
+                    {
+                        q: "يقتضي مفهوم 'النزاهة' (Integrity) في ممارسة الوظيفة العامة والدبلوماسية الالتزام بـ:",
+                        options: [
+                            "التضحية بالمعايير القانونية في حال تعارضها مع رغبات المسؤول المباشر داخل الدائرة",
+                            "تقديم المصلحة الذاتية والولاء الشخصي على المصلحة العامة متى ضمن ذلك ترقية الموظف",
+                            "الالتزام بالقيم الأخلاقية والقانونية وتقديم المصلحة العامة وتجنب استغلال المنصب العام",
+                            "عدم الإفصاح عن أي انتهاكات مالية تقع في المؤسسة لحماية السمعة الإدارية خارجياً"
+                        ],
+                        originalCorrect: 2, // ج
+                        reason: "النزاهة تعني الالتزام بالقيم الأخلاقية والقانونية، وتقديم المصلحة العامة، والحياد، وتجنب استغلال المنصب أو تضارب المصالح."
+                    },
+                    {
+                        q: "ما هو المقابل الإنجليزي الدقيق لمصطلح 'المصلحة العامة'؟",
+                        options: [
+                            "Public Relations",
+                            "Public Spending",
+                            "Public Interest",
+                            "Public Policy"
+                        ],
+                        originalCorrect: 2, // ج
+                        reason: "المصلحة العامة تترجم بدقة إلى: Public Interest."
+                    },
+                    {
+                        q: "المصطلح المعياري في اللوائح الإدارية الدبلوماسية الذي يقابل 'تضارب المصالح' هو:",
+                        options: [
+                            "Conflict of Interest",
+                            "Freedom of Information",
+                            "Dispute Settlement",
+                            "Balance of Power"
+                        ],
+                        originalCorrect: 0, // أ
+                        reason: "تضارب المصالح يقابله علمياً: Conflict of Interest."
+                    },
+                    {
+                        q: "أي من الآليات التالية تُعد أداة فاعلة في منظومة مكافحة الفساد وحماية النزاهة المؤسسية؟",
+                        options: [
+                            "منع الموظفين من تدوين ملاحظاتهم حول الإجراءات والقرارات غير السليمة في تقارير مكتوبة",
+                            "إلغاء لجان التدقيق المستقلة والاكتفاء بمصادقة المسؤول التنفيذي المباشر على النفقات",
+                            "توفير الحماية القانونية للمبلّغين (Whistleblowers) وفرض الإفصاح المالي الدوري وتطبيق العقوبات",
+                            "حظر الإفصاح عن معايير وشروط التعيينات والترقيات في السلك الإداري والمهني"
+                        ],
+                        originalCorrect: 2, // ج
+                        reason: "أدوات مكافحة الفساد: الشفافية، الرقابة، المساءلة، التدقيق، الإفصاح، حماية المبلغين، وتطبيق العقوبات الرادعة."
+                    }
+                ]
+            },
+
+            // SECTION 2: إدارة العمليات والمؤسسات الحكومية (25 سؤالاً)
+            {
+                sectionId: 1,
+                sectionName: "إدارة العمليات والمؤسسات الحكومية",
+                questions: [
+                    {
+                        q: "ما هو التعريف الأكاديمي الشامل لـ 'إدارة العمليات' (Operations Management)؟",
+                        options: [
+                            "حصر المعاملات الدبلوماسية والتصديقات القنصلية وحفظها في السجلات التاريخية للوزارة",
+                            "تخطيط وتنظيم وتوجيه ورقابة الأنشطة والموارد لتحويل المدخلات إلى مخرجات ذات قيمة تلبي الأهداف",
+                            "إعداد الموازنة الاستثمارية السنوية للدولة وإصدار التعليمات التنفيذية للمصارف العامة",
+                            "الإشراف على صياغة اللوائح القانونية والدستورية والتفاوض مع المنظمات الدولية فقط"
+                        ],
+                        originalCorrect: 1, // ب
+                        reason: "إدارة العمليات هي تخطيط وتنظيم وتوجيه ورقابة الأنشطة والموارد لتحويل المدخلات إلى سلع وخدمات بأعلى كفاءة وجودة."
+                    },
+                    {
+                        q: "ما هو الهدف المحوري الذي تسعى إدارة العمليات إلى بلوغه داخل أي منظمة؟",
+                        options: [
+                            "تحقيق أفضل قيمة ممكنة للمستفيد أو المتعامل مع الاستخدام الأمثل لموارد المنظمة",
+                            "زيادة عدد التوقيعات والموافقات الروتينية لضمان تقاسم المسؤولية بين أكبر عدد من الموظفين",
+                            "حصر اتخاذ القرارات التنفيذية بيد المدير العام دون تفويض لأي دائرة أخرى في المؤسسة",
+                            "تجميد الموارد المالية المتاحة وتفادي إنفاقها في تحديث التقنيات التشغيلية للمؤسسة"
+                        ],
+                        originalCorrect: 0, // أ
+                        reason: "الهدف الأساسي لإدارة العمليات: تحقيق أفضل قيمة ممكنة للمستفيد مع الاستخدام الأمثل لموارد المؤسسة."
+                    },
+                    {
+                        q: "ما هو الفرق المفاهيمي الأساسي بين 'إدارة الإنتاج' و'إدارة العمليات'؟",
+                        options: [
+                            "إدارة الإنتاج خاصة بالقطاع الحكومي الخدمي، بينما إدارة العمليات تقتصر على المعامل الصناعية",
+                            "إدارة الإنتاج تركز على السلع المادية، وإدارة العمليات مفهوم أشمل يغطي السلع والخدمات معاً",
+                            "إدارة الإنتاج تهتم بالسياسات التسويقية، بينما إدارة العمليات تنحصر في التوظيف والتدريب",
+                            "المفهومان متطابقان تماماً ولا يوجد أي فرق علمي أو تطبيقي بينهما في بيئة الأعمال"
+                        ],
+                        originalCorrect: 1, // ب
+                        reason: "إدارة الإنتاج تركز على السلع المادية، بينما إدارة العمليات مفهوم أشمل يغطي إنتاج السلع وتقديم الخدمات وإدارة الموارد."
+                    },
+                    {
+                        q: "يُعتبر تنظيم عمل الأطباء، وحجز المواعيد، وإدارة الأسرّة والمختبرات في مشفى حكومي تطبيقاً مباشراً لـ:",
+                        options: [
+                            "إدارة الإنتاج الصناعي الثقيل",
+                            "إدارة العمليات الخدمية",
+                            "إدارة التشريعات الجنائية",
+                            "الرقابة المالية المصرفية"
+                        ],
+                        originalCorrect: 1, // ب
+                        reason: "المستشفيات مؤسسات خدمية لا تنتج سلعاً مادية، وتنظيم الأسرّة والكوادر والتدفقات يمثل صميم إدارة العمليات الخدمية."
+                    },
+                    {
+                        q: "تستمد إدارة العمليات أهميتها الاستراتيجية الفائقة في المنظمات الحكومية من كونها:",
+                        options: [
+                            "الجهة المخولة دستورياً بتعديل القوانين والأنظمة النافذة في الدولة متى دعت الحاجة",
+                            "الذراع التنفيذي الذي يترجم خطط المؤسسة واستراتيجياتها النظرية إلى نتائج وخدمات ملموسة",
+                            "الوحدة الإدارية الوحيدة المعفية من التدقيق والمساءلة أمام أجهزة الرقابة والتفتيش",
+                            "المسؤولة عن تمثيل الدولة في المؤتمرات الدولية المعنية بالمعاهدات الاقتصادية"
+                        ],
+                        originalCorrect: 1, // ب
+                        reason: "أهميتها تنبع من كونها الجانب التنفيذي الذي يحول الاستراتيجية والخطط النظرية إلى نتائج واقعية ومخرجات فعلية."
+                    },
+                    {
+                        q: "تتميز إدارة العمليات في المؤسسات الحكومية عن نظيرتها في الشركات الخاصة الربحية بأنها:",
+                        options: [
+                            "لا تهتم مطلقاً بمعايير الكفاءة أو الجودة باعتبارها مؤسسات غير قابلة للإفلاس المالي",
+                            "تستهدف تحقيق المصلحة العامة وتيسير شؤون المواطنين بدلاً من تعظيم الأرباح المالية",
+                            "تعمل دون الحاجة إلى تحديد مدخلات أو مخرجات أو تدفقات إجرائية في دوائرها",
+                            "تمنح الموظف التنفيذي سلطة مطلقة في تحديد مواعيد تقديم الخدمة وفق ظروفه الخاصة"
+                        ],
+                        originalCorrect: 1, // ب
+                        reason: "القطاع الحكومي يهدف إلى المصلحة العامة والخدمة ورضا المستفيد، بينما القطاع التجاري يستهدف الربح، مع اشتراكهما في أسس الكفاءة."
+                    },
+                    {
+                        q: "عند قيام وزارة بنقل معاملات منح التراخيص من النظام الورقي إلى منصة رقمية موحدة، فإن ذلك يمثل:",
+                        options: [
+                            "تحسيناً تشغيلياً يساهم في تقليل زمن المعاملة وخفض التكلفة والأخطاء وتحسين الخدمة",
+                            "إلغاءً للضوابط الرقابية الداخلية وتفريطاً بالمسؤولية القانونية المنوطة بالوزارة المعنية",
+                            "إجراءً روتينياً شكلياً لا يترتب عليه أي أثر إيجابي على مؤشرات الأداء المؤسسي",
+                            "زيادة مقصودة في البيروقراطية وتعقيد الإجراءات أمام طالبي الخدمة من المتعاملين"
+                        ],
+                        originalCorrect: 0, // أ
+                        reason: "أتمتة المعاملات ونقلها لمنصات رقمية تحسين في العملية التشغيلية يقلل الوقت والتكلفة والأخطاء."
+                    },
+                    {
+                        q: "ما طبيعة الرابطة المنهجية التي تجمع بين 'الاستراتيجية' و'إدارة العمليات'؟",
+                        options: [
+                            "علاقة تناقض تفرض تفوق الأهداف الاستراتيجية النظرية على واقعية العمليات وإلغاء متطلباتها",
+                            "علاقة تكاملية؛ فالاستراتيجية تحدد 'أين نريد الوصول' والعمليات تحدد 'كيف نصل' بتوظيف الموارد",
+                            "علاقة استقلال تام؛ حيث تعمل العمليات التشغيلية بمعزل تام عن أي رؤية استراتيجية عليا",
+                            "علاقة تراتبية تجعل العمليات مسؤولة عن التخطيط وتجعل الاستراتيجية مسؤولة عن التنفيذ اليومي"
+                        ],
+                        originalCorrect: 1, // ب
+                        reason: "العلاقة تكاملية ومباشرة: الاستراتيجية تحدد إلى أين تريد المؤسسة الوصول، والعمليات تحدد كيف ستصل عبر العمليات والموارد."
+                    },
+                    {
+                        q: "إذا تبنت وزارة استراتيجية ترتكز على 'المنافسة بالجودة العالية' في خدماتها، فإن على العمليات أن تركز على:",
+                        options: [
+                            "تقليص معايير الفحص والرقابة الإجرائية لتسريع تسليم المعاملات بأي صورة متاحة",
+                            "التوسع في قبول الطلبات غير المستوفية للشروط مراعاة لظروف المراجعين الخاصة",
+                            "تطبيق معايير رقابة صارمة، وتدريب الكوادر، وضبط الإجراءات لتقليل الأخطاء والانحرافات",
+                            "إلغاء لجان التدقيق الداخلي لتوفير النفقات الإدارية وتوجيهها نحو المشتريات المكتبية"
+                        ],
+                        originalCorrect: 2, // ج
+                        reason: "استراتيجية الجودة العالية تفرض على العمليات التركيز على معايير الجودة والرقابة الدقيقة على المخرجات."
+                    },
+                    {
+                        q: "إذا كان التوجه الاستراتيجي لمؤسسة عامة يركز على 'سرعة تقديم الخدمة'، فإن إدارة العمليات تلتزم بـ:",
+                        options: [
+                            "تحسين تدفق الإجراءات، إزالة الاختناقات، وتقليل أوقات الانتظار دون الإخلال بسلامة العمل",
+                            "الاستغناء عن فحص الوثائق والتوقيع على الطلبات دون مراجعة تفاصيلها الثبوتية",
+                            "تقليص عدد الموظفين في صالات الاستقبال لتقليل الازدحام الظاهري أمام المكاتب",
+                            "تحويل المعاملات غير المكتملة إلى الدوائر الأخرى للتخلص من مسؤولية تأخيرها"
+                        ],
+                        originalCorrect: 0, // أ
+                        reason: "المنافسة بالسرعة تتطلب من العمليات تحسين الإجراءات، تقليل الهدر الزمني، وإزالة الاختناقات وأوقات الانتظار."
+                    },
+                    {
+                        q: "وفق سلسلة إدارة العمليات: (الاستراتيجية -> العمليات -> الموارد -> المخرجات)، ما هي الحلقة المكملة لتحقيق الأهداف؟",
+                        options: [
+                            "إلغاء نظم المتابعة والاعتماد على النتائج الأولية المسجلة",
+                            "وقف عمليات التدريب لحين اعتماد موازنات استثمارية جديدة",
+                            "قياس الأداء والتحسين المستمر لتأكيد فاعلية العمليات وبلوغ النتائج",
+                            "تحويل المخرجات المنجزة إلى سجلات أرشيفية دون تحليل مؤشراتها"
+                        ],
+                        originalCorrect: 2, // ج
+                        reason: "السلسلة تنتهي بـ: المخرجات تحقق قيمة، ثم قياس الأداء والتحسين المستمر لضمان تحقيق أهداف المؤسسة."
+                    },
+                    {
+                        q: "لماذا تُعد العملية التشغيلية المضبوطة عنصراً حيوياً في منظومة إدارة المخاطر والامتثال؟",
+                        options: [
+                            "لأنها تسمح للموظف بممارسة الاستثناءات الفردية دون الحاجة لتوثيق قانوني",
+                            "لأنها تكون قابلة للقياس والمتابعة، ومتوافقة مع الأنظمة، وتتضمن ضوابط تحد من الانحرافات",
+                            "لأنها تعتمد على التواصل الشفهي غير المسجل وتتفادى الأرشفة الإلكترونية المعقدة",
+                            "لأن إدارة المخاطر لا تطبق في الحقيقة إلا في المنظمات التي تغيب عنها الإجراءات المنظمة"
+                        ],
+                        originalCorrect: 1, // ب
+                        reason: "العملية التشغيلية الجيدة يجب أن تكون مضبوطة، قابلة للقياس، متوافقة مع الأنظمة، ومحصنة بضوابط للحد من المخاطر."
+                    },
+                    {
+                        q: "أي من العناصر التالية يمثل جزءاً من 'المدخلات' (Inputs) في نظام العمليات بوزارة الخارجية؟",
+                        options: [
+                            "القرارات الوزارية الصادرة، وجوازات السفر المسلمة، والتقارير المكتملة",
+                            "المعاهدات الدولية المبرمة، والتصديقات القنصلية المنجزة للمتعاملين",
+                            "الكوادر الدبلوماسية والإدارية، الميزانيات، المعلومات، الوثائق، والأنظمة التقنية",
+                            "مستوى رضا المواطنين عن جودة الخدمات القنصلية المقدمة في الخارج"
+                        ],
+                        originalCorrect: 2, // ج
+                        reason: "المدخلات هي الموارد التي تستخدمها المؤسسة لتحويلها إلى مخرجات (موارد بشرية، معلومات، وثائق، تمويل، تقنيات)."
+                    },
+                    {
+                        q: "أي من الآتي يعتبر من 'المخرجات' (Outputs) في نظام العمليات لدى المؤسسات الدبلوماسية والقنصلية؟",
+                        options: [
+                            "أجهزة الحواسيب وقواعد البيانات ومقرات السفارات والبعثات بالخارج",
+                            "الخدمات القنصلية المنجزة، والوثائق المصادق عليها، والمذكرات الرسمية الصادرة",
+                            "المخصصات المالية المعتمدة في الموازنة العامة لتسيير عمل الوزارة",
+                            "القوانين والتشريعات الصادرة عن مجلس الشعب لتنظيم السلك الخارجي"
+                        ],
+                        originalCorrect: 1, // ب
+                        reason: "المخرجات هي السلع أو الخدمات المنجزة مثل القرارات، التقارير، المعاملات، الوثائق، والخدمات المصادق عليها."
+                    },
+                    {
+                        q: "يؤدي تقليل 'الهدر' والأخطاء التشغيلية في الإدارة العامة بصورة مباشرة إلى:",
+                        options: [
+                            "خفض التكاليف والنفقات غير الضرورية وتحقيق الاستخدام الأمثل للموارد المتاحة",
+                            "زيادة الضغط المالي على الموازنة الاستثمارية للدولة نتيجة تطبيق معايير الجودة",
+                            "تأخير إنجاز المعاملات بسبب التعقيد الناتج عن معايير التدقيق الدقيقة",
+                            "تراجع مستوى رضا المراجعين نتيجة التشدد في تطبيق اللوائح الإدارية"
+                        ],
+                        originalCorrect: 0, // أ
+                        reason: "تقليل الهدر والأخطاء يحسن الإنتاجية ويخفض التكاليف والنفقات غير الضرورية ويحقق الاستخدام الأمثل للموارد."
+                    },
+                    {
+                        q: "تُعرف 'المرونة' (Flexibility) كأحد أهداف إدارة العمليات بقدرة المؤسسة على:",
+                        options: [
+                            "التراجع عن تطبيق اللوائح التنظيمية والقوانين كلما واجهت ضغوطاً من المتعاملين",
+                            "الاستجابة الفعالة والسريعة للمتغيرات والمستجدات الطارئة في بيئة العمل الداخلية والخارجية",
+                            "تغيير الهيكل الوظيفي بصورة مفاجئة وشخصية دون استناد إلى دراسات تنظيمية معتمدة",
+                            "إعفاء الموظفين المقصرين من المساءلة الإدارية تحت بند دعم الاستقرار الوظيفي"
+                        ],
+                        originalCorrect: 1, // ب
+                        reason: "المرونة تعني زيادة القدرة والسرعة في التعامل الإيجابي والتكيف مع التغيرات في البيئة المحيطة والطلب."
+                    },
+                    {
+                        q: "أي من الأنشطة التالية يندرج بصورة نموذجية ضمن إدارة العمليات في القطاع المصرفي العام؟",
+                        options: [
+                            "تصنيع الهواتف الذكية وتجميع الدارات الإلكترونية في المصانع المؤتمتة",
+                            "إدارة حسابات المتعاملين، التحويلات المالية، والاعتمادات المستندية، وخدمة العملاء",
+                            "استصلاح الأراضي الزراعية وبناء السدود المائية لتوليد الطاقة الكهربائية",
+                            "إصدار الأحكام القضائية وتنفيذ قرارات الحجز المالي الصادرة عن المحاكم"
+                        ],
+                        originalCorrect: 1, // ب
+                        reason: "الأنشطة المصرفية كفتح الحسابات، التحويلات، وإدارة الاعتمادات تمثل صميم العمليات الخدمية للبنوك."
+                    },
+                    {
+                        q: "يساهم تحسين تدفق العمليات وتنسيق المسارات بين الدوائر الإدارية المشتركة في:",
+                        options: [
+                            "تعقيد الرقابة الداخلية وإخفاء المسؤوليات الوظيفية الفردية للعاملين",
+                            "زيادة تراكم السجلات الورقية وصعوبة الوصول إلى الوثائق التاريخية",
+                            "الحد من الاختناقات، وتقليل أوقات المعالجة، ورفع الإنتاجية العامة للمؤسسة",
+                            "إلغاء التخصص الوظيفي وتكليف العاملين بمهام متناقضة مع مؤهلاتهم العلمية"
+                        ],
+                        originalCorrect: 2, // ج
+                        reason: "التدفق المنظم للإجراءات يزيل الاختناقات ويخفض أوقات الانتظار ويزيد من إنتاجية وكفاءة الأداء المؤسسي."
+                    },
+                    {
+                        q: "تتحقق ترجمة الاستراتيجية بنجاح إلى واقع تشغيلي ملموس من خلال:",
+                        options: [
+                            "تحويل الأهداف الاستراتيجية إلى عمليات تفصيلية واضحة ومقاسة بمؤشرات دقيقة وقابلة للتنفيذ",
+                            "صياغة خطط استراتيجية فضفاضة وغير ملزمة وتوزيعها ككتيبات إرشادية على المكاتب",
+                            "الاعتماد على الاجتهادات الفردية للموظفين في معالجة القضايا اليومية دون مرجعية مكتوبة",
+                            "تجميد خطط التدريب وتفادي ربط الترقيات الوظيفية بأي مؤشرات أداء تشغيلية"
+                        ],
+                        originalCorrect: 0, // أ
+                        reason: "نجاح الاستراتيجية يعتمد على ترجمتها إلى عمليات فعالة واضحة وقابلة للتنفيذ والقياس عبر الموارد المتاحة."
+                    },
+                    {
+                        q: "ما معنى 'ضبط الجودة' (Quality Control) في سياق العمليات الحكومية الخدمية؟",
+                        options: [
+                            "إلغاء جميع الطلبات التي تحتاج زمناً أطول من المتوسط المحدد لإنجاز الخدمة",
+                            "التأكد من مطابقة المعاملة والخدمة المنجزة للمواصفات والضوابط القانونية المعتمدة",
+                            "إجراء استطلاعات الرأي التلفزيونية حول أداء الحكومة دون تقييم داخلي للإجراءات",
+                            "حصر تسليم الوثائق الرسمية بالمدراء العامين دون تفويض لرؤساء الدوائر التنفيذية"
+                        ],
+                        originalCorrect: 1, // ب
+                        reason: "ضبط الجودة يعني التحقق من سلامة المخرجات ومطابقتها للمعايير والأنظمة الموضوعة قبل تسليمها للمستفيد."
+                    },
+                    {
+                        q: "تعتبر العمليات الوسيلة التنفيذية لتحقيق أهداف المؤسسة لأن:",
+                        options: [
+                            "الأهداف مجرد نصوص نظرية لا يمكن أن تتحقق ذاتياً إلا بممارسات وإجراءات منظمة ومضبوطة",
+                            "وضع الخطط الاستراتيجية في الكتيبات الرسمية يكفي بحد ذاته لتحقيق التنمية المطلوبة",
+                            "العمليات التشغيلية لا تتأثر بمدى توفر الموارد البشرية والمالية في المؤسسة",
+                            "المؤسسات الحكومية معنية بتطبيق النظريات الإدارية دون الاهتمام بالمخرجات الفعلية"
+                        ],
+                        originalCorrect: 0, // أ
+                        reason: "الأهداف لا تتحقق بمجرد وضع الخطط، بل من خلال عمليات وإجراءات واضحة ومنظمة تنفذها الموارد بكفاءة."
+                    },
+                    {
+                        q: "أي من الممارسات التالية تساهم في تقليل 'المخاطر التشغيلية' في الإدارة الدبلوماسية؟",
+                        options: [
+                            "تداخل الاختصاصات وإسناد المهام دون توصيف وظيفي معتمد لتشجيع العمل المشترك",
+                            "وضوح الإجراءات، وتحديد المسؤوليات، وتوفير أدلة العمل، والتأهيل والتدريب المستمر",
+                            "تفادي توثيق القرارات الحساسة ورقياً أو إلكترونياً لحمايتها من المتابعة والتدقيق",
+                            "السماح للموظف المستجد باتخاذ القرارات المصيرية دون إشراف من رئيس الدائرة المختص"
+                        ],
+                        originalCorrect: 1, // ب
+                        reason: "تقليل المخاطر التشغيلية يتحقق بوضوح الإجراءات، التدريب، الأدلة المعتمدة، وتحديد المسؤوليات ونقاط الرقابة."
+                    },
+                    {
+                        q: "ما المقصود بـ 'الاستخدام الأمثل للموارد' في إدارة العمليات الحكومية؟",
+                        options: [
+                            "تحقيق أقصى قيمة ومخرجات ممكنة من الموارد المتاحة مع تفادي الهدر والإسراف والتعطيل",
+                            "إنفاق الميزانية السنوية كاملة في الربع الأول من العام لتفادي استردادها من وزارة المالية",
+                            "تخزين الموارد المادية في المستودعات لسنوات طويلة تحسباً لأي طارئ قد يواجه الوزارة",
+                            "تشغيل الموظفين لساعات إضافية إلزامية دون توفير بيئة عمل مناسبة أو تعويضات نظامية"
+                        ],
+                        originalCorrect: 0, // أ
+                        reason: "الاستخدام الأمثل يعني الحصول على أفضل النتائج بأقل استهلاك وهدر ممكن للموارد البشرية والمادية والمالية."
+                    },
+                    {
+                        q: "تعتمد تجربة المستفيد المتميزة (Citizen Experience) في القطاع الحكومي بصورة أساسية على:",
+                        options: [
+                            "فرض متطلبات إضافية وموافقات أمنية متعددة على كل معاملة دون مبرر قانوني",
+                            "تقليص ساعات استقبال المراجعين في البعثات القنصلية لتخفيف أعباء العمل على الطاقم",
+                            "سهولة الإجراءات، وضوح المتطلبات، سرعة الإنجاز، والمعاملة اللائقة والشفافية",
+                            "حصر المعاملات الرسمية في المقر المركزي للوزارة ومنع تقديمها عبر الفروع أو المنصات"
+                        ],
+                        originalCorrect: 2, // ج
+                        reason: "تحسين تجربة المستفيد يرتكز على تبسيط الإجراءات، تقليل وقت الانتظار، جودة الخدمة، وسرعة الاستجابة."
+                    },
+                    {
+                        q: "يساهم تبسيط الإجراءات الحكومية في دعم الحوكمة المؤسسية من خلال:",
+                        options: [
+                            "تقليل حلقات التعقيد والبيروقراطية وتضييق فرص الابتزاز واستغلال النفوذ",
+                            "إلغاء سجلات التدقيق المالي المعتمدة لتمكين الموظف من الصرف المباشر",
+                            "السماح بتمرير المعاملات غير القانونية لتخفيف الازدحام اليومي في المكاتب",
+                            "منع الجهات الرقابية من فحص المعاملات المنجزة إلكترونياً لسرية البيانات"
+                        ],
+                        originalCorrect: 0, // أ
+                        reason: "تبسيط الإجراءات يقلل البيروقراطية ويحد من الفساد والهدر ويضمن الشفافية والمساءلة الإدارية."
+                    }
+                ]
+            },
+
+            // SECTION 3: محاضرات المعهد الدبلوماسي 2024 وتنسيق وزارة التنمية الإدارية (25 سؤالاً)
+            {
+                sectionId: 2,
+                sectionName: "المعهد الدبلوماسي والتنمية الإدارية والهندرة والتحول الرقمي",
+                questions: [
+                    {
+                        q: "وفق محاضرات المعهد الدبلوماسي وتنسيق التنمية الإدارية، ما هو الهدف الأساسي لإدارة العمليات؟",
+                        options: [
+                            "حصر المراسلات والبرقيات السياسية في دائرة المراسم لتفادي أي احتكاك رقابي",
+                            "تحقيق الكفاءة والفعالية وتحسين جودة المخرجات من خلال إدارة العمليات وتحسينها المستمر",
+                            "تحقيق أعلى عائد ربحي مالي ممكن لصالح خزينة الوزارة من الرسوم القنصلية المفروضة",
+                            "إلغاء لجان المتابعة الميدانية والاعتماد الكلي على التقارير السنوية الذاتية للمدراء"
+                        ],
+                        originalCorrect: 1, // ب
+                        reason: "وفق محاضرات المعهد الدبلوماسي: الهدف الأساسي لإدارة العمليات هو تحقيق الكفاءة والفعالية وتحسين جودة المخرجات."
+                    },
+                    {
+                        q: "في سؤال سابق لمسابقة الخارجية حول تقييم جودة العملية، ما هي حزمة المعايير التقييمية المعتمدة؟",
+                        options: [
+                            "هل العملية سريعة؟ دقيقة؟ واضحة؟ قليلة التكلفة؟ قابلة للرقابة؟ وهل تحقق رضا المستفيد؟",
+                            "هل العملية معقدة؟ سرية؟ مركزية؟ مكلفة مالياً؟ وتعتمد كلياً على التقدير الشخصي للمدير؟",
+                            "هل العملية تتطلب موافقات شفهية متعددة؟ وتلغي التوثيق الأرشيفي الإلكتروني المعتمد؟",
+                            "هل تسمح العملية باستثناء بعض الشخصيات من التدقيق الأمني والقانوني لتسهيل أعمالهم؟"
+                        ],
+                        originalCorrect: 0, // أ
+                        reason: "المعايير المعتمدة لتقييم العملية: هل هي سريعة؟ دقيقة؟ واضحة؟ قليلة التكلفة؟ قابلة للرقابة؟ وهل تحقق رضا المستفيد؟"
+                    },
+                    {
+                        q: "ما هو المسار الإجرائي النموذجي لإدارة معاملة قنصلية في وزارة الخارجية كمثال تطبيقي؟",
+                        options: [
+                            "إصدار الوثيقة -> التدقيق اللاحق للمرفقات -> دفع الرسوم -> استلام طلب المعاملة من المواطن",
+                            "طلب المعاملة -> تدقيق الوثائق -> تسجيل الطلب -> إحالة -> معالجة -> موافقة -> إصدار الوثيقة",
+                            "تسجيل المعاملة -> إرسالها للوزير للموافقة -> مراجعة صحة الأوراق -> إصدار الجواز أو الوثيقة",
+                            "إحالة الطلب مباشرة للبعثة الخارجية -> تدقيق أولي -> موافقة شفهية -> تسجيل الطلب لاحقاً"
+                        ],
+                        originalCorrect: 1, // ب
+                        reason: "التسلسل النموذجي: طلب معاملة قنصلية -> تدقيق الوثائق -> تسجيل الطلب -> إحالة -> معالجة -> موافقة -> إصدار الوثيقة."
+                    },
+                    {
+                        q: "ما هو الفارق الجوهري والامتحاني الدقيق بين المخرجات (Outputs) والنتائج/الأثر (Outcomes)؟",
+                        options: [
+                            "المخرجات هي النواتج والخدمات المباشرة المنجزة، بينما النتائج هي الأثر والقيمة الناتجة عنها",
+                            "المخرجات هي الأثر المجتمعي البعيد، والنتائج هي عدد المعاملات المنجزة على شباك الخدمة",
+                            "المخرجات تختص بالشركات التجارية، بينما النتائج تختص بوزارة الخارجية حصراً",
+                            "المفهومان متطابقان كمياً ولا يمكن التمييز بينهما في الإحصاءات الإدارية الحكومية"
+                        ],
+                        originalCorrect: 0, // أ
+                        reason: "المخرجات (Outputs) هي الناتج المباشر (مثل إصدار 100 وثيقة)، أما النتائج (Outcomes) فهي الأثر المحقق (مثل تيسير شؤون المواطنين)."
+                    },
+                    {
+                        q: "إذا قامت القنصلية بإصدار 150 جواز سفر، وأدى ذلك لتحسين وصول المغتربين لحقوقهم القانونية، فإن إصدار الجوازات يمثل:",
+                        options: [
+                            "الأثر النهائي المستدام (Impact)",
+                            "النتائج المجتمعية (Outcomes)",
+                            "المدخلات التشغيلية (Inputs)",
+                            "المخرجات المباشرة (Outputs)"
+                        ],
+                        originalCorrect: 3, // د
+                        reason: "إصدار 150 جوازاً هو المخرج الفعلي المباشر (Output)، بينما تحسين وصول المواطنين لحقوقهم يمثل النتيجة/الأثر (Outcome)."
+                    },
+                    {
+                        q: "ما هو المعيار اللاتيني/الإداري المميز بين الكفاءة والفعالية والموضح في كراسة المعهد الدبلوماسي؟",
+                        options: [
+                            "الكفاءة تعني (Doing things right)، بينما الفعالية تعني (Doing the right things)",
+                            "الكفاءة تعني (Doing the right things)، بينما الفعالية تعني (Doing things right)",
+                            "الكفاءة تعني (Doing things fast)، بينما الفعالية تعني (Doing things slow)",
+                            "الكفاءة تعني (Doing things once)، بينما الفعالية تعني (Doing things twice)"
+                        ],
+                        originalCorrect: 0, // أ
+                        reason: "الكفاءة: إنجاز الأمور بالشكل الصحيح وبأقل موارد (Doing things right). الفعالية: فعل وإنجاز الأشياء والأهداف الصحيحة (Doing the right things)."
+                    },
+                    {
+                        q: "تسعى الإدارة الحكومية الممتازة إلى تحقيق ثلاثية متكاملة لا غنى عنها تتمثل في:",
+                        options: [
+                            "السرية المطلقة + المركزية الحادة + تقليص الملاكات",
+                            "الكفاءة + الفعالية + الجودة",
+                            "تقليص الرواتب + زيادة الرسوم + التوسع في اللوائح",
+                            "الإنفاق المفتوح + إلغاء الرقابة + سرعة التنفيذ"
+                        ],
+                        originalCorrect: 1, // ب
+                        reason: "الإدارة الممتازة تسعى دوماً لتحقيق: الكفاءة + الفعالية + الجودة في كافة عملياتها وخدماتها."
+                    },
+                    {
+                        q: "ما هي الغاية الأساسية من إعداد 'خرائط العمليات' (Process Mapping) في المؤسسات العامة؟",
+                        options: [
+                            "التمثيل البصري للعملية لتحديد خطواتها ومسؤولياتها ونقاط القرار ونقاط الرقابة وبدايتها ونهايتها",
+                            "رسم الهيكل المعماري والتوزيع الهندسي لمكاتب السفارة وصالات استقبال الوفود الأجنبية",
+                            "تحديد المسارات الجغرافية والملاحية التي تسلكها الوفود الدبلوماسية أثناء السفر للخارج",
+                            "حصر الموظفين وفق محافظات ولادتهم لتوزيعهم على الدوائر الإدارية التابعة للوزارة"
+                        ],
+                        originalCorrect: 0, // أ
+                        reason: "خرائط العمليات تهدف لتمثيل العملية بصرياً لتحديد البداية، الخطوات، المسؤوليات، نقاط القرار، الرقابة، والمخرجات."
+                    },
+                    {
+                        q: "ما هي القاعدة المحورية في منهجية 'تبسيط الإجراءات' بالقطاع الحكومي؟",
+                        options: [
+                            "زيادة عدد التواقيع والموافقات يوفر حماية قانونية أكبر للموظف في حال وقوع أخطاء",
+                            "كل إجراء أو خطوة غير ضرورية تمثل تكلفة إضافية وعبئاً وهدراً على المؤسسة والمستفيد",
+                            "الاحتفاظ بالسجلات الورقية إلى جانب السجلات الرقمية ضروري لمنع ضياع المعاملات",
+                            "تحويل المعاملات من دائرة إلى أخرى يضمن تدقيقها الشامل حتى وإن استغرقت أشهراً"
+                        ],
+                        originalCorrect: 1, // ب
+                        reason: "الفكرة الأساسية في تبسيط الإجراءات: كل إجراء غير ضروري يمثل تكلفة إضافية وعبئاً على المؤسسة والمستفيد."
+                    },
+                    {
+                        q: "ما هو التعريف العلمي الدقيق لمفهوم 'الهندرة' أو إعادة هندسة العمليات (BPR)؟",
+                        options: [
+                            "إعادة التفكير الجذري في العمليات وإعادة تصميمها من الأساس لإحداث تحسينات وطفرات هائلة بالأداء",
+                            "إجراء تحسينات طفيفة ومتدرجة على النماذج الورقية الحالية دون المساس بجوهر الإجراءات",
+                            "الترميم الإنشائي وتجديد الواجهات المعمارية للمباني التاريخية التابعة لوزارة الخارجية",
+                            "استبدال الحواسيب المكتبية بأخرى حديثة مع الحفاظ على نفس الخطوات الروتينية السابقة"
+                        ],
+                        originalCorrect: 0, // أ
+                        reason: "إعادة هندسة العمليات (BPR) تعني: إعادة التفكير الجذري في العمليات وإعادة تصميمها لتحقيق تحسينات كبيرة وطفرات في الأداء."
+                    },
+                    {
+                        q: "ما هو الفارق الجوهري بين 'تحسين العملية' و'إعادة هندسة العملية' (BPR)؟",
+                        options: [
+                            "تحسين العملية يقتصر على الأمور المالية، بينما الهندرة تقتصر على الدوائر الدبلوماسية",
+                            "تحسين العملية تعديل وتطوير تدريجي، بينما إعادة الهندسة هي إعادة تصميم جذرية للعملية من الأساس",
+                            "تحسين العملية يتطلب إلغاء كافة القوانين، بينما إعادة الهندسة تعتمد على الإجراءات القديمة",
+                            "لا يوجد أي اختلاف بينهما وكلاهما يعبر عن التطوير الشكلي للنماذج الإدارية"
+                        ],
+                        originalCorrect: 1, // ب
+                        reason: "تحسين العملية = تطوير وتعديل تدريجي. إعادة هندسة العملية (BPR) = إعادة تصميم جذرية وكاملة من الأساس."
+                    },
+                    {
+                        q: "يدل المفهوم الإداري الياباني 'كايزن' (Kaizen) المطبق في إدارة العمليات الحكومية على:",
+                        options: [
+                            "التحسين المستمر والمتدرج بمشاركة كافة العاملين والمستويات الإدارية في المؤسسة",
+                            "الهيكلة المفاجئة وفصل الموظفين غير القادرين على استيعاب النظم الإلكترونية الحديثة",
+                            "تجميد الإجراءات الحالية وتكليف بيوت خبرة أجنبية بإدارة العمليات التشغيلية اليومية",
+                            "حصر عمليات اتخاذ القرار بيد القيادة العليا وإلغاء صلاحيات الإدارات المتوسطة"
+                        ],
+                        originalCorrect: 0, // أ
+                        reason: "كايزن (Kaizen) هو مفهوم إداري ياباني يعني التحسين المستمر والتدريجي لكافة جوانب العمل بمشاركة الجميع."
+                    },
+                    {
+                        q: "ما هو التسلسل الصحيح لمراحل حلقة الجودة والتحسين الشهيرة (PDCA)؟",
+                        options: [
+                            "Process -> Direct -> Check -> Approve",
+                            "Plan -> Do -> Check -> Act",
+                            "Perform -> Design -> Control -> Analyze",
+                            "Predict -> Delegate -> Correct -> Assess"
+                        ],
+                        originalCorrect: 1, // ب
+                        reason: "نموذج PDCA الشهير يتكون من: Plan (تخطيط) -> Do (تنفيذ) -> Check (تحقق) -> Act (تصحيح وتحسين)."
+                    },
+                    {
+                        q: "ما الفرق الدقيق بين 'مراقبة الجودة' (Quality Control) و'ضمان الجودة' (Quality Assurance)؟",
+                        options: [
+                            "مراقبة الجودة تركز على فحص المخرجات وكشف العيوب، وضمان الجودة يركز على العمليات لمنع وقوع الخطأ أصلاً",
+                            "مراقبة الجودة خاصة بالمعاملات القنصلية، وضمان الجودة خاصة بالمفاوضات السياسية الخارجية",
+                            "مراقبة الجودة نظام وقائي يسبق التنفيذ، وضمان الجودة نشاط تفتيشي يعقب صدور القرارات",
+                            "المصطلحان يعبران عن نشاط تدقيقي مالي واحد يتولاه الجهاز المركزي للرقابة المالية"
+                        ],
+                        originalCorrect: 0, // أ
+                        reason: "Quality Control يركز على فحص المخرجات لاكتشاف العيوب، بينما Quality Assurance نظام وقائي يركز على العمليات لمنع الأخطاء."
+                    },
+                    {
+                        q: "يرمز الاختصار الإداري (KPI) المستخدم على نطاق واسع في تقييم المؤسسات إلى:",
+                        options: [
+                            "Knowledge Protocol Index",
+                            "Key Problem Identification",
+                            "Key Performance Indicator",
+                            "Key Process Integration"
+                        ],
+                        originalCorrect: 2, // ج
+                        reason: "KPI يرمز إلى: Key Performance Indicator أي مؤشر الأداء الرئيسي."
+                    },
+                    {
+                        q: "أي من النماذج التالية يمثل مؤشر أداء رئيسي (KPI) تشغيلي لقياس كفاءة العمليات القنصلية؟",
+                        options: [
+                            "متوسط زمن إنجاز المعاملة القنصلية، ونسبة المعاملات المنجزة بالمدة المحددة، ومستوى رضا المراجعين",
+                            "نوعية الطابعات والماسحات الضوئية المستخدمة في مكاتب التصديقات القنصلية بالوزارة",
+                            "عدد المؤتمرات الصحفية التي يعقدها الناطق الرسمي باسم وزارة الخارجية شهرياً",
+                            "المساحة الإجمالية للمباني التابعة للبعثات الدبلوماسية والقنصليات في العواصم الغربية"
+                        ],
+                        originalCorrect: 0, // أ
+                        reason: "من مؤشرات الأداء بالخارجية: متوسط زمن الإنجاز، نسبة المعاملات المنجزة في الوقت، ونسبة الأخطاء ورضا المستفيدين."
+                    },
+                    {
+                        q: "تتحدد مواصفات 'مؤشر الأداء الجيد' في العمل المؤسسي بأنه يجب أن يكون:",
+                        options: [
+                            "واضحاً، وقابلاً للقياس الكمي، ومرتبطاً بالهدف الاستراتيجي، وقابلاً للمتابعة الدورية",
+                            "معقداً، ونظرياً، وسرياً، ومحفوظاً لدى الإدارة العليا دون إشراك الموظفين في قياسه",
+                            "مبنياً على التقدير الشخصي لرئيس الدائرة دون الحاجة إلى أرقام أو بيانات إحصائية",
+                            "ثابتاً لا يقبل التعديل أو التطوير حتى في حال تغير السياسات أو القوانين النافذة"
+                        ],
+                        originalCorrect: 0, // أ
+                        reason: "المؤشر الجيد يجب أن يكون: واضحاً - قابلاً للقياس - مرتبطاً بالهدف - قابلاً للمتابعة."
+                    },
+                    {
+                        q: "ما هو التعريف الدقيق لمصطلح 'الرقمنة البسيطة' (Digitization) مقارنة بالتحول الرقمي؟",
+                        options: [
+                            "إعادة هندسة الإجراءات الحكومية بالكامل وتغيير نماذج العمل الإداري في الدولة",
+                            "تحويل المعلومات والوثائق من شكلها الورقي التماثلي إلى صيغة رقمية إلكترونية مخزنة",
+                            "استخدام تطبيقات الذكاء الاصطناعي في إدارة المراسلات الدبلوماسية الحساسة للوزارة",
+                            "الربط الشبكي الشامل بين كافة السفارات والوزارات وإلغاء الإجراءات التقليدية"
+                        ],
+                        originalCorrect: 1, // ب
+                        reason: "Digitization هي تحويل المعلومات والبيانات من شكل ورقي تماثلي إلى صيغة رقمية إلكترونية مخزنة."
+                    },
+                    {
+                        q: "يُقصد بمصطلح 'Digitalization' في مسار التحديث الإداري:",
+                        options: [
+                            "إلغاء المعاملات الرقمية والعودة للوثائق الورقية الموثقة بخاتم الدولة الرسمي",
+                            "استخدام التكنولوجيا الرقمية لتحسين طريقة العمل وتيسير تدفق الإجراءات القائمة",
+                            "التدريب الحصري للمدراء على كتابة البريد الإلكتروني دون المساس بآليات العمل",
+                            "حصر المعاملات الدبلوماسية في القنوات اللاسلكية المشفرة والمغلقة"
+                        ],
+                        originalCorrect: 1, // ب
+                        reason: "Digitalization تعني: استخدام التكنولوجيا لتحسين طريقة وأسلوب العمل داخل المؤسسة."
+                    },
+                    {
+                        q: "لماذا يُعتبر 'التحول الرقمي' (Digital Transformation) أعمق بكثير من مجرد تحويل الورق إلى ملفات؟",
+                        options: [
+                            "لأنه يتطلب إعادة بناء وتصميم نموذج العمل والعمليات بالكامل للاستفادة من قدرات التكنولوجيا",
+                            "لأنه يفرض الاستغناء عن القوانين الوطنية واعتماد اللوائح الرقمية للمنظمات الدولية",
+                            "لأنه يستلزم استبدال الطواقم الدبلوماسية بمبرمجين وخبراء أمن سيبراني حصراً",
+                            "لأنه يرفع تكلفة الخدمات القنصلية ويجعلها غير متاحة للمواطنين العاديين"
+                        ],
+                        originalCorrect: 0, // أ
+                        reason: "التحول الرقمي ليس مجرد نقل الورق إلى شاشات، بل هو إعادة بناء نموذج العمل والعمليات اعتماداً على التكنولوجيا."
+                    },
+                    {
+                        q: "في إدارة العمليات، ما الفارق المنهجي بين 'اتخاذ القرار' و'حل المشكلة'؟",
+                        options: [
+                            "اتخاذ القرار للمدير العام، وحل المشكلة من اختصاص لجنة الانضباط المالي حصراً",
+                            "اتخاذ القرار يتعلق بالاختيار بين البدائل، بينما حل المشكلة يتعلق بمعالجة الأسباب الجذرية للخلل",
+                            "اتخاذ القرار يقتصر على القضايا السياسية، بينما حل المشكلة ينحصر في المسائل التقنية",
+                            "المصطلحان مترادفان تماماً ولا يوجد أي فارق في خطوات وإجراءات كل منهما"
+                        ],
+                        originalCorrect: 1, // ب
+                        reason: "اتخاذ القرار (Decision Making) يتعلق باختيار البديل، بينما حل المشكلة (Problem Solving) يتعلق بمعالجة سبب المشكلة الجذري."
+                    },
+                    {
+                        q: "يُعرف مفهوم 'الهدر' في منهجية الإدارة الرشيقة (Lean Management) الحكومية بأنه:",
+                        options: [
+                            "كل نشاط، أو إجراء، أو زمن انتظار مستهلك دون أن يضيف أي قيمة حقيقية للخدمة أو المواطن",
+                            "صرف الرواتب الشهرية والتعويضات الدبلوماسية المستحقة للكوادر العاملة في البعثات",
+                            "شراء منظومات الحماية الرقمية والنسخ الاحتياطي لقواعد البيانات في وزارة الخارجية",
+                            "عقد اللقاءات التنسيقية والمفاوضات السياسية بين الدبلوماسيين لمناقشة الأزمات الدولية"
+                        ],
+                        originalCorrect: 0, // أ
+                        reason: "هدف Lean الأساسي هو تعظيم القيمة وتقليل الهدر، والهدر هو كل ما لا يضيف قيمة (مثل الانتظار، والإجراءات الزائدة، والأخطاء)."
+                    },
+                    {
+                        q: "أي من الخيارات التالية يمثل تطبيقاً حكومياً مباشراً لمنهجية (Lean) لتقليل الهدر؟",
+                        options: [
+                            "تقليص أوقات الانتظار غير المبررة وإلغاء طلب المستندات المكررة والموافقات الزائدة",
+                            "إلزام المراجع بتصديق وثيقته من 5 إدارات داخل نفس المبنى لضمان الدقة الإدارية",
+                            "إيقاف الربط الشبكي مع السجل المدني وطلب إخراج قيد ورقي حديث لكل معاملة",
+                            "تجميع المعاملات الواردة وتأجيل البت فيها شهرياً لدراستها في جلسة واحدة"
+                        ],
+                        originalCorrect: 0, // أ
+                        reason: "تطبيق Lean في الإدارة الحكومية يهدف إلى تقليل الوقت الذي ينتظره المواطن دون قيمة مضافة وإلغاء الخطوات والموافقات الفائضة."
+                    },
+                    {
+                        q: "ما هو الترتيب المنطقي المتكامل للسلسلة الإدارية المعتمدة في محاضرات إدارة العمليات 2024؟",
+                        options: [
+                            "Continuous Improvement -> Performance -> Control -> Processes -> Governance",
+                            "Processes -> Control -> Governance -> Continuous Improvement -> Performance",
+                            "Governance -> Processes -> Performance -> Control -> Continuous Improvement",
+                            "Control -> Performance -> Processes -> Governance -> Continuous Improvement"
+                        ],
+                        originalCorrect: 2, // ج
+                        reason: "التسلسل العلمي المتكامل هو: الحوكمة (القواعد) -> العمليات (إجراءات عملية) -> الأداء (قياس النتائج) -> الرقابة (كشف الانحراف) -> التحسين المستمر (معالجة وتطوير)."
+                    },
+                    {
+                        q: "في السلسلة الإدارية المتكاملة، ما الدور الوظيفي الذي يربط بين الرقابة (Control) والتحسين المستمر؟",
+                        options: [
+                            "الرقابة تمنع التحسين المستمر للحفاظ على استقرار اللوائح الإدارية القديمة المعمول بها",
+                            "الرقابة تكتشف الانحرافات والثغرات، ليتولى التحسين المستمر معالجة الخلل وتطوير الأداء",
+                            "التحسين المستمر يلغي الحاجة لأجهزة الرقابة والتفتيش المالي في الوزارات والمؤسسات",
+                            "الرقابة والتحسين مساران متناقضان لا يلتقيان في أي مرحلة من مراحل الدورة التنظيمية"
+                        ],
+                        originalCorrect: 1, // ب
+                        reason: "الرقابة تكتشف الانحرافات والثغرات، بينما التحسين المستمر يعالج مواطن الخلل ويطور الأداء لمنع تكراره."
+                    }
+                ]
+            }
+        ];
+
+        // خوارزمية الخلط العشوائي (Fisher-Yates Shuffle Engine)
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        // تجهيز مصفوفة الأسئلة بعد الخلط العشوائي الحقيقي للخيارات
+        let quizData = [];
+
+        function prepareQuizEngine() {
+            quizData = rawQuizData.map(sec => {
+                const shuffledQuestions = sec.questions.map(qObj => {
+                    // تكوين كائنات للخيارات لحفظ المؤشر الصحيح
+                    const optionsWithTracking = qObj.options.map((optText, origIdx) => ({
+                        text: optText,
+                        isCorrect: (origIdx === qObj.originalCorrect)
+                    }));
+
+                    // خلط الخيارات عشوائياً
+                    shuffleArray(optionsWithTracking);
+
+                    // استخراج النصوص وتحديد الفهرس الصحيح الجديد
+                    const newOptions = optionsWithTracking.map(o => o.text);
+                    const newCorrectIndex = optionsWithTracking.findIndex(o => o.isCorrect);
+
+                    return {
+                        q: qObj.q,
+                        options: newOptions,
+                        correct: newCorrectIndex,
+                        reason: qObj.reason
+                    };
+                });
+
+                return {
+                    sectionId: sec.sectionId,
+                    sectionName: sec.sectionName,
+                    questions: shuffledQuestions
+                };
+            });
+        }
+
+        // حالة التطبيق والتتبع
+        let activeSection = 0; // 0, 1, 2
+        let currentQuestionIdx = 0; // 0 إلى 24
+        let isReviewingWrongOnly = false;
+        let wrongIndicesList = [];
+
+        // تتبع الإجابات: 3 أقسام كل قسم 25 عنصراً
+        let userProgress = [
+            new Array(25).fill(null),
+            new Array(25).fill(null),
+            new Array(25).fill(null)
+        ];
+
+        // إحصائيات عامة
+        let totalCorrect = 0;
+        let totalIncorrect = 0;
+
+        // مؤقت 60 دقيقة
+        let timerSeconds = 60 * 60;
+        let timerInterval = null;
+
+        // العناصر البرمجية
+        const headerCorrectEl = document.getElementById("header-correct");
+        const headerIncorrectEl = document.getElementById("header-incorrect");
+        const headerQIndexEl = document.getElementById("header-q-index");
+        const sectionProgressEl = document.getElementById("section-progress");
+        const sectionTagEl = document.getElementById("section-tag");
+        const qNumberTitleEl = document.getElementById("q-number-title");
+        const questionTextEl = document.getElementById("question-text");
+        const optionsContainerEl = document.getElementById("options-container");
+        const explanationBoxEl = document.getElementById("explanation-box");
+        const explanationTitleEl = document.getElementById("explanation-title");
+        const explanationTextEl = document.getElementById("explanation-text");
+        const explanationIconEl = document.getElementById("explanation-icon");
+        const prevBtn = document.getElementById("prev-btn");
+        const nextBtn = document.getElementById("next-btn");
+        const quizBoxEl = document.getElementById("quiz-box");
+        const summaryBoxEl = document.getElementById("summary-box");
+        const matrixGridEl = document.getElementById("matrix-grid");
+        const matrixModalEl = document.getElementById("matrix-modal");
+        const examTimerEl = document.getElementById("exam-timer");
+
+        function initApp() {
+            prepareQuizEngine();
+            renderSectionTabs();
+            loadQuestion(0);
+            startCountdown();
+        }
+
+        function startCountdown() {
+            if (timerInterval) clearInterval(timerInterval);
+            timerInterval = setInterval(() => {
+                if (timerSeconds > 0) {
+                    timerSeconds--;
+                    const mins = Math.floor(timerSeconds / 60);
+                    const secs = timerSeconds % 60;
+                    examTimerEl.textContent = `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+                    if (timerSeconds <= 300) {
+                        examTimerEl.classList.add("text-rose-400", "animate-pulse");
+                    }
+                } else {
+                    clearInterval(timerInterval);
+                    examTimerEl.textContent = "00:00";
+                    showSectionSummary();
+                }
+            }, 1000);
+        }
+
+        function renderSectionTabs() {
+            for (let i = 0; i < 3; i++) {
+                const tab = document.getElementById(`sec-tab-${i}`);
+                if (i === activeSection) {
+                    tab.classList.add("active");
+                } else {
+                    tab.classList.remove("active");
+                }
+            }
+        }
+
+        function switchSection(secIndex) {
+            activeSection = secIndex;
+            currentQuestionIdx = 0;
+            isReviewingWrongOnly = false;
+            renderSectionTabs();
+            resumeCurrentSection();
+            loadQuestion(0);
+        }
+
+        function loadQuestion(idx) {
+            currentQuestionIdx = idx;
+            const currentSecData = quizData[activeSection];
+            const qItem = currentSecData.questions[idx];
+            const state = userProgress[activeSection][idx];
+
+            sectionTagEl.textContent = currentSecData.sectionName;
+            qNumberTitleEl.textContent = idx + 1;
+            headerQIndexEl.textContent = idx + 1;
+
+            const pct = ((idx + 1) / 25) * 100;
+            sectionProgressEl.style.width = `${pct}%`;
+
+            questionTextEl.textContent = qItem.q;
+
+            prevBtn.disabled = (idx === 0);
+            if (idx === 24) {
+                nextBtn.textContent = state ? "عرض ملخص القسم" : "التالي";
+            } else {
+                nextBtn.textContent = "التالي";
+            }
+
+            optionsContainerEl.innerHTML = "";
+            const letters = ["أ", "ب", "ج", "د"];
+
+            qItem.options.forEach((optText, optIdx) => {
+                const btn = document.createElement("button");
+                btn.className = "option-btn w-full text-right p-4 rounded-xl flex items-center justify-between text-sm sm:text-base font-medium";
+
+                btn.innerHTML = `
+                    <div class="flex items-center gap-3">
+                        <span class="w-7 h-7 flex-shrink-0 flex items-center justify-center rounded-lg bg-[#272a30] text-gray-300 font-bold text-xs sm:text-sm">
+                            ${letters[optIdx]}
+                        </span>
+                        <span class="text-gray-200">${optText}</span>
+                    </div>
+                `;
+
+                if (state !== null) {
+                    btn.disabled = true;
+                    if (optIdx === qItem.correct) {
+                        btn.classList.add("correct");
+                    }
+                    if (optIdx === state.selectedIndex && !state.isCorrect) {
+                        btn.classList.add("incorrect");
+                    }
+                } else {
+                    btn.onclick = () => handleAnswer(optIdx);
+                }
+
+                optionsContainerEl.appendChild(btn);
+            });
+
+            if (state !== null) {
+                displayExplanation(state.isCorrect, qItem.reason);
+            } else {
+                explanationBoxEl.classList.add("hidden");
+            }
+
+            updateGlobalStats();
+        }
+
+        function handleAnswer(selectedIdx) {
+            const qItem = quizData[activeSection].questions[currentQuestionIdx];
+            const isCorrect = (selectedIdx === qItem.correct);
+
+            userProgress[activeSection][currentQuestionIdx] = {
+                selectedIndex: selectedIdx,
+                isCorrect: isCorrect
+            };
+
+            recalcStats();
+            loadQuestion(currentQuestionIdx);
+        }
+
+        function displayExplanation(isCorrect, reason) {
+            explanationBoxEl.classList.remove("hidden");
+            if (isCorrect) {
+                explanationBoxEl.className = "rounded-xl border p-4 text-sm leading-relaxed transition-all duration-300 bg-emerald-950/40 border-emerald-700/60 text-emerald-300";
+                explanationTitleEl.textContent = "إجابة صحيحة ومطابقة للسند الإداري! ✨";
+                explanationTitleEl.className = "font-bold text-sm mb-1 text-emerald-400";
+                explanationIconEl.textContent = "✔";
+            } else {
+                explanationBoxEl.className = "rounded-xl border p-4 text-sm leading-relaxed transition-all duration-300 bg-rose-950/40 border-rose-800/60 text-rose-300";
+                explanationTitleEl.textContent = "إجابة خاطئة! السند المعرفي المعتمد:";
+                explanationTitleEl.className = "font-bold text-sm mb-1 text-rose-400";
+                explanationIconEl.textContent = "✖";
+            }
+            explanationTextEl.textContent = reason;
+        }
+
+        function recalcStats() {
+            totalCorrect = 0;
+            totalIncorrect = 0;
+            for (let s = 0; s < 3; s++) {
+                for (let q = 0; q < 25; q++) {
+                    const st = userProgress[s][q];
+                    if (st !== null) {
+                        if (st.isCorrect) totalCorrect++;
+                        else totalIncorrect++;
+                    }
+                }
+            }
+            updateGlobalStats();
+        }
+
+        function updateGlobalStats() {
+            headerCorrectEl.textContent = totalCorrect;
+            headerIncorrectEl.textContent = totalIncorrect;
+        }
+
+        function handleNext() {
+            if (currentQuestionIdx < 24) {
+                loadQuestion(currentQuestionIdx + 1);
+            } else {
+                showSectionSummary();
+            }
+        }
+
+        function handlePrev() {
+            if (currentQuestionIdx > 0) {
+                loadQuestion(currentQuestionIdx - 1);
+            }
+        }
+
+        function showSectionSummary() {
+            quizBoxEl.classList.add("hidden");
+            document.querySelector("footer").classList.add("hidden");
+            summaryBoxEl.classList.remove("hidden");
+
+            let secCorrect = 0;
+            let secWrong = 0;
+            wrongIndicesList = [];
+
+            for (let i = 0; i < 25; i++) {
+                const item = userProgress[activeSection][i];
+                if (item !== null) {
+                    if (item.isCorrect) secCorrect++;
+                    else {
+                        secWrong++;
+                        wrongIndicesList.push(i);
+                    }
+                }
+            }
+
+            document.getElementById("summary-title").textContent = `ملخص: ${quizData[activeSection].sectionName}`;
+            document.getElementById("sum-correct").textContent = secCorrect;
+            document.getElementById("sum-wrong").textContent = secWrong;
+            const pct = Math.round((secCorrect / 25) * 100);
+            document.getElementById("sum-percent").textContent = `${pct}%`;
+
+            const totalAnswered = totalCorrect + totalIncorrect;
+            document.getElementById("overall-total-score").textContent = `${totalCorrect} صحيحة من أصل ${totalAnswered} مجابة (من إجمالي 75)`;
+
+            const wrongBtn = document.getElementById("summary-wrong-only-btn");
+            if (wrongIndicesList.length > 0) {
+                wrongBtn.classList.remove("hidden");
+            } else {
+                wrongBtn.classList.add("hidden");
+            }
+
+            const nextSecBtn = document.getElementById("summary-next-sec-btn");
+            if (activeSection < 2) {
+                nextSecBtn.textContent = `الانتقال إلى القسم ${activeSection + 2}`;
+                nextSecBtn.classList.remove("hidden");
+            } else {
+                nextSecBtn.textContent = "العودة للقسم الأول للمراجعة العامة";
+            }
+        }
+
+        function resumeCurrentSection() {
+            summaryBoxEl.classList.add("hidden");
+            quizBoxEl.classList.remove("hidden");
+            document.querySelector("footer").classList.remove("hidden");
+        }
+
+        function reviewWrongOnly() {
+            if (wrongIndicesList.length > 0) {
+                resumeCurrentSection();
+                loadQuestion(wrongIndicesList[0]);
+            }
+        }
+
+        function goToNextSection() {
+            if (activeSection < 2) {
+                switchSection(activeSection + 1);
+            } else {
+                switchSection(0);
+            }
+        }
+
+        function toggleMatrixModal() {
+            if (matrixModalEl.classList.contains("hidden")) {
+                populateMatrixGrid();
+                matrixModalEl.classList.remove("hidden");
+            } else {
+                matrixModalEl.classList.add("hidden");
+            }
+        }
+
+        function populateMatrixGrid() {
+            matrixGridEl.innerHTML = "";
+            for (let i = 0; i < 25; i++) {
+                const btn = document.createElement("button");
+                btn.className = "q-matrix-btn text-xs font-bold py-2 rounded-lg border text-center transition flex flex-col items-center justify-center";
+                
+                const state = userProgress[activeSection][i];
+                if (i === currentQuestionIdx) {
+                    btn.classList.add("current");
+                }
+
+                if (state === null) {
+                    btn.classList.add("bg-[#202227]", "border-[#353941]", "text-gray-300", "hover:bg-[#2b2e35]");
+                } else if (state.isCorrect) {
+                    btn.classList.add("bg-emerald-950/70", "border-emerald-600", "text-emerald-300");
+                } else {
+                    btn.classList.add("bg-rose-950/70", "border-rose-600", "text-rose-300");
+                }
+
+                btn.textContent = (i + 1);
+                btn.onclick = () => {
+                    toggleMatrixModal();
+                    resumeCurrentSection();
+                    loadQuestion(i);
+                };
+
+                matrixGridEl.appendChild(btn);
+            }
+        }
+
+        function copyShareLink() {
+            const toast = document.getElementById("toast");
+            try {
+                const dummy = document.createElement("input");
+                document.body.appendChild(dummy);
+                dummy.value = window.location.href;
+                dummy.select();
+                document.execCommand("copy");
+                document.body.removeChild(dummy);
+
+                toast.classList.remove("hidden");
+                setTimeout(() => toast.classList.add("hidden"), 2500);
+            } catch (e) {
+                console.error("تعذر النسخ");
+            }
+        }
+
+        window.onload = function() {
+            initApp();
+        };
+    </script>
+</body>
+</html>
