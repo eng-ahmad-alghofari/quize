@@ -1,0 +1,2371 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>بنك الاختبار الدبلوماسي الشامل - تاريخ وجغرافيا وثقافة سوريا (100 سؤال)</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- خطوط عربية فاخرة وواضحة -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Cairo', 'Tajawal', sans-serif;
+            background-color: #0d0f12;
+            color: #e2e5ea;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+        .canvas-card {
+            background-color: #15181e;
+            border: 1px solid #232732;
+        }
+        .option-btn {
+            background-color: #1a1e26;
+            border: 1px solid #2a303d;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .option-btn:hover:not(:disabled) {
+            background-color: #222733;
+            border-color: #3d4659;
+            transform: translateY(-1.5px);
+        }
+        .option-btn.correct {
+            background-color: rgba(16, 185, 129, 0.16) !important;
+            border-color: #10b981 !important;
+            color: #34d399 !important;
+            box-shadow: 0 0 14px rgba(16, 185, 129, 0.22);
+        }
+        .option-btn.incorrect {
+            background-color: rgba(239, 68, 68, 0.16) !important;
+            border-color: #ef4444 !important;
+            color: #f87171 !important;
+            box-shadow: 0 0 14px rgba(239, 68, 68, 0.22);
+        }
+        .nav-chip {
+            transition: all 0.2s ease;
+            white-space: nowrap;
+        }
+        .nav-chip.active {
+            background-color: #0284c7;
+            color: #ffffff;
+            border-color: #38bdf8;
+            box-shadow: 0 2px 10px rgba(2, 132, 199, 0.45);
+        }
+        .q-matrix-btn.current {
+            outline: 2px solid #0284c7;
+            outline-offset: 2px;
+        }
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0d0f12;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #252b38;
+            border-radius: 9999px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #363e50;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between selection:bg-sky-600 selection:text-white">
+
+    <!-- الشريط العلوي والتنقل -->
+    <header class="w-full border-b border-[#212631] bg-[#12151b] px-3 sm:px-4 py-3 sticky top-0 z-50 shadow-xl">
+        <div class="max-w-6xl mx-auto flex flex-col gap-2.5">
+            
+            <!-- السطر الأول: الإجراءات، العنوان، والعداد التراكمي -->
+            <div class="flex flex-wrap items-center justify-between gap-2.5">
+                <div class="flex items-center gap-2">
+                    <button onclick="copyShareLink()" class="text-xs bg-[#191d25] hover:bg-[#222733] text-sky-300 border border-[#2b3240] px-3 py-1.5 rounded-full transition font-medium flex items-center gap-1.5 shadow-sm">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/>
+                        </svg>
+                        مشاركة
+                    </button>
+                    <button onclick="resetCurrentQuiz()" class="text-xs bg-[#191d25] hover:bg-[#2d1b1b] text-rose-300 border border-[#3c2525] px-3 py-1.5 rounded-full transition font-medium flex items-center gap-1.5 shadow-sm">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                        </svg>
+                        إعادة الاختبار
+                    </button>
+                    <div id="toast" class="hidden text-xs bg-emerald-950 border border-emerald-600 text-emerald-300 px-2.5 py-1 rounded-md animate-pulse">
+                        تم نسخ الرابط!
+                    </div>
+                </div>
+
+                <div class="text-center">
+                    <h1 class="text-xs sm:text-sm md:text-base font-bold text-gray-100 flex items-center justify-center gap-1.5">
+                        <span class="text-sky-400">🌐</span>
+                        <span>بنك الاختبار الدبلوماسي - ثقافة وتاريخ وجغرافيا سوريا (100 سؤال)</span>
+                    </h1>
+                </div>
+
+                <!-- العداد والوقت والنتائج -->
+                <div class="flex items-center gap-2 sm:gap-2.5">
+                    <div class="flex items-center gap-1 bg-[#171b23] border border-[#2b3240] text-amber-300 text-xs font-semibold px-2.5 py-1 rounded-full">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <span id="open-timer">الوقت مفتوح</span>
+                    </div>
+
+                    <div class="flex items-center gap-1 bg-[#0f2418] border border-[#14532d] text-emerald-400 text-xs sm:text-sm font-bold px-2.5 py-1 rounded-full">
+                        <span id="header-correct">0</span>
+                        <span class="text-xs">✔</span>
+                    </div>
+                    <div class="flex items-center gap-1 bg-[#251212] border border-[#7f1d1d] text-rose-400 text-xs sm:text-sm font-bold px-2.5 py-1 rounded-full">
+                        <span id="header-incorrect">0</span>
+                        <span class="text-xs">✖</span>
+                    </div>
+                    <div class="text-xs font-medium text-gray-300 bg-[#191d25] px-2.5 py-1 rounded-full border border-[#2b3240]">
+                        <span id="header-q-index">1</span> / <span id="header-q-total">20</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ألسنة الأقسام الخمسة (كل قسم 20 سؤالاً) -->
+            <div class="flex items-center gap-1.5 overflow-x-auto pb-1 text-xs scrollbar-none">
+                <button onclick="switchSection(0)" id="sec-tab-0" class="nav-chip active flex-shrink-0 px-3 py-1.5 rounded-full border border-[#2b3240] font-medium bg-[#171b23] text-gray-300 hover:text-white">
+                    1. الجغرافيا والموارد (20)
+                </button>
+                <button onclick="switchSection(1)" id="sec-tab-1" class="nav-chip flex-shrink-0 px-3 py-1.5 rounded-full border border-[#2b3240] font-medium bg-[#171b23] text-gray-300 hover:text-white">
+                    2. الحضارات والتراث العالمي (20)
+                </button>
+                <button onclick="switchSection(2)" id="sec-tab-2" class="nav-chip flex-shrink-0 px-3 py-1.5 rounded-full border border-[#2b3240] font-medium bg-[#171b23] text-gray-300 hover:text-white">
+                    3. التاريخ السياسي والاستقلال (20)
+                </button>
+                <button onclick="switchSection(3)" id="sec-tab-3" class="nav-chip flex-shrink-0 px-3 py-1.5 rounded-full border border-[#2b3240] font-medium bg-[#171b23] text-gray-300 hover:text-white">
+                    4. الرؤساء والدبلوماسيون (20)
+                </button>
+                <button onclick="switchSection(4)" id="sec-tab-4" class="nav-chip flex-shrink-0 px-3 py-1.5 rounded-full border border-[#2b3240] font-medium bg-[#171b23] text-gray-300 hover:text-white">
+                    5. الدبلوماسية والمنظمات الدولية (20)
+                </button>
+            </div>
+
+            <!-- شريط التقدم للقسم الحالي -->
+            <div class="w-full bg-[#191d25] h-1.5 rounded-full overflow-hidden">
+                <div id="section-progress" class="bg-sky-500 h-full w-[5%] transition-all duration-300 ease-out"></div>
+            </div>
+        </div>
+    </header>
+
+    <!-- منطقة المحتوى الرئيسية -->
+    <main class="max-w-4xl w-full mx-auto p-4 sm:p-6 flex-grow flex flex-col justify-center">
+
+        <!-- صندوق السؤال التفاعلي -->
+        <div id="quiz-box" class="space-y-5">
+
+            <!-- شريط الترويسة للسؤال وزر المصدر وفهرس الأسئلة -->
+            <div class="flex flex-wrap items-center justify-between gap-2 border-b border-[#212631] pb-3">
+                <div class="flex items-center gap-2">
+                    <span id="section-tag" class="text-xs font-semibold px-2.5 py-1 rounded bg-sky-950/70 border border-sky-700/60 text-sky-300">
+                        القسم 1: الجغرافيا والموارد
+                    </span>
+                    <span class="text-xs text-gray-400 font-medium">
+                        السؤال <span id="q-number-title">1</span> من <span id="q-total-title">20</span>
+                    </span>
+                </div>
+                
+                <div class="flex items-center gap-2">
+                    <!-- الزر المطلوب صراحة: زر المصدر الموثق -->
+                    <button onclick="toggleSourceBox()" id="btn-toggle-source" class="text-xs bg-[#162230] hover:bg-[#1d2d40] text-sky-300 border border-sky-700/60 px-3 py-1.5 rounded-md transition flex items-center gap-1.5 shadow-sm font-semibold">
+                        <svg class="w-3.5 h-3.5 text-sky-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+                        </svg>
+                        <span>📖 مصدر المعلومة والتوثيق (اضغط هنا)</span>
+                    </button>
+
+                    <button onclick="toggleMatrixModal()" class="text-xs bg-[#191d25] hover:bg-[#222733] text-gray-300 border border-[#2b3240] px-2.5 py-1.5 rounded-md transition flex items-center gap-1.5">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/>
+                        </svg>
+                        فهرس أسئلة القسم (Matrix)
+                    </button>
+                </div>
+            </div>
+
+            <!-- صندوق المصدر والتوثيق (يظهر فقط عند الضغط على الزر كما طُلب بدقة) -->
+            <div id="source-box" class="hidden rounded-xl border border-sky-800/60 bg-[#101824] p-4 text-xs sm:text-sm leading-relaxed transition-all duration-300 shadow-xl space-y-2.5">
+                <div class="flex items-center justify-between border-b border-sky-900/60 pb-2.5">
+                    <span class="font-bold text-sky-300 flex items-center gap-1.5 text-xs sm:text-sm">
+                        <span>🏛️</span>
+                        <span>المصدر المعتمد:</span>
+                        <span id="source-site-name" class="text-sky-200 underline">ويكيبيديا الموسوعة الحرة</span>
+                    </span>
+                    <a id="source-url-link" href="#" target="_blank" rel="noopener noreferrer" class="bg-sky-600 hover:bg-sky-500 text-white font-semibold px-3 py-1 rounded text-xs flex items-center gap-1.5 transition shadow">
+                        <span>زيارة صفحة المصدر في ويكيبيديا ↗</span>
+                    </a>
+                </div>
+
+                <div class="space-y-1.5 text-gray-300 pt-1">
+                    <div>
+                        <span class="font-bold text-gray-200">عنوان المقال:</span> 
+                        <span id="source-article-title" class="text-sky-300 font-medium"></span>
+                    </div>
+                    <div>
+                        <span class="font-bold text-gray-200">المكان الدقيق للمعلومة في المقال:</span> 
+                        <span id="source-section-location" class="text-amber-300 font-bold bg-amber-950/60 px-2 py-0.5 rounded border border-amber-800/40"></span>
+                    </div>
+                    <div class="bg-[#090f18] p-3 rounded-lg border border-sky-950/80 mt-2">
+                        <span class="font-semibold text-gray-400 block mb-1 text-xs">نص الاقتباس الموثق والمطابق للإجابة:</span>
+                        <p id="source-exact-quote" class="text-gray-300 italic text-xs leading-relaxed border-r-2 border-sky-500 pr-2"></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- نص السؤال -->
+            <div>
+                <h2 id="question-text" class="text-base sm:text-lg md:text-xl font-bold leading-relaxed text-gray-100">
+                    جاري تحميل السؤال الدبلوماسي...
+                </h2>
+            </div>
+
+            <!-- شبكة الخيارات الأربعة -->
+            <div id="options-container" class="grid grid-cols-1 gap-3 pt-1">
+                <!-- يتم توليد الأزرار برمجياً -->
+            </div>
+
+            <!-- صندوق الشرح والتعليل المعرفي -->
+            <div id="explanation-box" class="hidden rounded-xl border p-4 text-sm leading-relaxed transition-all duration-300">
+                <div class="flex items-start gap-3">
+                    <div id="explanation-icon" class="text-xl">💡</div>
+                    <div class="flex-1">
+                        <h4 id="explanation-title" class="font-bold text-sm mb-1">التحليل والسند المعرفي والدبلوماسي:</h4>
+                        <p id="explanation-text" class="text-gray-300 text-xs sm:text-sm leading-relaxed"></p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- شاشة ملخص نتائج القسم -->
+        <div id="summary-box" class="hidden canvas-card rounded-2xl p-6 sm:p-10 text-center space-y-6 shadow-2xl">
+            <div class="text-5xl">📊</div>
+            <h2 id="summary-title" class="text-2xl sm:text-3xl font-extrabold text-white">ملخص أداء القسم الدبلوماسي</h2>
+            <p id="summary-subtitle" class="text-gray-400 text-sm max-w-lg mx-auto">
+                تم الانتهاء من أسئلة هذا القسم بنجاح. يمكنك استعراض نتيجتك أو مراجعة الأسئلة الخاطئة فقط بدقة.
+            </p>
+
+            <div class="grid grid-cols-3 gap-3 max-w-lg mx-auto py-2">
+                <div class="bg-[#0f2418] border border-[#14532d] p-4 rounded-xl">
+                    <span id="sum-correct" class="block text-2xl font-black text-emerald-400">0</span>
+                    <span class="text-xs text-gray-300">إجابة صحيحة</span>
+                </div>
+                <div class="bg-[#251212] border border-[#7f1d1d] p-4 rounded-xl">
+                    <span id="sum-wrong" class="block text-2xl font-black text-rose-400">0</span>
+                    <span class="text-xs text-gray-300">إجابة خاطئة</span>
+                </div>
+                <div class="bg-[#122238] border border-[#0369a1] p-4 rounded-xl">
+                    <span id="sum-percent" class="block text-2xl font-black text-sky-400">0%</span>
+                    <span class="text-xs text-gray-300">النسبة المئوية</span>
+                </div>
+            </div>
+
+            <div class="bg-[#171b23] border border-[#2b3240] p-3 rounded-xl max-w-md mx-auto text-xs text-gray-300">
+                إجمالي الاختبار الدبلوماسي الكامل (100 سؤال): 
+                <span id="overall-total-score" class="font-bold text-white">0 / 100</span>
+            </div>
+
+            <div class="flex flex-wrap justify-center gap-3 pt-2">
+                <button onclick="resumeCurrentSection()" class="px-5 py-2.5 bg-[#1f2530] hover:bg-[#28303e] text-gray-200 font-medium rounded-xl text-xs sm:text-sm border border-[#323c4d] transition">
+                    مراجعة أسئلة القسم
+                </button>
+                <button id="summary-wrong-only-btn" onclick="reviewWrongOnly()" class="px-5 py-2.5 bg-rose-950 hover:bg-rose-900 text-rose-200 font-medium rounded-xl text-xs sm:text-sm border border-rose-800 transition">
+                    مراجعة الأخطاء فقط ✖
+                </button>
+                <button id="summary-next-sec-btn" onclick="goToNextSection()" class="px-6 py-2.5 bg-sky-600 hover:bg-sky-700 text-white font-medium rounded-xl text-xs sm:text-sm shadow-md transition">
+                    الانتقال للقسم التالي
+                </button>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- شريط التحكم السفلي -->
+    <footer class="w-full border-t border-[#212631] bg-[#12151b] px-4 py-3 sticky bottom-0 z-40">
+        <div class="max-w-4xl mx-auto flex items-center justify-between">
+            <button id="prev-btn" onclick="handlePrev()" disabled class="px-5 py-2 text-xs sm:text-sm font-semibold rounded-lg bg-[#191d25] text-gray-500 border border-[#2b3240] disabled:opacity-30 disabled:cursor-not-allowed hover:enabled:bg-[#222733] hover:enabled:text-white transition">
+                السابق
+            </button>
+            
+            <span class="text-xs text-gray-400 hidden sm:inline-block">
+                الوقت مفتوح - يمكنك التخطي والاطلاع على المصدر الموثق لكل سؤال بحرية تامة
+            </span>
+
+            <button id="next-btn" onclick="handleNext()" class="px-7 py-2 text-xs sm:text-sm font-semibold rounded-lg bg-sky-600 hover:bg-sky-700 text-white shadow transition">
+                التالي
+            </button>
+        </div>
+    </footer>
+
+    <!-- نافذة فهرس الأسئلة (Matrix Modal) -->
+    <div id="matrix-modal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="canvas-card w-full max-w-lg rounded-2xl p-5 border border-[#2d3545] shadow-2xl space-y-4">
+            <div class="flex items-center justify-between border-b border-[#232732] pb-3">
+                <h3 id="matrix-title" class="font-bold text-sm text-gray-200">فهرس أسئلة القسم الحالي</h3>
+                <button onclick="toggleMatrixModal()" class="text-gray-400 hover:text-white text-lg font-bold">&times;</button>
+            </div>
+
+            <p class="text-xs text-gray-400">انقر على رقم السؤال للانتقال المباشر أو التخطي والرجوع إليه لاحقاً:</p>
+            <div id="matrix-grid" class="grid grid-cols-5 sm:grid-cols-5 gap-2.5 max-h-72 overflow-y-auto p-1">
+                <!-- مربعات الأسئلة العشرون -->
+            </div>
+            <div class="flex items-center justify-between text-xs pt-2 border-t border-[#232732] text-gray-400">
+                <div class="flex items-center gap-1"><span class="w-3 h-3 rounded bg-emerald-950 border border-emerald-500 inline-block"></span> صحيح</div>
+                <div class="flex items-center gap-1"><span class="w-3 h-3 rounded bg-rose-950 border border-rose-500 inline-block"></span> خاطئ</div>
+                <div class="flex items-center gap-1"><span class="w-3 h-3 rounded bg-[#191d25] border border-[#2b3240] inline-block"></span> لم يُحل</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- المحرك البرمجي وبنك الأسئلة -->
+    <script>
+        const quizData = [
+  {
+    "sectionId": 0,
+    "sectionName": "القسم 1: الجغرافيا والتضاريس والموارد الاستراتيجية",
+    "sectionBadge": "القسم 1: الجغرافيا والموارد (20)",
+    "questions": [
+      {
+        "q": "سؤال 1: كم تبلغ المساحة الإجمالية الرسمية للجمهورية العربية السورية وفق المعطيات الجغرافية المعتمدة؟",
+        "options": [
+          "155,200 كيلومتر مربع",
+          "185,180 كيلومتر مربع",
+          "210,450 كيلومتر مربع",
+          "175,800 كيلومتر مربع"
+        ],
+        "correct": 1,
+        "reason": "تبلغ المساحة الإجمالية لسوريا 185,180 كم² (71,498 ميل مربع)، وتتنوع تضاريسها بين السهول الساحلية والسلاسل الجبلية والبادية.",
+        "sourceSite": "ويكيبيديا الموسوعة الحرة",
+        "sourceArticle": "مقال: جغرافيا سوريا",
+        "sourceUrl": "https://ar.wikipedia.org/wiki/%D8%AC%D8%BA%D8%B1%D8%A7%D9%81%D9%8A%D8%A7_%D8%B3%D9%88%D8%B1%D9%8A%D8%A7",
+        "sourceLocation": "فقرة: 'الموقع والمساحة'",
+        "sourceQuote": "تبلغ مساحة الجمهورية العربية السورية 185,180 كم²، وتعد في المرتبة 88 عالمياً من حيث المساحة."
+      },
+      {
+        "q": "سؤال 2: مع أيٍّ من دول الجوار ترتبط سوريا بأطول شريط حدودي بري، وكم يبلغ طوله تقريباً؟",
+        "options": [
+          "مع العراق بطول نحو 605 كيلومترات",
+          "مع تركيا بطول نحو 822 كيلومتراً",
+          "مع الأردن بطول نحو 375 كيلومتراً",
+          "مع لبنان بطول نحو 375 كيلومتراً"
+        ],
+        "correct": 1,
+        "reason": "تشترك سوريا مع تركيا شمالاً بأطول حدود برية تمتد لنحو 822 كم، تليها الحدود مع العراق شرقاً بطول 605 كم، ثم الأردن ولبنان جنوباً وغرباً.",
+        "sourceSite": "ويكيبيديا الموسوعة الحرة",
+        "sourceArticle": "مقال: جغرافيا سوريا",
+        "sourceUrl": "https://ar.wikipedia.org/wiki/%D8%AC%D8%BA%D8%B1%D8%A7%D9%81%D9%8A%D8%A7_%D8%B3%D9%88%D8%B1%D9%8A%D8%A7",
+        "sourceLocation": "فقرة: 'الحدود البرية والبحرية'",
+        "sourceQuote": "يبلغ طول الحدود البرية مع تركيا 822 كم وهي الأطول لسوريا مع أي دولة مجاورة."
+      },
+      {
+        "q": "سؤال 3: ما هي أعلى قمة جبلية في سوريا، وكم يبلغ ارتفاعها عن مستوى سطح البحر؟",
+        "options": [
+          "قمة النبي يونس في جبال الساحل بارتفاع 1560 متراً",
+          "قمة جبل الشيخ (حرمون) بارتفاع 2814 متراً",
+          "قمة تل قينة في جبل العرب بارتفاع 1803 أمتار",
+          "قمة جبل عبد العزيز بارتفاع 920 متراً"
+        ],
+        "correct": 1,
+        "reason": "تعتبر قمة جبل الشيخ (حرمون) ضمن سلسلة جبال لبنان الشرقية أعلى نقطة في سوريا بارتفاع 2814 متراً عن مستوى سطح البحر، وتكسوها الثلوج أغلب فترات العام.",
+        "sourceSite": "ويكيبيديا الموسوعة الحرة",
+        "sourceArticle": "مقال: جبل الشيخ",
+        "sourceUrl": "https://ar.wikipedia.org/wiki/%D8%AC%D8%A8%D9%84_%D8%A7%D9%84%D8%B4%D9%8a%D8%AE",
+        "sourceLocation": "فقرة: 'التضاريس والارتفاع'",
+        "sourceQuote": "يصل أعلى ارتفاع لجبل الشيخ إلى 2814 متراً عند قمة قصر شبيب، وهي أعلى قمة في سوريا."
+      },
+      {
+        "q": "سؤال 4: ما هو أطول نهر يجري داخل الأراضي السورية، وأين يدخل الأراضي السورية وأين يغادرها؟",
+        "options": [
+          "نهر دجلة؛ يدخل عند عين ديوار ويغادر عند فش خابور",
+          "نهر الفرات؛ يدخل عند مدينة جرابلس ويغادر عند مدينة البوكمال",
+          "نهر العاصي؛ يدخل من القصير ويغادر عند دركوش",
+          "نهر اليرموك؛ يدخل من نوى ويغادر عند تل شهاب"
+        ],
+        "correct": 1,
+        "reason": "نهر الفرات هو أطول نهر في سوريا؛ يبلغ طول مجراه داخل الأراضي السورية حوالي 675 كم، يدخل من الشمال عند مدينة جرابلس ويخرج شرقاً نحو العراق عند البوكمال.",
+        "sourceSite": "ويكيبيديا الموسوعة الحرة",
+        "sourceArticle": "مقال: الفرات",
+        "sourceUrl": "https://ar.wikipedia.org/wiki/%D8%A7%D9%84%D9%81%D8%B1%D8%A7%D8%AA",
+        "sourceLocation": "فقرة: 'المسار في سوريا'",
+        "sourceQuote": "يدخل الفرات الأراضي السورية عند مدينة جرابلس ويقطعها لمسافة تزيد عن 600 كم حتى يغادرها عند البوكمال."
+      },
+      {
+        "q": "سؤال 5: من أين ينبع نهر العاصي السوري، وما هي السمة الهيدروغرافية الفريدة التي تميزه عن بقية أنهار المنطقة؟",
+        "options": [
+          "ينبع من بحيرة طبريا ويتجه جنوباً نحو البحر الميت",
+          "ينبع من هضبة الأناضول ويتجه غرباً ليصب في بحيرة الأسد",
+          "ينبع من سهل البقاع في لبنان ويتجه شمالاً عكس انحدار معظم أنهار بلاد الشام ليصب في البحر الأبيض المتوسط",
+          "ينبع من جبل الزاوية ويتجه شرقاً نحو بادية الرصافة"
+        ],
+        "correct": 2,
+        "reason": "سُمي العاصي بهذا الاسم لأنه ينبع من اللبوة في سهل البقاع اللبناني ويتجه شمالاً (عاصياً الاتجاه العام لانحدار الأنهار بالمنطقة نحو الجنوب)، ويمر بحمص وحماة ثم يصب في المتوسط.",
+        "sourceSite": "ويكيبيديا الموسوعة الحرة",
+        "sourceArticle": "مقال: نهر العاصي",
+        "sourceUrl": "https://ar.wikipedia.org/wiki/%D9%86%D9%87%D8%B1_%D8%A7%D9%84%D8%B9%D8%A7%D8%B5%D9%8A",
+        "sourceLocation": "فقرة: 'التسمية والمجرى'",
+        "sourceQuote": "سُمي بالعاصي لأنه يجري من الجنوب إلى الشمال متمرداً على الاتجاه الطبيعي لمعظم أنهار المنطقة."
+      },
+      {
+        "q": "سؤال 6: ما هو النهر التاريخي الذي ينبع من سهل الزبداني ويمر بالعاصمة دمشق ليتفرع إلى سبعة فروع رئيسية؟",
+        "options": [
+          "نهر الأعوج",
+          "نهر بردى",
+          "نهر السن",
+          "نهر اليرموك"
+        ],
+        "correct": 1,
+        "reason": "نهر بردى هو النهر التاريخي لمدينة دمشق؛ ينبع من نبع بردى في الزبداني شمال غرب دمشق، ويتفرع في دمشق إلى سبعة فروع تروي بساتين الغوطة قبل أن يصب في بحيرة العتيبة.",
+        "sourceSite": "ويكيبيديا الموسوعة الحرة",
+        "sourceArticle": "مقال: بردى",
+        "sourceUrl": "https://ar.wikipedia.org/wiki/%D8%A8%D8%B1%D8%AF%D9%89",
+        "sourceLocation": "فقرة: 'المجرى والفروع'",
+        "sourceQuote": "ينبع بردى من سهل الزبداني ويتجه شرقاً مخترقاً مدينة دمشق حيث يتفرع إلى فروعه السبعة الشهيرة."
+      },
+      {
+        "q": "سؤال 7: ما هي أكبر بحيرة صناعية في سوريا، وما هو السد الهندسي العملاق الذي يحتجز مياهها؟",
+        "options": [
+          "بحيرة قطينة خلف سد الرستن",
+          "بحيرة الأسد خلف سد الطبقة (سد الفرات)",
+          "بحيرة 16 تشرين خلف سد الباسل باللاذقية",
+          "بحيرة البعث خلف سد تشرين"
+        ],
+        "correct": 1,
+        "reason": "بحيرة الأسد هي أكبر خزان مائي اصطناعي في سوريا بمساحة تبلغ نحو 640 كم² وسعة تخزينية تصل لـ 14.1 مليار متر مكعب، تكونت نتيجة بناء سد الفرات في مدينة الطبقة.",
+        "sourceSite": "ويكيبيديا الموسوعة الحرة",
+        "sourceArticle": "مقال: بحيرة الأسد",
+        "sourceUrl": "https://ar.wikipedia.org/wiki/%D8%A8%D8%AD%D9%8A%D8%B1%D8%A9_%D8%A7%D9%84%D8%A3%D8%B3%D8%AF",
+        "sourceLocation": "فقرة: 'المواصفات والسعة'",
+        "sourceQuote": "تعد بحيرة الأسد خلف سد الفرات بالطبقة أكبر بحيرات سوريا الصناعية بمساحة 640 كم²."
+      },
+      {
+        "q": "سؤال 8: ما هي أكبر محافظة سورية من حيث المساحة الجغرافية؟",
+        "options": [
+          "محافظة دير الزور",
+          "محافظة حمص",
+          "محافظة حلب",
+          "محافظة الحسكة"
+        ],
+        "correct": 1,
+        "reason": "تعد محافظة حمص أكبر محافظات سوريا مساحة؛ حيث تبلغ مساحتها حوالي 42,223 كم²، وتشكل وحدها أكثر من 22% من المساحة الإجمالية للبلاد وتمتد من حدود لبنان حتى العراق.",
+        "sourceSite": "ويكيبيديا الموسوعة الحرة",
+        "sourceArticle": "مقال: محافظة حمص",
+        "sourceUrl": "https://ar.wikipedia.org/wiki/%D9%85%D8%AD%D8%A7%D9%81%D8%B8%D8%A9_%D8%AD%D9%85%D8%B5",
+        "sourceLocation": "فقرة: 'الموقع والمساحة'",
+        "sourceQuote": "محافظة حمص هي كبرى المحافظات السورية مساحةً حيث تبلغ مساحتها 42,223 كيلومتراً مربعاً."
+      },
+      {
+        "q": "سؤال 9: كم يبلغ طول الشريط الساحلي للجمهورية العربية السورية المطل على البحر الأبيض المتوسط؟",
+        "options": [
+          "حوالي 95 كيلومتراً",
+          "حوالي 183 - 193 كيلومتراً",
+          "حوالي 320 كيلومتراً",
+          "حوالي 450 كيلومتراً"
+        ],
+        "correct": 1,
+        "reason": "يمتد الساحل السوري على البحر الأبيض المتوسط بطول يتراوح بين 183 و193 كم، ويضم الموانئ الرئيسية للبلاد في مدينتي اللاذقية وطرطوس وبانياس.",
+        "sourceSite": "ويكيبيديا الموسوعة الحرة",
+        "sourceArticle": "مقال: الساحل السوري",
+        "sourceUrl": "https://ar.wikipedia.org/wiki/%D8%AC%D8%BA%D8%B1%D8%A7%D9%81%D9%8A%D8%A7_%D8%B3%D9%88%D8%B1%D9%8A%D8%A7",
+        "sourceLocation": "فقرة: 'الساحل والموانئ'",
+        "sourceQuote": "يبلغ طول الساحل السوري على البحر الأبيض المتوسط نحو 185 كم إلى 193 كم."
+      },
+      {
+        "q": "سؤال 10: ما هي الجزيرة السورية المأهولة الوحيدة على امتداد الساحل السوري في البحر الأبيض المتوسط؟",
+        "options": [
+          "جزيرة النمل",
+          "جزيرة أرواد",
+          "جزيرة الحمام",
+          "جزيرة العباس"
+        ],
+        "correct": 1,
+        "reason": "جزيرة أرواد قبالة شاطئ طرطوس هي الجزيرة المأهولة الوحيدة في سوريا، وتتميز بتاريخ بحري فينيقي عريق وأسوار ضخمة كنعانية.",
+        "sourceSite": "ويكيبيديا الموسوعة الحرة",
+        "sourceArticle": "مقال: أرواد",
+        "sourceUrl": "https://ar.wikipedia.org/wiki/%D8%A3%D8%B1%D9%88%D8%A7%D8%AF",
+        "sourceLocation": "فقرة: 'الموقع والأهمية'",
+        "sourceQuote": "أرواد هي الجزيرة المأهولة الوحيدة في سوريا، وتقع على بعد 3 كم من شاطئ طرطوس."
+      },
+      {
+        "q": "سؤال 11: كم تشكل 'بادية الشام' (البادية السورية) تقريباً من إجمالي مساحة الجمهورية العربية السورية؟",
+        "options": [
+          "حوالي 25% من المساحة",
+          "حوالي 55% من المساحة",
+          "حوالي 75% من المساحة",
+          "حوالي 40% من المساحة"
+        ],
+        "correct": 1,
+        "reason": "تغطي البادية السورية الهضبية والصحراوية حوالي 55% من مساحة سوريا، وتمتد عبر محافظات حمص ودير الزور والرقة وريف دمشق والسويداء وتزخر بمكامن الفوسفات والغاز.",
+        "sourceSite": "ويكيبيديا الموسوعة الحرة",
+        "sourceArticle": "مقال: بادية الشام",
+        "sourceUrl": "https://ar.wikipedia.org/wiki/%D8%A8%D8%A7%D8%AF%D9%8A%D8%A9_%D8%A7%D9%84%D8%B4%D8%A7%D9%85",
+        "sourceLocation": "فقرة: 'الجغرافيا والمناخ'",
+        "sourceQuote": "تغطي البادية السورية ما يقارب 55% من المساحة الكلية لسوريا."
+      },
+      {
+        "q": "سؤال 12: ما هي البحيرة البركانية الطبيعية الشهيرة الواقعة في هضبة الجولان السورية المحتلة؟",
+        "options": [
+          "بحيرة قطينة",
+          "بحيرة مسعدة (بركة رعام)",
+          "بحيرة العتيبة",
+          "بحيرة مزيريب"
+        ],
+        "correct": 1,
+        "reason": "بحيرة مسعدة (برام رعام) هي بحيرة طبيعية تتجمع في فوهة بركان خامد تقع قرب قرية مسعدة في شمال هضبة الجولان السورية وتعتبر معلماً جغرافياً مائياً فريداً.",
+        "sourceSite": "ويكيبيديا الموسوعة الحرة",
+        "sourceArticle": "مقال: بركة رام",
+        "sourceUrl": "https://ar.wikipedia.org/wiki/%D8%A8%D8%B1%D9%83%D8%A9_%D8%B1%D8%A7%D9%85",
+        "sourceLocation": "فقرة: 'التكوين الجيولوجي'",
+        "sourceQuote": "بركة رام بحيرة طبيعية في فوهة بركان خامد في هضبة الجولان السورية المحتلة."
+      },
+      {
+        "q": "سؤال 13: ما هو النهر الحيوي الذي يُعد أكبر روافد نهر الفرات في منطقة الجزيرة السورية وينبع من رأس العين؟",
+        "options": [
+          "نهر البليخ",
+          "نهر الخابور",
+          "نهر الساجور",
+          "نهر جغبجغ"
+        ],
+        "correct": 1,
+        "reason": "نهر الخابور هو أكبر روافد نهر الفرات داخل سوريا؛ ينبع من ينابيع رأس العين بمحافظة الحسكة ويمر بتل تمر والحسكة ويصب في الفرات قرب البصيرة بدير الزور.",
+        "sourceSite": "ويكيبيديا الموسوعة الحرة",
+        "sourceArticle": "مقال: نهر الخابور",
+        "sourceUrl": "https://ar.wikipedia.org/wiki/%D9%86%D9%87%D8%B1_%D8%A7%D9%84%D8%AE%D8%A7%D8%A8%D9%88%D8%B1",
+        "sourceLocation": "فقرة: 'المسار والروافد'",
+        "sourceQuote": "نهر الخابور هو أطول رافد لنهر الفرات في سوريا وينبع من ينابيع مدينة رأس العين."
+      },
+      {
+        "q": "سؤال 14: ما هي المحافظة السورية المعروفة بأنها 'سلة الغذاء والقمح' في سوريا، وتقع في أقصى الشمال الشرقي؟",
+        "options": [
+          "محافظة درعا",
+          "محافظة الحسكة",
+          "محافظة طرطوس",
+          "محافظة إدلب"
+        ],
+        "correct": 1,
+        "reason": "تُعد محافظة الحسكة (الجزيرة السورية) سلة الغذاء والقمح الأولى في سوريا بإنتاجها لأكثر من ثلث إنتاج القمح والقطن والثروات الزراعية والنفطية (رميلان والسويدية).",
+        "sourceSite": "ويكيبيديا الموسوعة الحرة",
+        "sourceArticle": "مقال: محافظة الحسكة",
+        "sourceUrl": "https://ar.wikipedia.org/wiki/%D9%85%D8%AD%D8%A7%D9%81%D8%B8%D8%A9_%D8%A7%D9%84%D8%AD%D8%B3%D9%83%D8%A9",
+        "sourceLocation": "فقرة: 'الزراعة والاقتصاد'",
+        "sourceQuote": "تعد الحسكة سلة سوريا الغذائية نظراً لخصوبة أراضيها وإنتاجها الضخم من القمح الصلب والقطن."
+      },
+      {
+        "q": "سؤال 15: أين تتركز أضخم مناجم ومكامن استخراج خامات 'الفوسفات' في الأراضي السورية؟",
+        "options": [
+          "في ريف اللاذقية الشمالي (كسب)",
+          "في ريف حمص الشرقي بمنطقة تدمر (خنيفيس والصوانة)",
+          "في سهل الغاب بحماة",
+          "في حوض اليرموك بدرعا"
+        ],
+        "correct": 1,
+        "reason": "تتركز ثروة سوريا الهائلة من الفوسفات في منطقة البادية السورية التابعة لمحافظة حمص قرب تدمر، وتحديداً في منجمي خنيفيس والصوانة الشرقية.",
+        "sourceSite": "ويكيبيديا الموسوعة الحرة",
+        "sourceArticle": "مقال: التعدين في سوريا",
+        "sourceUrl": "https://ar.wikipedia.org/wiki/%D8%A7%D9%84%D8%AA%D8%B9%D8%AF%D9%8A%D9%86_%D9%81%D9%8A_%D8%B3%D9%88%D8%B1%D9%8A%D8%A7",
+        "sourceLocation": "فقرة: 'الفوسفات'",
+        "sourceQuote": "تعد سوريا من أبرز مصدري الفوسفات عالمياً وتتركز مناجمها في خنيفيس ومناجم الشرقية قرب تدمر."
+      },
+      {
+        "q": "سؤال 16: ما هو النهر الساحلي الذي ينبع من نبع طبيعي غزير ويُعد أقصر وأغزر نهر في سوريا ويغذي مدن الساحل بمياه الشرب؟",
+        "options": [
+          "نهر الكبير الشمالي",
+          "نهر السن",
+          "نهر الصنوبر",
+          "نهر قنديل"
+        ],
+        "correct": 1,
+        "reason": "نهر السن في محافظة طرطوس/اللاذقية ينبع من نبع السن العذب الغزير، ويبلغ طوله حوالي 6 كم فقط ليكون أقصر أنهار سوريا وأغزرها تصريفاً ومصدراً رئيسياً لمياه الشرب.",
+        "sourceSite": "ويكيبيديا الموسوعة الحرة",
+        "sourceArticle": "مقال: نهر السن",
+        "sourceUrl": "https://ar.wikipedia.org/wiki/%D9%86%D9%87%D8%B1_%D8%A7%D9%84%D8%B3%D9%86",
+        "sourceLocation": "فقرة: 'النبع والخصائص'",
+        "sourceQuote": "نهر السن هو أقصر أنهار سوريا بطول نحو 6 كم، ويعتبر المصدر الرئيسي لمياه الشرب في الساحل."
+      },
+      {
+        "q": "سؤال 17: ما هي المنطقة الجغرافية السورية السليبة الواقعة شمال غربي البلاد والتي تم ضمها لتركيا عام 1939 بموجب اتفاق فرنسي-تركي؟",
+        "options": [
+          "لواء إسكندرون (هاتاي)",
+          "إقليم ديار بكر",
+          "منطقة ماردين",
+          "سهل كيليكيا"
+        ],
+        "correct": 0,
+        "reason": "لواء إسكندرون (المعروف في تركيا بهاتاي) تبلغ مساحته نحو 4800 كم²، وفصلته سلطات الانتداب الفرنسي عن سوريا وضُم لتركيا في حزيران 1939 في صفقة سياسية قبل الحرب العالمية الثانية.",
+        "sourceSite": "ويكيبيديا الموسوعة الحرة",
+        "sourceArticle": "مقال: لواء إسكندرون",
+        "sourceUrl": "https://ar.wikipedia.org/wiki/%D9%84%D9%88%D8%A7%D8%A1_%D8%A5%D8%B3%D9%83%D9%86%D8%AF%D8%B1%D9%88%D9%86",
+        "sourceLocation": "فقرة: 'التاريخ والانفصال 1939'",
+        "sourceQuote": "قامت فرنسا في 23 حزيران 1939 بالتنازل عن لواء إسكندرون لتركيا رغم الرفض السوري القاطع."
+      },
+      {
+        "q": "سؤال 18: كم يبلغ عدد المحافظات الرسمية في التقسيم الإداري للجمهورية العربية السورية؟",
+        "options": [
+          "12 محافظة",
+          "14 محافظة",
+          "16 محافظة",
+          "18 محافظة"
+        ],
+        "correct": 1,
+        "reason": "تنقسم سوريا إدارياً إلى 14 محافظة رئيسية (دمشق، ريف دمشق، حلب، حمص، حماة، اللاذقية، طرطوس، إدلب، درعا، السويداء، القنيطرة، دير الزور، الرقة، الحسكة).",
+        "sourceSite": "ويكيبيديا الموسوعة الحرة",
+        "sourceArticle": "مقال: محافظات سوريا",
+        "sourceUrl": "https://ar.wikipedia.org/wiki/%D9%85%D8%AD%D8%A7%D9%81%D8%B8%D8%A7%D8%AA_%D8%B3%D9%88%D8%B1%D9%8A%D8%A7",
+        "sourceLocation": "فقرة: 'التقسيم الإداري'",
+        "sourceQuote": "تنقسم الجمهورية العربية السورية إلى 14 محافظة، وتعتبر دمشق العاصمة الإدارية والسياسية."
+      },
+      {
+        "q": "سؤال 19: ما هو المنخفض الانهدامي الخصيب الشهير الواقع بين جبال الساحل غرباً وجبل الزاوية شرقاً ويمر فيه نهر العاصي بمحافظة حماة؟",
+        "options": [
+          "سهل البقاع",
+          "سهل الغاب",
+          "سهل حوران",
+          "سهل الروج"
+        ],
+        "correct": 1,
+        "reason": "سهل الغاب هو منخفض انهدامي خصيب للغاية يمتد بطول نحو 80 كم وعرض 12 كم في محافظة حماة، تم تجفيف مستنقعاته واستصلاحه ليكون من أخصب بقاع الزراعة المروية بالعاصي.",
+        "sourceSite": "ويكيبيديا الموسوعة الحرة",
+        "sourceArticle": "مقال: سهل الغاب",
+        "sourceUrl": "https://ar.wikipedia.org/wiki/%D8%B3%D9%87%D9%84_%D8%A7%D9%84%D8%BA%D8%A7%D8%A8",
+        "sourceLocation": "فقرة: 'الموقع والتضاريس'",
+        "sourceQuote": "سهل الغاب منخفض انهدامي خصب يقع بين جبال اللاذقية غرباً وجبل الزاوية شرقاً ويمر فيه نهر العاصي."
+      },
+      {
+        "q": "سؤال 20: ما هو النهر الذي يشكل مجراه الأدنى جزءاً من الحدود الجنوبية الغربية الفاصلة بين سوريا ولبنان؟",
+        "options": [
+          "نهر الكبير الشمالي",
+          "نهر الكبير الجنوبي",
+          "نهر الأولي",
+          "نهر الحاصباني"
+        ],
+        "correct": 1,
+        "reason": "نهر الكبير الجنوبي ينبع من هضاب عكار ويسير غرباً ليشكل مجراه في جزء منه خط الحدود الدولية الفاصلة بين الجمهورية العربية السورية والجمهورية اللبنانية حتى مصبه بالمتوسط.",
+        "sourceSite": "ويكيبيديا الموسوعة الحرة",
+        "sourceArticle": "مقال: النهر الكبير الجنوبي",
+        "sourceUrl": "https://ar.wikipedia.org/wiki/%D8%A7%D9%84%D9%86%D9%87%D8%B1_%D8%A7%D9%84%D9%83%D8%A8%D9%8A%D8%B1_%D8%A7%D9%84%D8%AC%D9%86%D9%88%D8%A8%D9%8A",
+        "sourceLocation": "فقرة: 'الحدود والمجرى'",
+        "sourceQuote": "يشكل النهر الكبير الجنوبي جزءاً أساسياً من خط الحدود البرية الفاصلة بين سوريا ولبنان."
+      }
+    ]
+  },
+  {
+    "sectionId": 1,
+    "sectionName": "القسم 2: الحضارات القديمة والآثار والتراث الإنساني العالمي",
+    "sectionBadge": "القسم 2: الحضارات والتراث العالمي (20)",
+    "questions": [
+      {
+        "q": "سؤال 21: في أي موقع أثري سوري تم اكتشاف 'أول أبجدية صوتية متكاملة في التاريخ' مدونة برقيم فخاري بالأحرف المسمارية؟",
+        "options": [
+          "مملكة ماري (تل الحريري)",
+          "مملكة أوغاريت (رأس شمرا)",
+          "مملكة إيبلا (تل مرديخ)",
+          "مملكة قطنا (المشرفة)"
+        ],
+        "correct": 1,
+        "reason": "اكتُشفت الأبجدية الأوغاريتية في رأس شمرا (أوغاريت) قرب اللاذقية، وتتألف من 30 حرفاً مسمارياً تعود للقرن الرابع عشر قبل الميلاد وتعد أقدم أبجدية كاملة في تاريخ البشرية.",
+        "sourceSite": "ويكيبيديا الموسوعة الحرة",
+        "sourceArticle": "مقال: أبجدية أوغاريتية",
+        "sourceUrl": "https://ar.wikipedia.org/wiki/%D8%A3%D8%A8%D8%AC%D8%AF%D9%8A%D8%A9_%D8%A3%D9%88%D8%BA%D8%A7%D8%B1%D9%8A%D8%AA%D9%8A%D8%A9",
+        "sourceLocation": "فقرة: 'التاريخ والاكتشاف'",
+        "sourceQuote": "الأبجدية الأوغاريتية هي أكمل وأقدم أبجدية صوتية معروفة حتى الآن، واكتشفت في موقع رأس شمرا عام 1928."
+      },
+      {
+        "q": "سؤال 22: ما هو الموقع الأثري السوري في محافظة إدلب الذي عثرت فيه البعثة الإيطالية برئاسة باولو ماتييه على أرشيف ملكي ودبلوماسي مسماري يضم آلاف الرُّقم؟",
+        "options": [
+          "تل براك",
+          "مملكة إيبلا (تل مرديخ)",
+          "قرقار",
+          "تل حلف"
+        ],
+        "correct": 1,
+        "reason": "مملكة إيبلا (تل مرديخ) شهدت عام 1974-1975 اكتشاف أعظم أرشيف ملكي في الشرق القديم يضم أكثر من 17 ألف رقيم مسماري توثق العلاقات الدبلوماسية والتجارية في الألف الثالث ق.م.",
+        "sourceSite": "ويكيبيديا الموسوعة الحرة",
+        "sourceArticle": "مقال: إبلا",
+        "sourceUrl": "https://ar.wikipedia.org/wiki/%D8%A5%D8%A8%D9%84%D8%A7",
+        "sourceLocation": "فقرة: 'الأرشيف الملكي والرقم المسمارية'",
+        "sourceQuote": "عثرت البعثة الإيطالية برئاسة باولو ماتييه على أرشيف إيبلا الملكي الذي قلب مفاهيم تاريخ الشرق الأدنى القديم."
+      },
+      {
+        "q": "سؤال 23: ما اسم المملكة السورية الفراتية القديمة (تل الحريري) التي اشتهرت بقصر الملك 'زمري-ليم' وأرشيفها الإداري والدبلوماسي الضخم؟",
+        "options": [
+          "مملكة تدمر",
+          "مملكة ماري",
+          "مملكة يمحاض",
+          "مملكة كوماجيني"
+        ],
+        "correct": 1,
+        "reason": "مملكة ماري (تل الحريري قرب البوكمال) ازدهرت بين 2900 و1759 ق.م على نهر الفرات، وتميزت بقصر زمري-ليم الملكي الضخم بشوارعه ولوحاته الجدارية وأكثر من 25 ألف رقيم دبلوماسي.",
+        "sourceSite": "ويكيبيديا الموسوعة الحرة",
+        "sourceArticle": "مقال: ماري (سوريا)",
+        "sourceUrl": "https://ar.wikipedia.org/wiki/%D9%85%D8%A7%D8%B1%D9%8A_(%D8%B3%D9%88%D8%B1%D9%8A%D8%A7)",
+        "sourceLocation": "فقرة: 'قصر زمري ليم وأرشيف ماري'",
+        "sourceQuote": "قصر زمري ليم في ماري كان يُعد إحدى عجائب العمارة القديمة واحتوى على آلاف الرسائل الدبلوماسية."
+      },
+      {
+        "q": "سؤال 24: من هي الملكة السورية التاريخية التي قادت 'مملكة تدمر' وتحدت الإمبراطورية الرومانية وبسطت نفوذها على بلاد الشام ومصر وآسيا الصغرى؟",
+        "options": [
+          "الملكة بلقيس",
+          "الملكة زنوبيا (الزباء)",
+          "الملكة جوليا دومنا",
+          "الملكة ماوية"
+        ],
+        "correct": 1,
+        "reason": "الملكة زنوبيا تولت حكم مملكة تدمر عقب اغتيال زوجها الملك أذينة في القرن الثالث الميلادي، وأسست إمبراطورية تدمرية امتدت من أنقرة حتى مصر قبل أن يواجهها الإمبراطور أوريليان.",
+        "sourceSite": "ويكيبيديا الموسوعة الحرة",
+        "sourceArticle": "مقال: زنوبيا",
+        "sourceUrl": "https://ar.wikipedia.org/wiki/%D8%A2%D9%86%D9%88%D8%A8%D9%8A%D8%A7",
+        "sourceLocation": "فقرة: 'التوسع التدمرية وحكم زنوبيا'",
+        "sourceQuote": "قادت الملكة زنوبيا جيوش تدمر ووسعت أرجاء مملكتها لتشمل بلاد الشام ومصر وأجزاء واسعة من آسيا الصغرى."
+      },
+      {
+        "q": "سؤال 25: في أي مدينة سورية يقع 'المسرح الروماني' المبني بالكامل من الحجر البازلتي الأسود والذي يُعد من أكمل وأفضل المسارح الرومانية حفظاً في العالم؟",
+        "options": [
+          "شهبا (فيليبوبوليس)",
+          "بصرى الشام",
+          "قنوات (كاناثا)",
+          "جبلة"
+        ],
+        "correct": 1,
+        "reason": "مسرح بصرى الشام الروماني في محافظة درعا بُني في عهد الإمبراطور تراجان بالحجر البازلتي الأسود، ويتسع لنحو 15 ألف متفرج، وحمته القلعة الأيوبية التي شيدت حوله من الاندثار.",
+        "sourceSite": "ويكيبيديا الموسوعة الحرة",
+        "sourceArticle": "مقال: مدرج بصرى",
+        "sourceUrl": "https://ar.wikipedia.org/wiki/%D9%85%D8%AF%D8%B1%D8%AC_%D8%A8%D8%B5%D8%B1%D9%89",
+        "sourceLocation": "فقرة: 'العمارة والتاريخ'",
+        "sourceQuote": "يعد مسرح بصرى من أروع وأكمل المسارح الرومانية المحفوظة في العالم وبُني من الحجر البازلتي المحلي."
+      },
+      {
+        "q": "سؤال 26: في أي عام أدرجت منظمة اليونسكو 'مدينة دمشق القديمة' على لائحة التراث الإنساني العالمي بوصفها أقدم عاصمة مأهولة في العالم دون انقطاع؟",
+        "options": [
+          "عام 1972",
+          "عام 1979",
+          "عام 1986",
+          "عام 1999"
+        ],
+        "correct": 1,
+        "reason": "أدرجت مدينة دمشق القديمة على قائمة التراث العالمي لليونسكو عام 1979 بوصفها أقدم عاصمة مأهولة باستمرار في التاريخ الإنساني ومعقلاً لحضارات متعاقبة.",
+        "sourceSite": "ويكيبيديا الموسوعة الحرة",
+        "sourceArticle": "مقال: دمشق القديمة",
+        "sourceUrl": "https://ar.wikipedia.org/wiki/%D8%AF%D9%85%D8%B4%D9%82_%D8%A7%D9%84%D9%82%D8%AF%D9%8A%D9%85%D8%A9",
+        "sourceLocation": "فقرة: 'قائمة التراث العالمي'",
+        "sourceQuote": "صُنفت دمشق القديمة ضمن مواقع التراث العالمي لليونسكو عام 1979 كأقدم عاصمة مأهولة في العالم."
+      },
+      {
+        "q": "سؤال 27: من هو الخليفة الأموي الذي شيد 'المسجد الأموي الكبير' في دمشق واكتمل بناؤه عام 715 م ليصبح درة العمارة الإسلامية؟",
+        "options": [
+          "معاوية بن أبي سفيان",
+          "الوليد بن عبد الملك",
+          "عبد الملك بن مروان",
+          "عمر بن عبد العزيز"
+        ],
+        "correct": 1,
+        "reason": "أمر الخليفة الأموي السادس الوليد بن عبد الملك ببناء الجامع الأموي بدمشق عام 705 م واكتمل عام 715 م، ويشتهر بمآذنه الرائعة وجدارياته الفسيفسائية الذهبية وقبة الخزنة.",
+        "sourceSite": "ويكيبيديا الموسوعة الحرة",
+        "sourceArticle": "مقال: جامع بني أمية الكبير",
+        "sourceUrl": "https://ar.wikipedia.org/wiki/%D8%AC%D8%A7%D9%85%D8%B9_%D8%A8%D9%86%D9%8A_%D8%A3%D9%85%D9%8A%D8%A9_%D8%A7%D9%84%D9%83%D8%A8%D9%8A%D8%B1",
+        "sourceLocation": "فقرة: 'البناء في العهد الأموي'",
+        "sourceQuote": "شيد الجامع الأموي الكبير الخليفة الوليد بن عبد الملك في دمشق عام 86 هـ (705 م)."
+      },
+      {
+        "q": "سؤال 28: ما هما القلعتان السوريتان اللتان أُدرجتا معاً في ملف واحد على لائحة التراث العالمي لليونسكو عام 2006؟",
+        "options": [
+          "قلعة حلب وقلعة دمشق",
+          "قلعة الحصن (Crac des Chevaliers) وقلعة صلاح الدين (صهيون)",
+          "قلعة جعبر وقلعة المضيق",
+          "قلعة شيزر وقلعة المرقب"
+        ],
+        "correct": 1,
+        "reason": "أدرجت اليونسكو قلعة الحصن بحمص وقلعة صلاح الدين باللاذقية معاً عام 2006 كأبرز نماذج العمارة العسكرية القروسطية وتمازج الفن المعماري البيزنطي والإسلامي والصليبي.",
+        "sourceSite": "ويكيبيديا الموسوعة الحرة",
+        "sourceArticle": "مقال: قلعة الحصن (حمص)",
+        "sourceUrl": "https://ar.wikipedia.org/wiki/%D9%82%D9%84%D8%B9%D8%A9_%D8%A7%D9%84%D8%AD%D8%B5%D9%86_(%D8%AD%D9%85%D8%B5)",
+        "sourceLocation": "فقرة: 'التراث العالمي'",
+        "sourceQuote": "أُدرجت قلعة الحصن وقلعة صلاح الدين على لائحة التراث العالمي لليونسكو في عام 2006."
+      },
+      {
+        "q": "سؤال 29: ما هي القرى والمدن التاريخية السورية المدرجة على قائمة التراث العالمي لليونسكو عام 2011 والممتدة في محافظتي إدلب وحلب؟",
+        "options": [
+          "قلاع الحشاشين في القدموس ومصياف",
+          "المدن المنسية (القرى القديمة في شمال سوريا)",
+          "مستوطنات تل حلف وتل براك",
+          "واحات تدمر والسخنة"
+        ],
+        "correct": 1,
+        "reason": "المدن المنسية (نحو 40 قرية تاريخية بين إدلب وحلب تضم كنيسة القديس سمعان وسرجيلا والبارة والرويحة) أدرجتها اليونسكو عام 2011 كشاهد فريد على الحياة الريفية والزراعية البيزنطية.",
+        "sourceSite": "ويكيبيديا الموسوعة الحرة",
+        "sourceArticle": "مقال: المدن المنسية",
+        "sourceUrl": "https://ar.wikipedia.org/wiki/%D8%A7%D9%84%D9%85%D8%AF%D9%86_%D8%A7%D9%84%D9%85%D9%86%D8%B3%D9%8A%D8%A9",
+        "sourceLocation": "فقرة: 'تسجيل اليونسكو 2011'",
+        "sourceQuote": "أدرجت القرى القديمة في شمال سوريا (المدن المنسية) على قائمة التراث الإنساني لليونسكو عام 2011."
+      },
+      {
+        "q": "سؤال 30: في أي موقع فينيقي أثري قرب طرطوس يقع 'المعبد المائي المنحوت في الصخر' والملعب الرياضي الفينيقي الأقدم في العالم؟",
+        "options": [
+          "أوغاريت",
+          "عمريت (ماراثوس)",
+          "تل كزل (سيميرا)",
+          "جبلة"
+        ],
+        "correct": 1,
+        "reason": "مدينة عمريت (ماراثوس الفينيقية) جنوب طرطوس تضم معبداً فينيقياً فريداً محفوراً في الصخر وسط حوض ماء مقدس، وملعباً أولمبياً فينيقياً يعود للألف الأول ق.م يسبق الألعاب الأولمبية اليونانية.",
+        "sourceSite": "ويكيبيديا الموسوعة الحرة",
+        "sourceArticle": "مقال: عمريت",
+        "sourceUrl": "https://ar.wikipedia.org/wiki/%D8%B9%D9%85%D8%B1%D9%8A%D8%AA",
+        "sourceLocation": "فقرة: 'المعبد والملعب الأولمبي'",
+        "sourceQuote": "يعد ملعب عمريت الفينيقي الرياضي أقدم من الملاعب الأولمبية في اليونان، ومعبدها المنحوت بالصخر فريد عالمياً."
+      },
+      {
+        "q": "سؤال 31: ما هي المدينة الأثرية السورية الواقعة على نهر العاصي في محافظة حماة والتي تشتهر بـ 'الشارع المستقيم' المحاط بالأعمدة الحلزونية لمسافة تقارب 2 كم؟",
+        "options": [
+          "تدمر",
+          "أفاميا",
+          "شهبا",
+          "قنوات"
+        ],
+        "correct": 1,
+        "reason": "مدينة أفاميا التي أسسها سلوقس نيكاتور الأول في عهد السلوقيين وتطورت بالعهد الروماني تشتهر بالشارع المستقيم الكبير المحاط بأعمدة أثرية حلزونية وتيجان كورنثية ومتحف الفسيفساء.",
+        "sourceSite": "ويكيبيديا الموسوعة الحرة",
+        "sourceArticle": "مقال: أفاميا",
+        "sourceUrl": "https://ar.wikipedia.org/wiki/%D8%A3%D9%81%D8%A7%D9%85%D9%8A%D8%A7",
+        "sourceLocation": "فقرة: 'الشارع المستقيم والأعمدة'",
+        "sourceQuote": "يمتد الشارع المستقيم (الكاردو ماكسيموس) في أفاميا لمسافة تقارب كيلومترين وتصطف على جانبيه الأعمدة الحلزونية."
+      },
+      {
+        "q": "سؤال 32: ما هي المدينة التاريخية السورية (المعروفة بـ سرجيوبوليس) الواقعة في البادية السورية بالرقة والتي اتخذها الخليفة هشام بن عبد الملك مقراً له؟",
+        "options": [
+          "قصر الحير الشرقي",
+          "الرصافة",
+          "تل أبيض",
+          "جعبر"
+        ],
+        "correct": 1,
+        "reason": "الرصافة (سرجيوبوليس) تميزت بأسوارها العالية المبنية من حجر الجبس اللامع وبواباتها الرومانية وكنائسها وخزانات مائها الضخمة تحت الأرض، واتخذها الخليفة هشام بن عبد الملك عاصمة صيفية لبني أمية.",
+        "sourceSite": "ويكيبيديا الموسوعة الحرة",
+        "sourceArticle": "مقال: الرصافة (سوريا)",
+        "sourceUrl": "https://ar.wikipedia.org/wiki/%D8%A7%D9%84%D8%B1%D8%B5%D8%A7%D9%81%D8%A9_(%D8%B3%D9%88%D8%B1%D9%8A%D8%A7)",
+        "sourceLocation": "فقرة: 'العهد الأموي وهشام بن عبد الملك'",
+        "sourceQuote": "اتخذ الخليفة الأموي هشام بن عبد الملك من الرصافة مقراً لحكمه وبنى فيها قصرين رائعين."
+      },
+      {
+        "q": "سؤال 33: ما هي البلدات السورية الواقعة في جبال القلمون بريف دمشق التي لا تزال تتحدث بـ 'اللغة الآرامية الغربية الحديثة' (لغة السيد المسيح) حتى يومنا هذا؟",
+        "options": [
+          "صيدنايا والزبداني وبلودان",
+          "معلولا وجبعدين وبخعا (الصرخة)",
+          "يبرود والنبك ودير عطية",
+          "رنكوس وحفير الفوقا وعسال الورد"
+        ],
+        "correct": 1,
+        "reason": "تعتبر بلدات معلولا، وجبعدين، وبخعا (الصرخة) في منطقة القلمون السورية الأماكن الوحيدة على وجه الأرض التي ما تزال تحافظ على التحدث باللغة الآرامية القديمة لهجة السيد المسيح.",
+        "sourceSite": "ويكيبيديا الموسوعة الحرة",
+        "sourceArticle": "مقال: معلولا",
+        "sourceUrl": "https://ar.wikipedia.org/wiki/%D9%85%D8%B9%D9%84%D9%88%D9%84%D8%A7",
+        "sourceLocation": "فقرة: 'اللغة الآرامية'",
+        "sourceQuote": "تتميز معلولا وجبعدين وبخعا بأن سكانها لا يزالون يتكلمون اللغة الآرامية لغة السيد المسيح حتى اليوم."
+      },
+      {
+        "q": "سؤال 34: كم يبلغ عدد المواقع السورية المصنفة رسمياً على لائحة التراث الإنساني العالمي التابعة لمنظمة اليونسكو؟",
+        "options": [
+          "3 مواقع",
+          "6 مواقع رئيسية",
+          "10 مواقع",
+          "14 موقعاً"
+        ],
+        "correct": 1,
+        "reason": "تضم سوريا 6 مواقع ثقافية رسمية مسجلة على قائمة التراث العالمي: دمشق القديمة (1979)، بصرى (1980)، تدمر (1980)، حلب القديمة (1986)، قلعتا الحصن وصلاح الدين (2006)، والقرى القديمة شمال سوريا (2011).",
+        "sourceSite": "ويكيبيديا الموسوعة الحرة",
+        "sourceArticle": "مقال: قائمة مواقع التراث العالمي في سوريا",
+        "sourceUrl": "https://ar.wikipedia.org/wiki/%D9%82%D8%A7%D8%A6%D9%85%D8%A9_%D9%85%D9%88%D8%A7%D9%82%D8%B9_%D8%A7%D9%84%D8%AA%D8%B1%D8%A7%D8%AB_%D8%A7%D9%84%D8%B9%D8%A7%D9%84%D9%85%D9%8A_%D9%81%D9%8A_%D8%B3%D9%88%D8%B1%D9%8A%D8%A7",
+        "sourceLocation": "فقرة: 'المواقع المسجلة'",
+        "sourceQuote": "تحتوي قائمة التراث العالمي في سوريا على 6 مواقع أساسية مسجلة جميعها ضمن الفئة الثقافية."
+      },
+      {
+        "q": "سؤال 35: ما هي أكبر ناعورة خشبية تاريخية في مدينة حماة على نهر العاصي بقطر يتجاوز 21 متراً، وتعد أضخم ناعورة في العالم؟",
+        "options": [
+          "ناعورة الجعبرية",
+          "ناعورة المحمدية",
+          "ناعورة البشريات",
+          "ناعورة العثمانيات"
+        ],
+        "correct": 1,
+        "reason": "ناعورة المحمدية في حماة التي شيدت عام 1361 م في العهد المملوكي يبلغ قطرها 21.5 متراً، وكانت مياهها تنقل عبر القناطر الحجرية لري جامع أبي الفداء وبساتين المدينة.",
+        "sourceSite": "ويكيبيديا الموسوعة الحرة",
+        "sourceArticle": "مقال: نواعير حماة",
+        "sourceUrl": "https://ar.wikipedia.org/wiki/%D9%86%D9%88%D8%A7%D8%B9%D9%8A%D8%B1_%D8%AD%D9%85%D8%A7%D8%A9",
+        "sourceLocation": "فقرة: 'أبرز النواعير - المحمدية'",
+        "sourceQuote": "تعد ناعورة المحمدية كبرى نواعير حماة بقطر 21 متراً وتعود لعام 1361 م."
+      },
+      {
+        "q": "سؤال 36: ما هي المدينة التاريخية الواقعة على الضفة اليمنى لنهر الفرات السوري التي لُقبت بـ 'بومبي الشرق' واحتوت على أقدم كنيسة منزلية وأقدم كنيس جداري في العالم؟",
+        "options": [
+          "مدينة الرصافة",
+          "مدينة دورا أوربوس (الصالحية)",
+          "مدينة عمريت",
+          "مدينة تدمر"
+        ],
+        "correct": 1,
+        "reason": "دورا أوربوس (قرب البوكمال بدير الزور) لُقبت ببومبي الشرق لحفظ رمال الصحراء لمعالمها، وعُثر فيها على أقدم كنيسة منزلية مسيحية مؤرخة (عام 232 م) وجداريات كنيس يهودي فريد ومحكمة التقاليد الرومانية والفرثية.",
+        "sourceSite": "ويكيبيديا الموسوعة الحرة",
+        "sourceArticle": "مقال: دورا أوربوس",
+        "sourceUrl": "https://ar.wikipedia.org/wiki/%D8%AF%D9%88%D8%B1%D8%A7_%D8%A3%D9%88%D8%B1%D8%A8%D9%88%D8%B3",
+        "sourceLocation": "فقرة: 'أهمية الموقع والاكتشافات'",
+        "sourceQuote": "تسمى دورا أوربوس ببومبي الصحراء واحتوت أقدم كنيسة منزلية مسيحية وأقدم كنيس جداري مرسوم."
+      },
+      {
+        "q": "سؤال 37: ما هو القصر الأموي الشهير في بادية الشام الذي نُقلت واجهته الحجرية المزخرفة المنحوتة بالكامل إلى مدخل 'المتحف الوطني بدمشق'؟",
+        "options": [
+          "قصر المشتى",
+          "قصر الحير الغربي",
+          "قصر الحير الشرقي",
+          "قصر ابن وردان"
+        ],
+        "correct": 1,
+        "reason": "شيد الخليفة هشام بن عبد الملك قصر الحير الغربي عام 728 م بين دمشق وتدمر، ونُقلت بوابته وواجهته الأثرية الشهيرة بالكامل ليعاد تركيبها كمدخل رئيسي للمتحف الوطني بدمشق عام 1939.",
+        "sourceSite": "ويكيبيديا الموسوعة الحرة",
+        "sourceArticle": "مقال: قصر الحير الغربي",
+        "sourceUrl": "https://ar.wikipedia.org/wiki/%D9%82%D8%B5%D8%B1_%D8%A7%D9%84%D8%AD%D9%8A%D8%B1_%D8%A7%D9%84%D8%BA%D8%B1%D8%A8%D9%8A",
+        "sourceLocation": "فقرة: 'واجهة القصر ومتحف دمشق'",
+        "sourceQuote": "تم نقل واجهة قصر الحير الغربي الرائعة وأعيد تركيبها لتصبح واجهة المتحف الوطني بدمشق."
+      },
+      {
+        "q": "سؤال 38: ما هو الموقع الأثري في شمال شرقي سوريا (محافظة الحسكة) الذي تميز بحضارته الفخارية الفريدة وتماثيله البازلتية واكتشفه الباحث الألماني ماكس فون أوبنهايم؟",
+        "options": [
+          "تل مرديخ",
+          "تل حلف (غوزانا القديمة)",
+          "تل بيدر",
+          "تل موزان (أوركيش)"
+        ],
+        "correct": 1,
+        "reason": "تل حلف قرب رأس العين كشف عن ثقافة العصر الحجري النحاسي المعروفة بثقافة حلف (الألف السادس ق.م) بتصاميم فخارها المتقن، وقصر كابارا الآرامي وتماثيله البازلتية العظيمة.",
+        "sourceSite": "ويكيبيديا الموسوعة الحرة",
+        "sourceArticle": "مقال: تل حلف",
+        "sourceUrl": "https://ar.wikipedia.org/wiki/%D8%AA%D9%84_%D8%AD%D9%84%D9%81",
+        "sourceLocation": "فقرة: 'اكتشافات أوبنهايم'",
+        "sourceQuote": "اكتشف البارون ماكس فون أوبنهايم آثار تل حلف وتماثيله البازلتية الآرامية الضخمة."
+      },
+      {
+        "q": "سؤال 39: في أي عام تأسس 'المتحف الوطني بدمشق' الذي يُعد أقدم وأكبر متاحف الجمهورية العربية السورية وحافظة كنوز الحضارات السورية؟",
+        "options": [
+          "عام 1919 في عهد المملكة السورية العربية",
+          "عام 1936 بعد توقيع المعاهدة",
+          "عام 1946 عقب الجلاء",
+          "عام 1958 إبان الوحدة"
+        ],
+        "correct": 0,
+        "reason": "تأسس المتحف الوطني بدمشق في عهد الحكومة العربية عام 1919 برعاية مجمع اللغة العربية وكان مقره الأول في المدرسة العادلية قبل أن ينتقل لمقره الحالي على ضفاف بردى عام 1936.",
+        "sourceSite": "ويكيبيديا الموسوعة الحرة",
+        "sourceArticle": "مقال: متحف دمشق الوطني",
+        "sourceUrl": "https://ar.wikipedia.org/wiki/%D9%85%D8%AA%D8%AD%D9%81_%D8%AF%D9%85%D8%B4%D9%82_%D8%A7%D9%84%D9%88%D8%B7%D9%86%D9%8A",
+        "sourceLocation": "فقرة: 'التأسيس والمقر'",
+        "sourceQuote": "تأسس المتحف الوطني عام 1919 بدمشق بقرار من مجمع اللغة العربية والمملكة السورية."
+      },
+      {
+        "q": "سؤال 40: ما هو القصر الدمشقي الفاخر المتميز بالهندسة المعمارية الإسلامية الشامية ويقع قرب الجامع الأموي وكان مقراً لوالي دمشق أسعد باشا العظم؟",
+        "options": [
+          "قصر النعسان",
+          "قصر العظم",
+          "قصر السباعي",
+          "قصر النيربين"
+        ],
+        "correct": 1,
+        "reason": "بنى والي دمشق أسعد باشا العظم قصر العظم عام 1749 م، ويُعد تحفة معمارية شامية بأقسامه (الحرملك والسلملك) وبحراته ورخامه الملون والمقرنصات، وحُول لمتحف التقاليد الشعبية.",
+        "sourceSite": "ويكيبيديا الموسوعة الحرة",
+        "sourceArticle": "مقال: قصر العظم (دمشق)",
+        "sourceUrl": "https://ar.wikipedia.org/wiki/%D9%82%D8%B5%D8%B1_%D8%A7%D9%84%D8%B9%D8%B8%D9%85_(%D8%AF%D9%85%D8%B4%D9%82)",
+        "sourceLocation": "فقرة: 'البناء والعمارة'",
+        "sourceQuote": "بُني قصر العظم في دمشق عام 1749 على يد الوالي أسعد باشا العظم ويعد نموذجاً مبهراً للعمارة الدمشقية."
+      }
+    ]
+  },
+  {
+    "sectionId": 2,
+    "sectionName": "القسم 3: التاريخ السياسي الحديث والثورات الوطنية والاستقلال",
+    "sectionBadge": "القسم 3: التاريخ السياسي والاستقلال (20)",
+    "questions": [
+      {
+        "q": "سؤال 41: من ترأس 'المؤتمر السوري العام' الذي انعقد في دمشق عام 1919-1920 وأعلن قيام المملكة السورية العربية المستقلة وتتويج فيصل الأول ملكاً دستورياً؟",
+        "options": [
+          "فارس الخوري",
+          "هاشم الأتاسي",
+          "سعد الله الجابري",
+          "رضا باشا الركابي"
+        ],
+        "correct": 1,
+        "reason": "ترأس الزعيم الوطني هاشم الأتاسي المؤتمر السوري العام (أول برلمان سوري منتخب يمثل بلاد الشام)، وأعلن في 8 آذار 1920 استقلال سوريا الطبيعية وإعلان المملكة الدستورية.",
+        "sourceSite": "ويكيبيديا الموسوعة الحرة",
+        "sourceArticle": "مقال: المؤتمر السوري العام",
+        "sourceUrl": "https://ar.wikipedia.org/wiki/%D8%A7%D9%84%D9%85%D8%A4%D8%AA%D9%85%D8%B1_%D8%A7%D9%84%D8%B3%D9%88%D8%B1%D9%8A_%D8%A7%D9%84%D8%B9%D8%A7%D9%85",
+        "sourceLocation": "فقرة: 'إعلان الاستقلال وهاشم الأتاسي'",
+        "sourceQuote": "ترأس هاشم الأتاسي المؤتمر السوري العام في دورته التاريخية التي أعلنت استقلال المملكة السورية في مارس 1920."
+      },
+      {
+        "q": "سؤال 42: ما هو المؤتمر الاستعماري الدولي الذي انعقد في إيطاليا في نيسان 1920 وقرر فرض الانتداب الفرنسي رسمياً على سوريا ولبنان والانتداب البريطاني على العراق وفلسطين؟",
+        "options": [
+          "مؤتمر فرساي للسلام",
+          "مؤتمر سان ريمو",
+          "مؤتمر لوزان",
+          "مؤتمر باريس"
+        ],
+        "correct": 1,
+        "reason": "قرر مؤتمر سان ريمو المنعقد في 19-26 نيسان 1920 توزيع تركة الدولة العثمانية وفرض الانتداب الفرنسي على سوريا ولبنان تطبيقاً لبنود اتفاقية سايكس-بيكو السرية.",
+        "sourceSite": "ويكيبيديا الموسوعة الحرة",
+        "sourceArticle": "مقال: مؤتمر سان ريمو",
+        "sourceUrl": "https://ar.wikipedia.org/wiki/%D9%85%D8%A4%D8%AA%D9%85%D8%B1_%D8%B3%D8%A7%D9%86_%D8%B1%D9%8A%D9%85%D9%88",
+        "sourceLocation": "فقرة: 'القرارات الخاصة بالشرق الأوسط'",
+        "sourceQuote": "أقر مؤتمر سان ريمو عام 1920 وضع سوريا ولبنان تحت الانتداب الفرنسي رسمياً."
+      },
+      {
+        "q": "سؤال 43: في أي تاريخ وقعت 'معركة ميسلون' الخالدة، ومن هو وزير الدفاع السوري البطل الذي نال الشهادة فيها مقبلاً غير مدبر في مواجهة قوات الجنرال غورو؟",
+        "options": [
+          "8 آذار 1920 - فوزي القاوقجي",
+          "24 تموز 1920 - يوسف العظمة",
+          "15 تموز 1925 - سلطان باشا الأطرش",
+          "29 أيار 1945 - شكري القوتلي"
+        ],
+        "correct": 1,
+        "reason": "وقعت معركة ميسلون في 24 تموز 1920 غرب دمشق، واستشهد فيها وزير الحربية السوري يوسف العظمة مع مئات المتطوعين، ودخل التاريخ كأول وزير دفاع يستشهد في ميدان المعركة مقاوماً الاحتلال.",
+        "sourceSite": "ويكيبيديا الموسوعة الحرة",
+        "sourceArticle": "مقال: معركة ميسلون",
+        "sourceUrl": "https://ar.wikipedia.org/wiki/%D9%85%D8%B9%D8%B1%D9%83%D8%A9_%D9%85%D9%8A%D8%B3%D9%84%D9%88%D9%86",
+        "sourceLocation": "فقرة: 'أحداث المعركة واستشهاد يوسف العظمة'",
+        "sourceQuote": "استشهد وزير الحربية يوسف العظمة في معركة ميسلون بتاريخ 24 تموز 1920 وهو يدافع عن دمشق."
+      },
+      {
+        "q": "سؤال 44: كيف جزأت سلطات الانتداب الفرنسي الجغرافيا السورية تنفيذاً لسياسة 'فرّق تسُد' في مطلع العشرينيات؟",
+        "options": [
+          "قسمتها إلى 14 محافظة مركزية تابعة لبيروت مباشرة",
+          "قسمتها إلى خمس دويلات: دولة دمشق، دولة حلب، دولة العلويين، دولة جبل الدروز، ولواء إسكندرون المستقل",
+          "قسمتها إلى إقليمين شمالي وجنوبي بحكم عسكري مباشر",
+          "أبقتها موحدة إدارياً وعينت عليها مجلساً استشارياً فرنسياً"
+        ],
+        "correct": 1,
+        "reason": "أصدر الجنرال الفرنسي غورو مراسيم عام 1920 بتقسيم سوريا إلى دويلات طائفية وإقليمية لتفتيت الهوية الوطنية (حلب، دمشق، جبل الدروز، العلويين، ولواء إسكندرون المستقل) قبل أن يوحدها النضال الوطني.",
+        "sourceSite": "ويكيبيديا الموسوعة الحرة",
+        "sourceArticle": "مقال: الانتداب الفرنسي على سوريا ولبنان",
+        "sourceUrl": "https://ar.wikipedia.org/wiki/%D8%A7%D9%84%D8%A7%D9%86%D8%AA%D8%AF%D8%A7%D8%A8_%D8%A7%D9%84%D9%81%D8%B1%D9%86%D8%B3%D9%8A_%D8%B9%D9%84%D9%89_%D8%B3%D9%88%D8%B1%D9%8A%D8%A7_%D9%88%D9%84%D8%A8%D9%86%D8%A7%D9%86",
+        "sourceLocation": "فقرة: 'تقسيم سوريا إلى دويلات'",
+        "sourceQuote": "قسّمت فرنسا سوريا بموجب مراسيم الجنرال غورو إلى دويلات دمشق وحلب والعلويين وجبل الدروز."
+      },
+      {
+        "q": "سؤال 45: من هو القائد العام لـ 'الثورة السورية الكبرى' التي اندلعت عام 1925 وهزت أركان الانتداب الفرنسي، وما كان شعاره الوطني الخالد؟",
+        "options": [
+          "صالح العلي - 'النصر أو الشهادة'",
+          "سلطان باشا الأطرش - 'الدين لله والوطن للجميع'",
+          "إبراهيم هنانو - 'عاشت سوريا حرة أبية'",
+          "فارس الخوري - 'الحق يعلو ولا يُعلى عليه'"
+        ],
+        "correct": 1,
+        "reason": "انطلقت الثورة السورية الكبرى عام 1925 من جبل الدروز بقيادة سلطان باشا الأطرش الذي أصدر بيانه التاريخي تحت شعار: 'إلى السلاح أيها السوريون.. الدين لله والوطن للجميع'.",
+        "sourceSite": "ويكيبيديا الموسوعة الحرة",
+        "sourceArticle": "مقال: الثورة السورية الكبرى",
+        "sourceUrl": "https://ar.wikipedia.org/wiki/%D8%A7%D9%84%D8%AB%D9%88%D8%B1%D8%A9_%D8%A7%D9%84%D8%B3%D9%88%D8%B1%D9%8A%D8%A9_%D8%A7%D9%84%D9%83%D8%A8%D8%B1%D9%89",
+        "sourceLocation": "فقرة: 'قيادة سلطان باشا الأطرش'",
+        "sourceQuote": "قاد سلطان باشا الأطرش الثورة السورية الكبرى عام 1925 رافعاً شعاره الشهير الدين لله والوطن للجميع."
+      },
+      {
+        "q": "سؤال 46: ما هي المعركة العسكرية الفاصلة في مطلع آب 1925 التي سحق فيها الثوار السوريون بقيادة سلطان باشا الأطرش حملة الجنرال الفرنسي ميشو بالكامل؟",
+        "options": [
+          "معركة الكفر",
+          "معركة المزرعة",
+          "معركة المسيفرة",
+          "معركة تلكلخ"
+        ],
+        "correct": 1,
+        "reason": "وقعت معركة المزرعة قرب السويداء في 2-3 آب 1925، وتمكن الثوار بأسلحتهم التقليدية والفروسية من تدمير رتل كامل لقوات الانتداب المجهزة بالمدفعية والدبابات بقيادة الجنرال ميشو.",
+        "sourceSite": "ويكيبيديا الموسوعة الحرة",
+        "sourceArticle": "مقال: معركة المزرعة",
+        "sourceUrl": "https://ar.wikipedia.org/wiki/%D9%85%D8%B9%D8%B1%D9%83%D8%A9_%D8%A7%D9%84%D9%85%D8%B2%D8%B1%D8%B9%D8%A9",
+        "sourceLocation": "فقرة: 'مجريات المعركة والنتائج'",
+        "sourceQuote": "حقق الثوار السوريون في معركة المزرعة في آب 1925 انتصاراً ساحقاً على جيش الجنرال الفرنسي ميشو."
+      },
+      {
+        "q": "سؤال 47: من هو الزعيم والمفكر السوري الذي قاد 'ثورة الشمال السوري' (1919 - 1921) في جبل الزاوية وحلب وحوكم لاحقاً وبرأه القضاء لعدم ثبوت العمالة أو الجناية؟",
+        "options": [
+          "حسن الخراط",
+          "إبراهيم هنانو",
+          "رمضان شلاش",
+          "عبد الرحمن الشهبندر"
+        ],
+        "correct": 1,
+        "reason": "قاد إبراهيم هنانو ثورة الشمال في حلب وإدلب وجبل الزاوية وحارم ضد الاحتلال الفرنسي، وأسس تنظيماً إدارياً وميدانياً متقناً، ثم صار أحد أبرز أقطاب الكتلة الوطنية والبرلمان.",
+        "sourceSite": "ويكيبيديا الموسوعة الحرة",
+        "sourceArticle": "مقال: إبراهيم هنانو",
+        "sourceUrl": "https://ar.wikipedia.org/wiki/%D8%A5%D8%A8%D8%B1%D8%A7%D9%87%D9%8A%D9%85_%D9%87%D9%86%D8%A7%D9%86%D9%88",
+        "sourceLocation": "فقرة: 'ثورة الشمال السوري'",
+        "sourceQuote": "أشعل إبراهيم هنانو ثورة الشمال السوري ضد القوات الفرنسية بين عامي 1919 و1921."
+      },
+      {
+        "q": "سؤال 48: من هو القائد الوطني الذي فجر 'ثورة الساحل والجبال الساحلية' عام 1919 ضد الاحتلال الفرنسي ونسق مع إبراهيم هنانو والحكومة العربية بدمشق؟",
+        "options": [
+          "الشيخ بدر الدين الحسني",
+          "الشيخ صالح العلي",
+          "الشيخ محمد الأشمر",
+          "الشيخ عز الدين القسام"
+        ],
+        "correct": 1,
+        "reason": "قاد الشيخ صالح العلي ثورة جبال الساحل من معقله في الشيخ بدر باللاذقية/طرطوس ضد القوات الفرنسية بين 1918 و1921، وخاض معارك شهيرة في وادي العيون وتلكلخ والقدموس.",
+        "sourceSite": "ويكيبيديا الموسوعة الحرة",
+        "sourceArticle": "مقال: صالح العلي",
+        "sourceUrl": "https://ar.wikipedia.org/wiki/%D8%B5%D8%A7%D9%84%D8%AD_%D8%A7%D9%84%D8%B9%D9%84%D9%8A",
+        "sourceLocation": "فقرة: 'قيادة ثورة الساحل'",
+        "sourceQuote": "قاد الشيخ صالح العلي أولى الثورات السورية المسلحة ضد الانتداب الفرنسي في جبال الساحل عام 1919."
+      },
+      {
+        "q": "سؤال 49: ما هو التنظيم السياسي الوطني الأبرز الذي تأسس في دمشق عام 1927-1928 وقاد النضال السياسي والمفاوضات الدبلوماسية مع فرنسا حتى نيل الاستقلال؟",
+        "options": [
+          "حزب الشعب",
+          "الكتلة الوطنية السورية",
+          "الحزب الوطني",
+          "حركة القوميين العرب"
+        ],
+        "correct": 1,
+        "reason": "تأسست 'الكتلة الوطنية' بقيادة نخبة رجالات سوريا (هاشم الأتاسي، إبراهيم هنانو، فارس الخوري، جميل مردم بك، سعد الله الجابري، وشكري القوتلي) واتبعت نهج 'المقاومة السياسية الدبلوماسية'.",
+        "sourceSite": "ويكيبيديا الموسوعة الحرة",
+        "sourceArticle": "مقال: الكتلة الوطنية (سوريا)",
+        "sourceUrl": "https://ar.wikipedia.org/wiki/%D8%A7%D9%84%D9%83%D8%AA%D9%84%D8%A9_%D8%A7%D9%84%D9%88%D8%B7%D9%86%D9%8A%D8%A9_(%D8%B3%D9%88%D8%B1%D9%8A%D8%A7)",
+        "sourceLocation": "فقرة: 'التأسيس والأهداف'",
+        "sourceQuote": "قادت الكتلة الوطنية السورية منذ تأسيسها عام 1928 معركة الاستقلال الدبلوماسي والدستوري لسوريا."
+      },
+      {
+        "q": "سؤال 50: ما هو التحرك الشعبي التاريخي العارم الذي قادته المدن السورية مطلع عام 1936 واستمر لمدة ستين يوماً متواصلة وأرغم باريس على التفاوض؟",
+        "options": [
+          "اعتصام الجامع الأموي الكبير",
+          "الإضراب الستيني (الإضراب العام لعام 1936)",
+          "مسيرة العودة للبرلمان",
+          "مقاطعة البضائع الأوروبية"
+        ],
+        "correct": 1,
+        "reason": "الإضراب الستيني (كانون الثاني - آذار 1936) كان أطول إضراب عام شل الحياة التجارية والتعليمية في دمشق وحلب وحمص وحماة عقب إغلاق مكاتب الكتلة الوطنية، وأجبر فرنسا على توقيع معاهدة 1936.",
+        "sourceSite": "ويكيبيديا الموسوعة الحرة",
+        "sourceArticle": "مقال: الإضراب الستيني",
+        "sourceUrl": "https://ar.wikipedia.org/wiki/%D8%A7%D9%84%D8%A5%D8%B6%D8%B1%D8%A7%D8%A8_%D8%A7%D9%84%D8%B3%D8%AA%D9%8A%D9%86%D9%8A",
+        "sourceLocation": "فقرة: 'أسباب الإضراب ونتائجه'",
+        "sourceQuote": "استمر الإضراب الستيني لستين يوماً عام 1936 مما شل البلاد ودفع فرنسا للدعوة لمفاوضات المعاهدة بباريس."
+      },
+      {
+        "q": "سؤال 51: من ترأس الوفد السوري الوطني المفاوض الذي سافر إلى باريس ووقع 'معاهدة الصداقة والتحالف السورية-الفرنسية' في أيلول 1936؟",
+        "options": [
+          "شكري القوتلي",
+          "هاشم الأتاسي",
+          "خالد العظم",
+          "ناظم القدسي"
+        ],
+        "correct": 1,
+        "reason": "ترأس الزعيم هاشم الأتاسي وفد الكتلة الوطنية السورية إلى باريس وضم فارس الخوري وسعد الله الجابري وجميل مردم بك، وتم توقيع معاهدة تعترف بوحدة واستقلال سوريا وإنهاء الانتداب تدريجياً.",
+        "sourceSite": "ويكيبيديا الموسوعة الحرة",
+        "sourceArticle": "مقال: المعاهدة السورية الفرنسية 1936",
+        "sourceUrl": "https://ar.wikipedia.org/wiki/%D8%A7%D9%84%D9%85%D8%B9%D8%A7%D9%87%D8%AF%D8%A9_%D8%A7%D9%84%D8%B3%D9%88%D8%B1%D9%8A%D8%A9_%D8%A7%D9%84%D9%81%D8%B1%D9%86%D8%B3%D9%8A%D8%A9_1936",
+        "sourceLocation": "فقرة: 'مفاوضات باريس والوفد السوري'",
+        "sourceQuote": "ترأس هاشم الأتاسي الوفد السوري إلى باريس عام 1936 للتفاوض على استقلال سوريا وإنهاء الانتداب."
+      },
+      {
+        "q": "سؤال 52: ما الحدث الجلل الذي وقع في دمشق بتاريخ 29 أيار 1945 وسجل فيه رجال الشرطة والدرك السوريون ملحمة فداء وطنية أصبحت عيداً لقوى الأمن الداخلي؟",
+        "options": [
+          "تفجير سكة حديد الحجاز",
+          "اقتحام وقصف البرلمان السوري واستشهاد حاميته لرفضهم أداء التحية للعلم الفرنسي",
+          "محاصرة قصر العظم وطرد المندوب السامي",
+          "اقتحام قلعة دمشق وتحرير المعتقلين السياسيين"
+        ],
+        "correct": 1,
+        "reason": "في 29 أيار 1945 حاصرت القوات الفرنسية البرلمان السوري وطلبت من عناصر الحامية من الشرطة والدرك أداء التحية للعلم الفرنسي، فرفضوا رفضاً قاطعاً فاستشهدوا جميعاً (30 شهيداً) وقصفت دمشق بالمدافع، وصار اليوم عيداً لقوى الأمن.",
+        "sourceSite": "ويكيبيديا الموسوعة الحرة",
+        "sourceArticle": "مقال: العدوان الفرنسي على دمشق (1945)",
+        "sourceUrl": "https://ar.wikipedia.org/wiki/%D8%A7%D9%84%D8%B9%D8%AF%D9%88%D8%A7%D9%86_%D8%A7%D9%84%D9%81%D8%B1%D9%86%D8%B3%D9%8A_%D8%B9%D9%84%D9%89_%D8%AF%D9%85%D8%B4%D9%82_(1945)",
+        "sourceLocation": "فقرة: 'مجزرة حامية البرلمان'",
+        "sourceQuote": "استشهدت حامية البرلمان السوري في 29 أيار 1945 بعد رفضها إنزال العلم السوري وأداء التحية للعلم الفرنسي."
+      },
+      {
+        "q": "سؤال 53: في أي تاريخ باليوم والشهر والسنة احتفلت سوريا بـ 'عيد الجلاء' الوطني إثر خروج آخر جندي فرنسي عن أراضيها؟",
+        "options": [
+          "29 أيار 1945",
+          "17 نيسان 1946",
+          "8 آذار 1946",
+          "24 تشرين الأول 1945"
+        ],
+        "correct": 1,
+        "reason": "في 17 نيسان/أبريل 1946 تم جلاء آخر القوات الفرنسية المحتلة عن أرض سوريا، ليرتفع العلم السوري خفاقاً في سماء دمشق كدولة مستقلة ذات سيادة في عهد الرئيس شكري القوتلي.",
+        "sourceSite": "ويكيبيديا الموسوعة الحرة",
+        "sourceArticle": "مقال: عيد الجلاء (سوريا)",
+        "sourceUrl": "https://ar.wikipedia.org/wiki/%D8%B9%D9%8A%D8%AF_%D8%A7%D9%84%D8%AC%D9%84%D8%A7%D8%A1_(%D8%B3%D9%88%D8%B1%D9%8A%D8%A7)",
+        "sourceLocation": "فقرة: 'الجلاء والاستقلال'",
+        "sourceQuote": "يحتفل السوريون بعيد الجلاء في 17 نيسان من كل عام تخليداً لخروج آخر جندي فرنسي عام 1946."
+      },
+      {
+        "q": "سؤال 54: من هو قائد أول انقلاب عسكري في تاريخ سوريا والوطن العربي المعاصر والذي وقع في آذار 1949؟",
+        "options": [
+          "سامي الحناوي",
+          "حسني الزعيم",
+          "أديب الشيشكلي",
+          "فوزي سلو"
+        ],
+        "correct": 1,
+        "reason": "قاد رئيس أركان الجيش السوري حسني الزعيم في 30 آذار 1949 أول انقلاب عسكري في تاريخ سوريا الحديث والعالم العربي، وأطاح بالرئيس شكري القوتلي ورئيس الوزراء خالد العظم.",
+        "sourceSite": "ويكيبيديا الموسوعة الحرة",
+        "sourceArticle": "مقال: حسني الزعيم",
+        "sourceUrl": "https://ar.wikipedia.org/wiki/%D8%AD%D8%B3%D9%86%D9%8A_%D8%A7%D9%84%D8%B2%D8%B9%D9%8A%D9%85",
+        "sourceLocation": "فقرة: 'انقلاب مارس 1949'",
+        "sourceQuote": "دشن حسني الزعيم في 30 آذار 1949 سلسلة الانقلابات العسكرية كأول انقلاب في تاريخ سوريا والمنطقة."
+      },
+      {
+        "q": "سؤال 55: ما هو الدستور السوري التاريخي الصادر في عهد الجمعية التأسيسية برئاسة رشدي الكيخيا عام 1950 والذي اعتُبر من أكثر الدساتير ديمقراطية في الشرق الأوسط؟",
+        "options": [
+          "دستور 1920 الملكي",
+          "دستور 1950 (دستور الاستقلال)",
+          "دستور 1973 الدائم",
+          "دستور 1930 الانتدابي"
+        ],
+        "correct": 1,
+        "reason": "أقر دستور 1950 نظاماً برلمانياً نموذجياً نص على فصل السلطات، وكفالة الحريات السياسية وحرية الصحافة والعدالة الاجتماعية وديانة رئيس الدولة الإسلام، وظل مرجعاً للحكم الديمقراطي.",
+        "sourceSite": "ويكيبيديا الموسوعة الحرة",
+        "sourceArticle": "مقال: دستور سوريا 1950",
+        "sourceUrl": "https://ar.wikipedia.org/wiki/%D8%AF%D8%B3%D8%AA%D9%88%D8%B1_%D8%B3%D9%88%D8%B1%D9%8A%D8%A7_1950",
+        "sourceLocation": "فقرة: 'مزايا دستور 1950'",
+        "sourceQuote": "يعد دستور 1950 من أرقى الدساتير الديمقراطية في تاريخ سوريا والشرق الأوسط حيث رسخ النظام البرلماني."
+      },
+      {
+        "q": "سؤال 56: متى أُعلنت 'الجمهورية العربية المتحدة' (الوحدة الاندماجية بين سوريا ومصر)، وما اللقب الذي منحه البرلمان السوري للرئيس شكري القوتلي بعد تنازله عن السلطة طواعية؟",
+        "options": [
+          "22 شباط 1958 - لُقب بـ 'المواطن العربي الأول'",
+          "17 نيسان 1955 - لُقب بـ 'حكيم الأمة'",
+          "28 أيلول 1961 - لُقب بـ 'أبو الاستقلال'",
+          "10 كانون الأول 1958 - لُقب بـ 'زعيم الوحدة'"
+        ],
+        "correct": 0,
+        "reason": "قامت الوحدة بين سوريا ومصر في 22 شباط 1958 برئاسة جمال عبد الناصر، وتنازل الرئيس شكري القوتلي طوعاً عن منصب الرئاسة وحمل بموجب مرسوم خاص لقب 'المواطن العربي الأول'.",
+        "sourceSite": "ويكيبيديا الموسوعة الحرة",
+        "sourceArticle": "مقال: الجمهورية العربية المتحدة",
+        "sourceUrl": "https://ar.wikipedia.org/wiki/%D8%A7%D9%84%D8%AC%D9%85%D9%87%D9%88%D8%B1%D9%8A%D8%A9_%D8%A7%D9%84%D8%B9%D8%B1%D8%A8%D9%8A%D8%A9_%D8%A7%D9%84%D9%85%D8%AA%D8%AD%D8%AF%D8%A9",
+        "sourceLocation": "فقرة: 'إعلان الوحدة والمواطن الأول'",
+        "sourceQuote": "أُعلنت الوحدة في 22 فبراير 1958 وتنازل القوتلي عن الرئاسة ونال لقب المواطن العربي الأول."
+      },
+      {
+        "q": "سؤال 57: في أي تاريخ وقع انقلاب الانفصال العسكري الذي فكك الجمهورية العربية المتحدة وأعاد إعلان الجمهورية العربية السورية؟",
+        "options": [
+          "22 شباط 1960",
+          "28 أيلول 1961",
+          "8 آذار 1963",
+          "16 تشرين الثاني 1970"
+        ],
+        "correct": 1,
+        "reason": "في 28 أيلول 1961 قاد ضباط سوريون حركة انقلابية أدت إلى إنهاء الوحدة مع مصر وعودة الحكم الدستوري التعددي وإجراء انتخابات عامة فاز فيها الدكتور ناظم القدسي برئاسة الجمهورية.",
+        "sourceSite": "ويكيبيديا الموسوعة الحرة",
+        "sourceArticle": "مقال: الانفصال (سوريا)",
+        "sourceUrl": "https://ar.wikipedia.org/wiki/%D8%A7%D9%84%D8%A7%D9%86%D9%81%D8%B5%D8%A7%D9%84_(%D8%B3%D9%88%D8%B1%D9%8A%D8%A7)",
+        "sourceLocation": "فقرة: 'أحداث 28 أيلول 1961'",
+        "sourceQuote": "انتهت تجربة الوحدة مع مصر عقب الانقلاب العسكري الذي وقع في 28 أيلول 1961."
+      },
+      {
+        "q": "سؤال 58: في أي حرب إقليمية تم احتلال هضبة الجولان السورية من قِبل إسرائيل وصدور قرار مجلس الأمن الدولي الشهير رقم 242؟",
+        "options": [
+          "حرب 1948",
+          "حرب حزيران (نكسة 1967)",
+          "حرب الاستنزاف 1969",
+          "حرب تشرين 1973"
+        ],
+        "correct": 1,
+        "reason": "احتلت إسرائيل هضبة الجولان السورية في حرب الأيام الستة (حزيران 1967)، وأصدر مجلس الأمن الدولي في 22 تشرين الثاني 1967 قراره رقم 242 الذي أكد عدم جواز الاستيلاء على الأراضي بالحرب ووجوب الانسحاب.",
+        "sourceSite": "ويكيبيديا الموسوعة الحرة",
+        "sourceArticle": "مقال: حرب 1967",
+        "sourceUrl": "https://ar.wikipedia.org/wiki/%D8%AD%D8%B1%D8%A8_1967",
+        "sourceLocation": "فقرة: 'الجبهة السورية واحتلال الجولان'",
+        "sourceQuote": "احتلت إسرائيل هضبة الجولان في حزيران 1967 وتلا ذلك صدور قرار مجلس الأمن رقم 242."
+      },
+      {
+        "q": "سؤال 59: ما هي المدينة السورية الرئيسية التي تم تحريرها واستعادتها ورفع العلم السوري فوق أطلالها المحررة في 26 حزيران 1974 عقب اتفاقية فصل القوات؟",
+        "options": [
+          "مدينة طبريا",
+          "مدينة القنيطرة",
+          "مدينة فيق",
+          "مدينة بانياس الجولان"
+        ],
+        "correct": 1,
+        "reason": "استعادت سوريا مدينة القنيطرة المحررة بعد حرب تشرين التحريرية بموجب اتفاقية فصل القوات الموقعة في جنيف، ورُفع العلم السوري فوقها في 26 حزيران 1974 بعد أن دمرها الاحتلال بالكامل قبل انسحابه.",
+        "sourceSite": "ويكيبيديا الموسوعة الحرة",
+        "sourceArticle": "مقال: القنيطرة (سوريا)",
+        "sourceUrl": "https://ar.wikipedia.org/wiki/%D8%A7%D9%84%D9%82%D9%86%D9%8A%D8%B7%D8%B1%D8%A9_(%D8%B3%D9%88%D8%B1%D9%8A%D8%A7)",
+        "sourceLocation": "فقرة: 'التحرير ورفع العلم 1974'",
+        "sourceQuote": "تم تحرير مدينة القنيطرة واستعادتها ورفع العلم السوري فوقها في 26 حزيران 1974."
+      },
+      {
+        "q": "سؤال 60: في أي تاريخ من كانون الأول 2024 سقط نظام الأسد في دمشق عبر معركة 'ردع العدوان' معلناً نهاية حقبة استبدادية استمرت 54 عاماً وبدء مرحلة انتقالية ديمقراطية؟",
+        "options": [
+          "1 كانون الأول 2024",
+          "8 كانون الأول 2024",
+          "15 كانون الأول 2024",
+          "27 كانون الأول 2024"
+        ],
+        "correct": 1,
+        "reason": "في 8 كانون الأول 2024 دخلت قوى الثورة السورية العاصمة دمشق بعد 11 يوماً من انطلاق معركة 'ردع العدوان'، وسقط نظام حكم عائلة الأسد الذي استمر نحو 54 عاماً لتبدأ حقبة دستورية ودبلوماسية جديدة لسوريا.",
+        "sourceSite": "ويكيبيديا الموسوعة الحرة",
+        "sourceArticle": "مقال: معركة ردع العدوان 2024",
+        "sourceUrl": "https://ar.wikipedia.org/wiki/%D9%87%D8%AC%D9%88%D9%85_%D8%B4%D9%85%D8%A7%D9%84_%D8%BA%D8%B1%D8%A8_%D8%B3%D9%88%D8%B1%D9%8A%D8%A7_2024",
+        "sourceLocation": "فقرة: 'سقوط دمشق 8 ديسمبر 2024'",
+        "sourceQuote": "سقط حكم بشار الأسد ونظامه بدخول الثوار إلى دمشق في 8 كانون الأول 2024 بعد 54 عاماً من حكم العائلة."
+      }
+    ]
+  },
+  {
+    "sectionId": 3,
+    "sectionName": "القسم 4: رؤساء سوريا ورواد الدبلوماسية والشخصيات الوطنية",
+    "sectionBadge": "القسم 4: الرؤساء والدبلوماسيون (20)",
+    "questions": [
+      {
+        "q": "سؤال 61: من هو الزعيم السوري الملقب بـ 'أبو الدستور' و'حكيم الأمة' والذي انتُخب رئيساً لسوريا لثلاث فترات تاريخية منفصلة (1936، 1949، 1954) واستقال طواعية التزاماً بالدستور؟",
+        "options": [
+          "شكري القوتلي",
+          "هاشم الأتاسي",
+          "فارس الخوري",
+          "ناظم القدسي"
+        ],
+        "correct": 1,
+        "reason": "يُعد الرئيس هاشم الأتاسي رمز النزاهة الدستورية في سوريا؛ ترأس الدولة ثلاث مرات وتنازل عن السلطة عام 1955 بعد انتهاء ولايته الدستورية ليضرب مثلاً في التداول السلمي للسلطة.",
+        "sourceSite": "ويكيبيديا الموسوعة الحرة",
+        "sourceArticle": "مقال: هاشم الأتاسي",
+        "sourceUrl": "https://ar.wikipedia.org/wiki/%D9%87%D8%A7%D8%B4%D9%85_%D8%A7%D9%84%D8%A3%D8%AA%D8%A7%D8%B3%D9%8A",
+        "sourceLocation": "فقرة: 'الرئاسة والرمزية الدستورية'",
+        "sourceQuote": "لُقب هاشم الأتاسي بأبي الدستور وحكيم سوريا وترأس الجمهورية ثلاث مرات ضارباً أروع أمثلة النزاهة."
+      },
+      {
+        "q": "سؤال 62: من هو أول رئيس للجمهورية السورية عقب نيل الاستقلال التام وجلاء القوات الفرنسية عام 1946؟",
+        "options": [
+          "هاشم الأتاسي",
+          "شكري القوتلي",
+          "حسني الزعيم",
+          "تاج الدين الحسني"
+        ],
+        "correct": 1,
+        "reason": "قاد شكري القوتلي معركة الاستقلال الدبلوماسي وانتخب رئيساً عام 1943، وشهد عهده جلاء القوات الفرنسية في 17 نيسان 1946 ليكون أول رئيس لسوريا المستقلة بالكامل.",
+        "sourceSite": "ويكيبيديا الموسوعة الحرة",
+        "sourceArticle": "مقال: شكري القوتلي",
+        "sourceUrl": "https://ar.wikipedia.org/wiki/%D8%B4%D9%83%D8%B1%D9%8A_%D8%A7%D9%84%D9%82%D9%88%D8%AA%D9%84%D9%8A",
+        "sourceLocation": "فقرة: 'فترة الرئاسة الأولى والجلاء'",
+        "sourceQuote": "يعد شكري القوتلي أول رئيس لسوريا بعد الاستقلال وجلاء الانتداب الفرنسي عام 1946."
+      },
+      {
+        "q": "سؤال 63: من هو عملاق الدبلوماسية السورية الذي ترأس وفد سوريا التأسيسي في مؤتمر سان فرانسيسكو 1945 وترأس مجلس الأمن الدولي مرتين، وتولى رئاسة الوزراء والبرلمان؟",
+        "options": [
+          "سعد الله الجابري",
+          "فارس الخوري",
+          "جميل مردم بك",
+          "فريد زين الدين"
+        ],
+        "correct": 1,
+        "reason": "فارس الخوري هو أحد ألمع رجال الدولة والدبلوماسية السورية؛ قاد وفد التأسيس للأمم المتحدة، وكان أول سوري وعربي يترأس مجلس الأمن الدولي، وتولى رئاسة الوزراء ورئاسة البرلمان لعدة دورات بالثقة الشعبية.",
+        "sourceSite": "ويكيبيديا الموسوعة الحرة",
+        "sourceArticle": "مقال: فارس الخوري",
+        "sourceUrl": "https://ar.wikipedia.org/wiki/%D9%81%D8%A7%D8%B1%D8%B3_%D8%A7%D9%84%D8%AE%D9%88%D8%B1%D9%8A",
+        "sourceLocation": "فقرة: 'رئاسة مجلس الأمن ومؤتمر سان فرانسيسكو'",
+        "sourceQuote": "ترأس فارس الخوري الوفد السوري المؤسس للأمم المتحدة وترأس مجلس الأمن الدولي كأول عربي وسوري."
+      },
+      {
+        "q": "سؤال 64: ما هي الواقعة الدبلوماسية الشهيرة التي سجلها فارس الخوري في الأمم المتحدة لإحراج ممثل فرنسا أثناء نضال سوريا للجلاء؟",
+        "options": [
+          "مزق وثيقة الانتداب أمام الجمعية العامة للأمم المتحدة",
+          "جلس على مقعد المندوب الفرنسي لمدة 25 دقيقة بصمت ثم قال له: احتملتني 25 دقيقة فكدت تقتلني، وسوريا احتملتكم 25 عاماً!",
+          "تحدث باللغة العربية الفصحى ورفض الترجمة إلى اللغة الفرنسية",
+          "قاطع الجلسة وغادر القاعة فور بدء كلمة وزير الخارجية الفرنسي"
+        ],
+        "correct": 1,
+        "reason": "جلس فارس الخوري عمداً على مقعد السفير الفرنسي واضعاً ساعته أمامه لمدة 25 دقيقة وسط غضب السفير، وعند انتهاء الدقائق قال عبارته الدبلوماسية الخالدة التي لخصت كفاح ربع قرن ضد الاستعمار.",
+        "sourceSite": "ويكيبيديا الموسوعة الحرة",
+        "sourceArticle": "مقال: فارس الخوري",
+        "sourceUrl": "https://ar.wikipedia.org/wiki/%D9%81%D8%A7%D8%B1%D8%B3_%D8%A7%D9%84%D8%AE%D9%88%D8%B1%D9%8A",
+        "sourceLocation": "فقرة: 'حادثة المقعد الشهيرة مع مندوب فرنسا'",
+        "sourceQuote": "جلس الخوري 25 دقيقة في مقعد المندوب الفرنسي وقال له: جلست 25 دقيقة فكدت تنفجر وسوريا صبرت 25 عاماً."
+      },
+      {
+        "q": "سؤال 65: من هو السياسي والدبلوماسي السوري البارز الذي عُين كأول سفير لسوريا في واشنطن بعد الاستقلال، وانتُخب لاحقاً رئيساً للجمهورية عام 1961؟",
+        "options": [
+          "الدكتور ناظم القدسي",
+          "خالد العظم",
+          "رشدي الكيخيا",
+          "معروف الدواليبي"
+        ],
+        "correct": 0,
+        "reason": "الدكتور ناظم القدسي هو أول سفير ومفوض دبلوماسي لسوريا لدى الولايات المتحدة (1944-1945)، وتولى رئاسة الوزراء ورئاسة مجلس النواب، ثم انتُخب رئيساً للجمهورية السورية (1961-1963).",
+        "sourceSite": "ويكيبيديا الموسوعة الحرة",
+        "sourceArticle": "مقال: ناظم القدسي",
+        "sourceUrl": "https://ar.wikipedia.org/wiki/%D9%86%D8%A7%D8%B8%D9%85_%D8%A7%D9%84%D9%82%D8%AF%D8%B3%D9%8A",
+        "sourceLocation": "فقرة: 'العمل الدبلوماسي ورئاسة الجمهورية'",
+        "sourceQuote": "عُين ناظم القدسي كأول سفير لسوريا في واشنطن عام 1944 وانتخب رئيساً للجمهورية السورية عام 1961."
+      },
+      {
+        "q": "سؤال 66: من هو زعيم حلب البارز في الكتلة الوطنية الذي ترأس الحكومة ووزارة الخارجية وشارك بفعالية في مباحثات تأسيس جامعة الدول العربية عام 1944-1945؟",
+        "options": [
+          "سعد الله الجابري",
+          "عبد الرحمن الكواكبي",
+          "كامل الغزي",
+          "علاء الدين الدروبي"
+        ],
+        "correct": 0,
+        "reason": "سعد الله الجابري قاد العمل الوطني في حلب، وشغل منصب رئيس الوزراء ووزير الخارجية، ووقع على بروتوكول الإسكندرية وميثاق جامعة الدول العربية ممثلاً لسوريا.",
+        "sourceSite": "ويكيبيديا الموسوعة الحرة",
+        "sourceArticle": "مقال: سعد الله الجابري",
+        "sourceUrl": "https://ar.wikipedia.org/wiki/%D8%B3%D8%B9%D8%AF_%D8%A7%D9%84%D9%84%D9%87_%D8%A7%D9%84%D8%AC%D8%A7%D8%A8%D8%B1%D9%8A",
+        "sourceLocation": "فقرة: 'رئاسة الوزراء وتأسيس الجامعة العربية'",
+        "sourceQuote": "ترأس سعد الله الجابري الحكومة السورية وكان من أبرز المساهمين في صياغة ميثاق جامعة الدول العربية."
+      },
+      {
+        "q": "سؤال 67: من هو السياسي السوري الملقب بـ 'مليونير الشعب' الذي ترأس الحكومة السورية ست مرات وكان مهندس بناء مرفأ اللاذقية وتثبيت الحياد الإيجابي؟",
+        "options": [
+          "خالد العظم",
+          "صبري العسلي",
+          "حسني البرازي",
+          "لطفي الحفار"
+        ],
+        "correct": 0,
+        "reason": "خالد العظم تولى رئاسة الوزراء ست فترات بين 1941 و1963، وعُرف بـ 'مليونير الشعب'، وأسس السياسة الاقتصادية المستقلة وبناء مرفأ اللاذقية وتوقيع اتفاقيات التعاون مع الكتلة الشرقية والغربية على أساس عدم الانحياز.",
+        "sourceSite": "ويكيبيديا الموسوعة الحرة",
+        "sourceArticle": "مقال: خالد العظم",
+        "sourceUrl": "https://ar.wikipedia.org/wiki/%D8%AE%D8%A7%D9%84%D8%AF_%D8%A7%D9%84%D8%B9%D8%B8%D9%85",
+        "sourceLocation": "فقرة: 'المسيرة السياسية ومليونير الشعب'",
+        "sourceQuote": "شغل خالد العظم رئاسة وزراء سوريا لست مرات وأسهم في تشييد مرفأ اللاذقية وتثبيت الحياد الإيجابي."
+      },
+      {
+        "q": "سؤال 68: من هو الطبيب والزعيم الوطني الذي شغل منصب أول وزير خارجية لحكومة دمشق في العهد الفيصلي (1920) وأسس حزب الشعب واغتيل عام 1940؟",
+        "options": [
+          "الدكتور عبد الرحمن الشهبندر",
+          "الدكتور عزت الطرابلسي",
+          "الدكتور أمين رويحة",
+          "الدكتور منيف الرزاز"
+        ],
+        "correct": 0,
+        "reason": "الدكتور عبد الرحمن الشهبندر هو رائد العمل السياسي والدبلوماسي السوري، تولى حقيبة الخارجية في حكومة المملكة السورية 1920، وقاد العمل الوطني ضد الانتداب حتى اغتياله في عيادته بدمشق في تموز 1940.",
+        "sourceSite": "ويكيبيديا الموسوعة الحرة",
+        "sourceArticle": "مقال: عبد الرحمن الشهبندر",
+        "sourceUrl": "https://ar.wikipedia.org/wiki/%D8%B9%D8%A8%D8%AF_%D8%A7%D9%84%D8%B1%D8%AD%D9%85%D9%86_%D8%A7%D9%84%D8%B4%D9%87%D8%A8%D9%86%D8%AF%D8%B1",
+        "sourceLocation": "فقرة: 'وزارة الخارجية والنضال الوطني'",
+        "sourceQuote": "تولى عبد الرحمن الشهبندر وزارة الخارجية في الحكومة العربية بدمشق عام 1920 واغتيل عام 1940."
+      },
+      {
+        "q": "سؤال 69: من هو الدبلوماسي والشاعر السوري العالمي الذي عمل لسنوات طويلة في السلك الدبلوماسي لوزارة الخارجية السورية في سفارات القاهرة ولندن ومدريد وبكين؟",
+        "options": [
+          "محمد الماغوط",
+          "نزار قباني",
+          "بدوي الجبل",
+          "عمر أبو ريشة"
+        ],
+        "correct": 1,
+        "reason": "الشاعر الكبير نزار قباني تخرج من كلية الحقوق بدمشق والتحق بالسلك الدبلوماسي لوزارة الخارجية السورية عام 1945، وعمل في سفارات سوريا بالقاهرة، ولندن، وأنقرة، وبكين، ومدريد، ولندن قبل استقالته عام 1966 للتفرغ للأدب.",
+        "sourceSite": "ويكيبيديا الموسوعة الحرة",
+        "sourceArticle": "مقال: نزار قباني",
+        "sourceUrl": "https://ar.wikipedia.org/wiki/%D9%86%D8%B2%D8%A7%D8%B1_%D9%82%D8%A8%D8%A7%D9%86%D9%8A",
+        "sourceLocation": "فقرة: 'العمل في السلك الدبلوماسي'",
+        "sourceQuote": "عمل نزار قباني دبلوماسياً في وزارة الخارجية السورية وتنقل بين سفارات دمشق في مدريد ولندن وبكين."
+      },
+      {
+        "q": "سؤال 70: من هو السياسي والبرلماني والمفكر السوري الذي نظم النشيد القومي الشهير 'بلادُ العُربِ أوطاني' وكان من رواد الحركة الكشفية والنهضة الثقافية؟",
+        "options": [
+          "فخري البارودي",
+          "خليل مردم بك",
+          "إبراهيم طوقان",
+          "زكي الأرسوزي"
+        ],
+        "correct": 0,
+        "reason": "فخري البارودي زعيم وطني ونائب في البرلمان ومؤسس فرقة البارودي الكشفية، ألّف النشيد الشهير 'بلاد العرب أوطاني من الشام لبغدانِ'، وكان منزله بدمشق صالوناً للسياسة والدبلوماسية والأدب.",
+        "sourceSite": "ويكيبيديا الموسوعة الحرة",
+        "sourceArticle": "مقال: فخري البارودي",
+        "sourceUrl": "https://ar.wikipedia.org/wiki/%D9%81%D8%ASide%D8%B1%D9%8A_%D8%A7%D9%84%D8%A8%D8%A7%D8%B1%D9%88%D8%AF%D9%8A",
+        "sourceLocation": "فقرة: 'نشيد بلاد العرب أوطاني'",
+        "sourceQuote": "كتب فخري البارودي النشيد القومي الشهير بلاد العرب أوطاني وكان من ألمع رجالات دمشق الوطنية."
+      },
+      {
+        "q": "سؤال 71: من هو المفكر والفقيه الدستوري والسياسي السوري الذي ترأس الجمعية التأسيسية التي صاغت دستور 1950 وترأس مجلس النواب السوري لعدة دورات؟",
+        "options": [
+          "رشدي الكيخيا",
+          "معروف الدواليبي",
+          "فيضي الأتاسي",
+          "عدنان الأتاسي"
+        ],
+        "correct": 0,
+        "reason": "رشدي الكيخيا زعيم حزب الشعب من حلب، ترأس الجمعية التأسيسية التي وضعت دستور 1950، وانتخب رئيساً لمجلس النواب السوري لعدة دورات، وعُرف بنزاهته واستقلاليته المطلقة ورفضه عسكرة الحكم.",
+        "sourceSite": "ويكيبيديا الموسوعة الحرة",
+        "sourceArticle": "مقال: رشدي الكيخيا",
+        "sourceUrl": "https://ar.wikipedia.org/wiki/%D8%B1%D8%B4%D8%AF%D9%8A_%D8%A7%D9%84%D9%83%D9%8A%D8%AE%D9%8A%D8%A7",
+        "sourceLocation": "فقرة: 'رئاسة الجمعية التأسيسية والبرلمان'",
+        "sourceQuote": "ترأس رشدي الكيخيا الجمعية التأسيسية عام 1949 التي وضعت دستور 1950 الشهير."
+      },
+      {
+        "q": "سؤال 72: من هو أستاذ القانون ورئيس وزراء ورئيس البرلمان السوري الأسبق الذي كان أول وزير دفاع مدني في سوريا وعُرف بمؤلفاته القانونية الدولية المرموقة؟",
+        "options": [
+          "الدكتور معروف الدواليبي",
+          "مأمون الكزبري",
+          "محسن البرازي",
+          "عوني عبد الهادي"
+        ],
+        "correct": 0,
+        "reason": "الدكتور معروف الدواليبي نال الدكتوراه في القانون من السوربون، وشغل رئاسة مجلس النواب ورئاسة الوزراء عامي 1951 و1961، وكان أول مدني يتولى وزارة الدفاع بهدف تكريس التبعية العسكرية للسلطة الدستورية.",
+        "sourceSite": "ويكيبيديا الموسوعة الحرة",
+        "sourceArticle": "مقال: معروف الدواليبي",
+        "sourceUrl": "https://ar.wikipedia.org/wiki/%D9%85%D8%B9%D8%B1%D9%88%D9%81_%D8%A7%D9%84%D8%AF%D9%88%D8%A7%D9%84%D9%8A%D8%A8%D9%8A",
+        "sourceLocation": "فقرة: 'المناصب الحكومية والقانونية'",
+        "sourceQuote": "شغل معروف الدواليبي رئاسة الوزراء ورئاسة البرلمان كأحد أبرز فقهاء القانون والسياسة السوريين."
+      },
+      {
+        "q": "سؤال 73: من هو الدبلوماسي السوري المخضرم الذي مثل سوريا في مؤتمر سان فرانسيسكو 1945 وعُين مندوباً دائماً لسوريا لدى الأمم المتحدة وسفيراً في واشنطن لسنوات عديدة؟",
+        "options": [
+          "الدكتور فريد زين الدين",
+          "جورج طعمة",
+          "رفيق عشا",
+          "أحمد الشقيري"
+        ],
+        "correct": 0,
+        "reason": "الدكتور فريد زين الدين كان عضواً بوفد سوريا التأسيسي بالأمم المتحدة في سان فرانسيسكو، ثم مندوباً دائماً لسوريا في الأمم المتحدة وسفيراً في واشنطن ودافع باقتدار عن القضايا العربية والسورية.",
+        "sourceSite": "ويكيبيديا الموسوعة الحرة",
+        "sourceArticle": "مقال: فريد زين الدين",
+        "sourceUrl": "https://ar.wikipedia.org/wiki/%D9%81%D8%B1%D9%8A%D8%AF_%D8%A7%D9%84%D8%B2%D9%8A%D9%86",
+        "sourceLocation": "فقرة: 'السلك الدبلوماسي والأمم المتحدة'",
+        "sourceQuote": "مثل فريد زين الدين سوريا في تأسيس الأمم المتحدة وعمل سفيراً ومندوباً دائماً لها في نيويورك."
+      },
+      {
+        "q": "سؤال 74: من هو الدبلوماسي والمفكر والأديب السوري الذي أسس 'مجمع اللغة العربية بدمشق' عام 1919 كأقدم مجمع لغوي في العالم العربي وشغل منصب وزير المعارف؟",
+        "options": [
+          "محمد كرد علي",
+          "ساطع الحصري",
+          "أحمد لطفي السيد",
+          "طه حسين"
+        ],
+        "correct": 0,
+        "reason": "العلامة محمد كرد علي أسس مجمع اللغة العربية بدمشق في عهد حكومة الملك فيصل عام 1919 وظل رئيساً له حتى وفاته، وألف موسوعته التاريخية والدبلوماسية الكبرى 'خطط الشام'.",
+        "sourceSite": "ويكيبيديا الموسوعة الحرة",
+        "sourceArticle": "مقال: محمد كرد علي",
+        "sourceUrl": "https://ar.wikipedia.org/wiki/%D9%85%D8%AD%D9%85%D8%AF_%D9%83%D8%B1%D8%AF_%D8%B9%D9%84%D9%8A",
+        "sourceLocation": "فقرة: 'تأسيس مجمع اللغة العربية'",
+        "sourceQuote": "أسس محمد كرد علي مجمع اللغة العربية بدمشق عام 1919 وهو أقدم مجمع لغوي في العالم العربي."
+      },
+      {
+        "q": "سؤال 75: من هو الأمير والمناضل والدبلوماسي السوري الذي شغل منصب وزير الخارجية عام 1949 وكان ممثلاً لسوريا في المحافل الدولية وجامعة الدول العربية؟",
+        "options": [
+          "الأمير عادل أرسلان",
+          "الأمير شكيب أرسلان",
+          "الأمير مجيد أرسلان",
+          "الأمير حسن الأطرش"
+        ],
+        "correct": 0,
+        "reason": "الأمير عادل أرسلان سياسي ودبلوماسي وشاعر، شارك في الثورة السورية الكبرى، وشغل منصب وزير الخارجية السوري عام 1949 ونائب رئيس الوزراء، ومثل سوريا في الأمم المتحدة والجامعة العربية.",
+        "sourceSite": "ويكيبيديا الموسوعة الحرة",
+        "sourceArticle": "مقال: عادل أرسلان",
+        "sourceUrl": "https://ar.wikipedia.org/wiki/%D8%B9%D8%A7%D8%AF%D9%84_%D8%A3%D8%B1%D8%B3%D9%84%D8%A7%D9%86",
+        "sourceLocation": "فقرة: 'وزارة الخارجية والعمل السياسي'",
+        "sourceQuote": "تولى الأمير عادل أرسلان وزارة الخارجية السورية عام 1949 وكان صوتاً عربياً بارزاً في الدبلوماسية."
+      },
+      {
+        "q": "سؤال 76: من هو وزير الخارجية السوري الأطول بقاءً في منصبه خلال القرن العشرين، حيث تولى الحقيبة الدبلوماسية لنحو 22 عاماً متواصلة (1984 - 2006)؟",
+        "options": [
+          "عبد الحليم خدام",
+          "فاروق الشرع",
+          "وليد المعلم",
+          "صلاح الدين البيطار"
+        ],
+        "correct": 1,
+        "reason": "شغل فاروق الشرع منصب وزير الخارجية السوري من آذار 1984 حتى شباط 2006 (22 عاماً)، وقاد مفاوضات مؤتمر مدريد للسلام 1991 ومفاوضات شيبردستاون عام 2000 قبل تعيينه نائباً لرئيس الجمهورية.",
+        "sourceSite": "ويكيبيديا الموسوعة الحرة",
+        "sourceArticle": "مقال: فاروق الشرع",
+        "sourceUrl": "https://ar.wikipedia.org/wiki/%D9%81%D8%A7%D8%B1%D9%88%D9%82_%D8%A7%D9%84%D8%B4%D8%B1%D8%B9",
+        "sourceLocation": "فقرة: 'وزارة الخارجية (1984-2006)'",
+        "sourceQuote": "تولى فاروق الشرع حقيبة وزارة الخارجية السورية لمدة 22 عاماً من 1984 حتى 2006."
+      },
+      {
+        "q": "سؤال 77: من هو الدبلوماسي الذي تولى وزارة الخارجية والمغتربين السورية عام 2006 واستمر حتى وفاته عام 2020، وشهد عهده دمج وزارة المغتربين رسمياً مع الخارجية؟",
+        "options": [
+          "فيصل المقداد",
+          "وليد المعلم",
+          "بشار الجعفري",
+          "حسان مريود"
+        ],
+        "correct": 1,
+        "reason": "تولى وليد المعلم منصب وزير الخارجية في شباط 2006، وفي عهده صدر المرسوم التشريعي رقم 15 لعام 2011 بدمج وزارة المغتربين مع وزارة الخارجية ليصبح المسمى 'وزارة الخارجية والمغتربين'.",
+        "sourceSite": "ويكيبيديا الموسوعة الحرة",
+        "sourceArticle": "مقال: وليد المعلم",
+        "sourceUrl": "https://ar.wikipedia.org/wiki/%D9%88%D9%84%D9%8A%D8%AF_%D8%A7%D9%84%D9%85%D8%B9%D9%84%D9%85",
+        "sourceLocation": "فقرة: 'وزارة الخارجية والمغتربين'",
+        "sourceQuote": "شغل وليد المعلم منصب وزير الخارجية من 2006 حتى وفاته 2020 ودُمجت معه وزارة المغتربين عام 2011."
+      },
+      {
+        "q": "سؤال 78: من هو الوزير الذي كُلف بحقيبة الخارجية والمغتربين في الإدارة الانتقالية السورية عقب تحرير دمشق وإسقاط النظام في كانون الأول 2024؟",
+        "options": [
+          "أسعد حسن الشيباني",
+          "أحمد معاذ الخطيب",
+          "هادي البحرة",
+          "رياض حجاب"
+        ],
+        "correct": 0,
+        "reason": "سُمي أسعد حسن الشيباني وزيراً للخارجية والمغتربين في حكومة تسيير الأعمال والمرحلة الانتقالية السورية اعتباراً من أواخر كانون الأول 2024 لقيادة الدبلوماسية السورية واستعادة العلاقات الدولية.",
+        "sourceSite": "ويكيبيديا الموسوعة الحرة",
+        "sourceArticle": "مقال: وزارة الخارجية والمغتربين (سوريا)",
+        "sourceUrl": "https://ar.wikipedia.org/wiki/%D9%88%D8%B2%D8%A7%D8%B1%D8%A9_%D8%A7%D9%84%D8%AE%D8%A7%D8%B1%D8%AC%D9%8A%D8%A9_%D9%88%D8%A7%D9%84%D9%85%D8%BA%D8%AA%D8%B1%D8%A8%D9%8A%D9%86_(%D8%B3%D9%88%D8%B1%D9%8A%D8%A7)",
+        "sourceLocation": "فقرة: 'قائمة الوزراء - الإدارة الانتقالية 2024'",
+        "sourceQuote": "تولى أسعد حسن الشيباني وزارة الخارجية والمغتربين في الحكومة السورية الانتقالية في ديسمبر 2024."
+      },
+      {
+        "q": "سؤال 79: من هي الشخصية الوطنية التي قادت إدارة المرحلة الانتقالية الرئاسية في سوريا إثر نجاح معركة ردع العدوان وسقوط دمشق في كانون الأول 2024؟",
+        "options": [
+          "أحمد الشرع",
+          "برهان غليون",
+          "جورج صبرا",
+          "عبد الباسط سيدا"
+        ],
+        "correct": 0,
+        "reason": "تولى أحمد الشرع قيادة الإدارة الانتقالية العامة في دمشق عقب التحرير في كانون الأول 2024 لإدارة مؤسسات الدولة وحفظ الأمن والتحضير لمؤتمر الحوار الوطني والدستور المؤقت.",
+        "sourceSite": "ويكيبيديا الموسوعة الحرة",
+        "sourceArticle": "مقال: أحمد الشرع",
+        "sourceUrl": "https://ar.wikipedia.org/wiki/%D8%A3%D8%AD%D9%85%D8%AF_%D8%A7%D9%84%D8%B4%D8%B1%D8%B9",
+        "sourceLocation": "فقرة: 'إدارة المرحلة الانتقالية في دمشق'",
+        "sourceQuote": "أصبح أحمد الشرع رئيساً للإدارة الانتقالية في سوريا عقب دخول دمشق وسقوط نظام الأسد في ديسمبر 2024."
+      },
+      {
+        "q": "سؤال 80: من هو الشاعر والسياسي السوري الذي ألف كلمات النشيد الوطني الرسمي للجمهورية العربية السورية 'حُماة الديار عليكم سلام'؟",
+        "options": [
+          "خليل مردم بك",
+          "فخري البارودي",
+          "محمد مهدي الجواهري",
+          "سليمان العيسى"
+        ],
+        "correct": 0,
+        "reason": "ألف الشاعر والأديب السوري خليل مردم بك (الذي شغل لاحقاً منصب وزير الخارجية ورئيس مجمع اللغة العربية) كلمات النشيد الوطني السوري 'حماة الديار' عام 1936، ولحنه الأخوان فليفل.",
+        "sourceSite": "ويكيبيديا الموسوعة الحرة",
+        "sourceArticle": "مقال: حماة الديار",
+        "sourceUrl": "https://ar.wikipedia.org/wiki/%D8%AD%D9%85%D8%A7%D8%A9_%D8%A7%D9%84%D8%AF%D9%8A%D8%A7%D8%B1",
+        "sourceLocation": "فقرة: 'المؤلف والتاريخ'",
+        "sourceQuote": "كتب الشاعر خليل مردم بك كلمات النشيد الوطني السوري حماة الديار ولحنه الأخوان فليفل عام 1938."
+      }
+    ]
+  },
+  {
+    "sectionId": 4,
+    "sectionName": "القسم 5: الدبلوماسية السورية والمنظمات الدولية والمعاهدات",
+    "sectionBadge": "القسم 5: الدبلوماسية والمنظمات الدولية (20)",
+    "questions": [
+      {
+        "q": "سؤال 81: ما هي الصفة القانونية التاريخية للجمهورية السورية في تأسيس منظمة 'الأمم المتحدة' (UN) عام 1945؟",
+        "options": [
+          "انضمت بصفة مراقب بعد حرب 1948",
+          "كانت عضواً مؤسساً أصلياً من بين الدول الـ 51 التي وقعت ميثاق الأمم المتحدة في مؤتمر سان فرانسيسكو",
+          "انضمت بعد إنهاء الانتداب الفرنسي رسمياً بقرار من مجلس الأمن عام 1950",
+          "قُبلت عضويتها ضمن كتلة دول عدم الانحياز عام 1955"
+        ],
+        "correct": 1,
+        "reason": "تُعد سوريا إحدى الدول الـ 51 المؤسسة الأصلية لهيئة الأمم المتحدة؛ ووقع وفدها برئاسة فارس الخوري ميثاق الأمم المتحدة في 26 حزيران 1945 بسان فرانسيسكو، ودخل الميثاق حيز النفاذ في 24 تشرين الأول 1945.",
+        "sourceSite": "ويكيبيديا الموسوعة الحرة",
+        "sourceArticle": "مقال: ميثاق الأمم المتحدة",
+        "sourceUrl": "https://ar.wikipedia.org/wiki/%D9%85%D9%8A%D8%AB%D8%A7%D9%82_%D8%A7%D9%84%D8%A3%D9%85%D9%85_%D8%A7%D9%84%D9%85%D8%AA%D8%AD%D8%AF%D8%A9",
+        "sourceLocation": "فقرة: 'الدول الموقعة الأصلية'",
+        "sourceQuote": "سوريا من الدول الـ 51 الأصلية المؤسسة للأمم المتحدة في مؤتمر سان فرانسيسكو عام 1945."
+      },
+      {
+        "q": "سؤال 82: متى شاركت سوريا في تأسيس 'جامعة الدول العربية' والتوقيع على ميثاقها التأسيسي بالقاهرة؟",
+        "options": [
+          "في 7 تشرين الأول 1944 (بروتوكول الإسكندرية) و22 آذار 1945 (ميثاق الجامعة)",
+          "في 17 نيسان 1946 عقب الجلاء التام",
+          "في 15 أيار 1948 تزامناً مع حرب فلسطين",
+          "في 22 شباط 1958 عند قيام الوحدة"
+        ],
+        "correct": 0,
+        "reason": "شاركت سوريا كدولة مؤسسة رئيسية في صياغة بروتوكول الإسكندرية عام 1944 ووقعت على ميثاق جامعة الدول العربية في قصر البستان بالقاهرة في 22 آذار 1945 إلى جانب 6 دول عربية مؤسسة أخرى.",
+        "sourceSite": "ويكيبيديا الموسوعة الحرة",
+        "sourceArticle": "مقال: جامعة الدول العربية",
+        "sourceUrl": "https://ar.wikipedia.org/wiki/%D8%AC%D8%A7%D9%85%D8%B9%D8%A9_%D8%A7%D9%84%D8%AF%D9%88%D9%84_%D8%A7%D9%84%D8%B9%D8%B1%D8%A8%D9%8A%D8%A9",
+        "sourceLocation": "فقرة: 'التأسيس والميثاق'",
+        "sourceQuote": "وقعت سوريا على ميثاق جامعة الدول العربية في 22 مارس 1945 كدولة مؤسسة."
+      },
+      {
+        "q": "سؤال 83: متى تولت سوريا لأول مرة في تاريخها العضوية غير الدائمة ورئاسة 'مجلس الأمن الدولي' التابع للأمم المتحدة؟",
+        "options": [
+          "عامي 1947 - 1948 برئاسة فارس الخوري",
+          "عامي 1967 - 1968 إبان حرب حزيران",
+          "عامي 1973 - 1974 بعد حرب تشرين",
+          "عامي 2002 - 2003 برئاسة ميخائيل وهبة"
+        ],
+        "correct": 0,
+        "reason": "انتُخبت سوريا عضواً غير دائم بمجلس الأمن الدولي لدورة (1947-1948)، وتولى رئيس الوفد السوري فارس الخوري رئاسة المجلس رسمياً في آب 1947 وأيار 1948 كأول شخصية عربية وسورية تتولى هذا المنصب الدولي الرفيع.",
+        "sourceSite": "ويكيبيديا الموسوعة الحرة",
+        "sourceArticle": "مقال: مجلس الأمن التابع للأمم المتحدة",
+        "sourceUrl": "https://ar.wikipedia.org/wiki/%D9%85%D8%AC%D9%84%D8%B3_%D8%A7%D9%84%D8%A3%D9%85%D9%86_%D8%A7%D9%84%D8%AA%D8%A7%D8%A8%D8%B9_%D9%84%D9%84%D8%A3%D9%85%D9%85_%D8%A7%D9%84%D9%85%D8%AA%D8%AD%D8%AF%D8%A9",
+        "sourceLocation": "فقرة: 'الدول الأعضاء والرئاسة التاريخية'",
+        "sourceQuote": "شغلت سوريا مقعد مجلس الأمن الدولي لأول مرة 1947-1948 وترأس فارس الخوري دورات المجلس."
+      },
+      {
+        "q": "سؤال 84: في أي مؤتمر دولي شهير شاركت سوريا في وضع اللبنات الأولى لـ 'حركة عدم الانحياز' إلى جانب الهند ومصر ويوغوسلافيا وإندونيسيا عام 1955؟",
+        "options": [
+          "مؤتمر جنيف للسلام",
+          "مؤتمر باندونغ بإندونيسيا",
+          "مؤتمر يالتا",
+          "مؤتمر بوتسدام"
+        ],
+        "correct": 1,
+        "reason": "شاركت الجمهورية السورية بوفد رسمي في مؤتمر باندونغ التاريخي (نيسان 1955)، وتبنت مبادئ بانتشاسيلا العشرة للتعايش السلمي والحياد الإيجابي التي تمخضت عنها حركة عدم الانحياز رسمياً في مؤتمر بلغراد 1961.",
+        "sourceSite": "ويكيبيديا الموسوعة الحرة",
+        "sourceArticle": "مقال: مؤتمر باندونغ",
+        "sourceUrl": "https://ar.wikipedia.org/wiki/%D9%85%D8%A4%D8%AA%D9%85%D8%B1_%D8%A8%D8%A7%D9%86%D8%AF%D9%88%D9%86%D8%BA",
+        "sourceLocation": "فقرة: 'المشاركون ومبادئ المؤتمر'",
+        "sourceQuote": "شاركت سوريا في مؤتمر باندونغ عام 1955 كعضو مؤسس لحركة عدم الانحياز والحياد الإيجابي."
+      },
+      {
+        "q": "سؤال 85: أين ومتى تم توقيع 'اتفاقية الهدنة العامة' بين سوريا وإسرائيل بإشراف الأمم المتحدة والوسيط الدولي رالف بانش عقب حرب 1948؟",
+        "options": [
+          "في رودس في شباط 1949",
+          "في منطقة تل القصر على الحدود السورية في 20 تموز 1949",
+          "في جنيف في كانون الأول 1949",
+          "في نيويورك في آب 1949"
+        ],
+        "correct": 1,
+        "reason": "كانت سوريا آخر دولة عربية توقع الهدنة في 20 تموز 1949 في خيمة أقيمت بتل القصر / بين الجبهتين بحضور المراقبين الدوليين، وأقرت الاتفاقية منطقة مجردة من السلاح، ورفضت سوريا اعتبار خط الهدنة حدوداً سياسية نهائية.",
+        "sourceSite": "ويكيبيديا الموسوعة الحرة",
+        "sourceArticle": "مقال: اتفاقيات الهدنة 1949",
+        "sourceUrl": "https://ar.wikipedia.org/wiki/%D8%A7%D8%AA%D9%81%D8%A7%D9%82%D9%8A%D8%A7%D8%AA_%D8%A7%D9%84%D9%87%D8%AF%D9%86%D8%A9_1949",
+        "sourceLocation": "فقرة: 'الاتفاقية السورية الإسرائيلية'",
+        "sourceQuote": "وقعت سوريا اتفاقية الهدنة في 20 تموز 1949 ونصت على إنشاء مناطق مجردة من السلاح."
+      },
+      {
+        "q": "سؤال 86: ما هي قوة حفظ السلام الدولية التابعة للأمم المتحدة التي شُكلت بموجب قرار مجلس الأمن 350 لمراقبة تنفيذ 'اتفاقية فصل القوات' في هضبة الجولان السورية عام 1974؟",
+        "options": [
+          "اليونيفيل (UNIFIL)",
+          "الأندوف (UNDOF)",
+          "الأنتسفير (UNTSO)",
+          "المينورسو (MINURSO)"
+        ],
+        "correct": 1,
+        "reason": "قوة الأمم المتحدة لمراقبة فض الاشتباك (UNDOF) أُنشئت بموجب قرار مجلس الأمن 350 بتاريخ 31 أيار 1974 لمراقبة منطقة الفصل والتزام الجانبين بالمنطقتين المحظورتين والمتساويتين بالأسلحة في الجولان.",
+        "sourceSite": "ويكيبيديا الموسوعة الحرة",
+        "sourceArticle": "مقال: قوة الأمم المتحدة لمراقبة فض الاشتباك",
+        "sourceUrl": "https://ar.wikipedia.org/wiki/%D9%82%D9%88%D8%A9_%D8%A7%D9%84%D8%A3%D9%85%D9%85_%D8%A7%D9%84%D9%85%D8%AA%D8%AD%D8%AF%D8%A9_%D9%84%D9%85%D8%B1%D8%A7%D9%82%D8%A8%D8%A9_%D9%81%D8%B6_%D8%A7%D9%84%D8%A7%D8%B4%D8%AA%D8%A8%D8%A7%D9%83",
+        "sourceLocation": "فقرة: 'التأسيس والمهمة 1974'",
+        "sourceQuote": "تأسست قوة الأندوف (UNDOF) بقرار مجلس الأمن 350 في 31 أيار 1974 لمراقبة فض الاشتباك في الجولان."
+      },
+      {
+        "q": "سؤال 87: ما هو المبدأ الجوهري في القانون الدولي الذي ارتكز عليه 'قرار مجلس الأمن رقم 242' الصادر في تشرين الثاني 1967 ويُعد حجر الزاوية للموقف الدبلوماسي السوري؟",
+        "options": [
+          "مبدأ تقرير المصير للأقليات العرقية",
+          "مبدأ عدم جواز الاستيلاء على أراضي الغير بالقوة المسلحة، وضرورة انسحاب القوات المحتلة",
+          "مبدأ السيادة المشتركة على الممرات المائية الإقليمية",
+          "مبدأ التعويض المالي المتبادل عن الخسائر الحربية"
+        ],
+        "correct": 1,
+        "reason": "شدد قرار مجلس الأمن 242 في ديباجته على مبدأ ميثاق الأمم المتحدة بعدم جواز حيازة الأراضي بالحرب، وطالب بسحب القوات الإسرائيلية من الأراضي التي احتلتها في النزاع لترسيخ سلام عادل ودائم.",
+        "sourceSite": "ويكيبيديا الموسوعة الحرة",
+        "sourceArticle": "مقال: قرار مجلس الأمن التابع للأمم المتحدة رقم 242",
+        "sourceUrl": "https://ar.wikipedia.org/wiki/%D9%82%D8%B1%D8%A7%D8%B1_%D9%85%D8%AC%D9%84%D8%B3_%D8%A7%D9%84%D8%A3%D9%85%D9%86_%D8%A7%D9%84%D8%AA%D8%A7%D8%A8%D8%B9_%D9%84%D9%84%D8%A3%D9%85%D9%85_%D8%A7%D9%84%D9%85%D8%AA%D8%AD%D8%AF%D8%A9_%D8%B1%D9%82%D9%85_242",
+        "sourceLocation": "فقرة: 'نص القرار والمبادئ'",
+        "sourceQuote": "يؤكد القرار 242 على عدم جواز الاستيلاء على الأراضي بالحرب وضرورة الانسحاب من الأراضي المحتلة."
+      },
+      {
+        "q": "سؤال 88: ما هو قرار مجلس الأمن الدولي الحاسم رقم '497' الصادر بالإجماع في 17 كانون الأول 1981 بخصوص هضبة الجولان السورية؟",
+        "options": [
+          "إرسال قوات طوارئ دولية جديدة لمنطقة طبريا",
+          "اعتبار قرار إسرائيل بفرض قوانينها وولايتها القضائية وإدارتها على الجولان السوري المحتل لاغياً وباطلاً وبلا أي أثر قانوني دولي",
+          "الموافقة على تأجير الأراضي لمدة 99 عاماً",
+          "تقسيم الجولان إلى شطرين تحت إشراف لجنة الصليب الأحمر"
+        ],
+        "correct": 1,
+        "reason": "أقر مجلس الأمن القرار 497 بالإجماع رداً على قانون ضم الجولان الصادر عن الكنيست في 14 كانون الأول 1981، وقضى بأن فرض القوانين الإسرائيلية لاغٍ وباطل ومجرد من الأثر القانوني الدولي، وطالب إسرائيل بإلغائه فوراً.",
+        "sourceSite": "ويكيبيديا الموسوعة الحرة",
+        "sourceArticle": "مقال: قرار مجلس الأمن التابع للأمم المتحدة رقم 497",
+        "sourceUrl": "https://ar.wikipedia.org/wiki/%D9%82%D8%B1%D8%A7%D8%B1_%D9%85%D8%AC%D9%84%D8%B3_%D8%A7%D9%84%D8%A3%D9%85%D9%86_%D8%A7%D9%84%D8%AA%D8%A7%D8%A8%D8%B9_%D9%84%D9%84%D8%A3%D9%85%D9%85_%D8%A7%D9%84%D9%85%D8%AA%D8%AD%D8%AF%D8%A9_%D8%B1%D9%82%D9%85_497",
+        "sourceLocation": "فقرة: 'نص القرار وبطلان الضم'",
+        "sourceQuote": "اعتبر القرار 497 قرار إسرائيل بضم الجولان ملغياً وباطلاً وليس له أي أثر قانوني على الصعيد الدولي."
+      },
+      {
+        "q": "سؤال 89: من ترأس الوفد الدبلوماسي السوري المفاوض في 'مؤتمر مدريد للسلام' عام 1991 الذي أُطلق تحت رعاية الولايات المتحدة والاتحاد السوفيتي على أساس مبدأ 'الأرض مقابل السلام'؟",
+        "options": [
+          "عبد الحليم خدام",
+          "فاروق الشرع",
+          "وليد المعلم",
+          "ناظم القدسي"
+        ],
+        "correct": 1,
+        "reason": "ترأس وزير الخارجية السوري فاروق الشرع وفد بلاده في مؤتمر مدريد (تشرين الأول 1991)، وخاض مفاوضات تمسكت بمرجعية قراري 242 و338 والانسحاب الإسرائيلي الكامل من الجولان حتى خط 4 حزيران 1967.",
+        "sourceSite": "ويكيبيديا الموسوعة الحرة",
+        "sourceArticle": "مقال: مؤتمر مدريد 1991",
+        "sourceUrl": "https://ar.wikipedia.org/wiki/%D9%85%D8%A4%D8%AA%D9%85%D8%B1_%D9%85%D8%AF%D8%B1%D9%8A%D8%AF_1991",
+        "sourceLocation": "فقرة: 'المسار السوري والوفود'",
+        "sourceQuote": "ترأس فاروق الشرع وزير الخارجية الوفد السوري إلى مؤتمر مدريد للسلام عام 1991."
+      },
+      {
+        "q": "سؤال 90: ما هي المدينة الأمريكية التي استضافت في كانون الثاني عام 2000 جولة المفاوضات السورية الإسرائيلية المباشرة برعاية الرئيس الأمريكي بيل كلينتون؟",
+        "options": [
+          "كامب ديفيد",
+          "شيبردستاون (Shepherdstown)",
+          "دايتون",
+          "أوسلو"
+        ],
+        "correct": 1,
+        "reason": "عقدت مفاوضات شيبردستاون في ويست فرجينيا بين الوفد السوري برئاسة فاروق الشرع والوفد الإسرائيلي برئاسة إيهود باراك برعاية كلينتون وأولبرايت، وتمسكت سوريا بترسيم خط الرابع من حزيران كاملاً.",
+        "sourceSite": "ويكيبيديا الموسوعة الحرة",
+        "sourceArticle": "مقال: مفاوضات السلام السورية الإسرائيلية",
+        "sourceUrl": "https://ar.wikipedia.org/wiki/%D9%85%D9%81%D8%A7%D9%88%D8%B6%D8%A7%D8%AA_%D8%A7%D9%84%D8%B3%D9%84%D8%A7%D9%85_%D8%A7%D9%84%D8%B3%D9%88%D8%B1%D9%8A%D8%A9_%D8%A7%D9%84%D8%A5%D8%B3%D8%B1%D8%A7%D8%A6%D9%8A%D9%84%D9%8A%D8%A9",
+        "sourceLocation": "فقرة: 'مفاوضات شيبردستاون 2000'",
+        "sourceQuote": "جرت مفاوضات شيبردستاون المباشرة في الولايات المتحدة في كانون الثاني عام 2000 برعاية بيل كلينتون."
+      },
+      {
+        "q": "سؤال 91: في أي عام صادقت سوريا على 'معاهدة عدم انتشار الأسلحة النووية' (NPT) مؤكدة التزامها بنزع السلاح النووي ودعوتها لجعل الشرق الأوسط منطقة خالية من أسلحة الدمار الشامل؟",
+        "options": [
+          "عام 1950",
+          "عام 1969",
+          "عام 1985",
+          "عام 1995"
+        ],
+        "correct": 1,
+        "reason": "وقعت سوريا على معاهدة عدم انتشار الأسلحة النووية (NPT) عام 1968 وصادقت عليها رسمياً في أيلول 1969، والتزمت باتفاق الضمانات الشاملة مع الوكالة الدولية للطاقة الذرية (IAEA).",
+        "sourceSite": "ويكيبيديا الموسوعة الحرة",
+        "sourceArticle": "مقال: معاهدة الحد من انتشار الأسلحة النووية",
+        "sourceUrl": "https://ar.wikipedia.org/wiki/%D9%85%D8%B9%D8%A7%D9%87%D8%AF%D8%A9_%D8%A7%D9%84%D8%AD%D8%AF_%D9%85%D9%86_%D8%A7%D9%86%D8%AA%D8%B4%D8%A7%D8%B1_%D8%A7%D9%84%D8%A3%D8%B3%D9%84%D8%AD%D8%A9_%D8%A7%D9%84%D9%86%D9%88%D9%88%D9%8A%D8%A9",
+        "sourceLocation": "فقرة: 'الدول الأطراف في المعاهدة'",
+        "sourceQuote": "صادقت الجمهورية العربية السورية على معاهدة الحد من انتشار الأسلحة النووية عام 1969."
+      },
+      {
+        "q": "سؤال 92: ما هو قرار مجلس الأمن الدولي المعتمد بالإجماع في 18 كانون الأول 2015 والذي يُعد المرجعية الدولية الأساسية لخارطة طريق الحل السياسي والانتقال الديمقراطي في سوريا؟",
+        "options": [
+          "القرار 1559",
+          "القرار 2254",
+          "القرار 2118",
+          "القرار 1973"
+        ],
+        "correct": 1,
+        "reason": "يضع القرار 2254 محددات التسوية السياسية عبر عملية يقودها السوريون وتيسرها الأمم المتحدة؛ وتشمل تشكيل حكم ذي مصداقية يشمل الجميع وغير طائفي، وإعداد دستور جديد، وإجراء انتخابات حرة ونزيهة برقابة أممية.",
+        "sourceSite": "ويكيبيديا الموسوعة الحرة",
+        "sourceArticle": "مقال: قرار مجلس الأمن التابع للأمم المتحدة رقم 2254",
+        "sourceUrl": "https://ar.wikipedia.org/wiki/%D9%82%D8%B1%D8%A7%D8%B1_%D9%85%D8%AC%D9%84%D8%B3_%D8%A7%D9%84%D8%A3%D9%85%D9%86_%D8%A7%D9%84%D8%AA%D8%A7%D8%A8%D8%B9_%D9%84%D9%84%D8%A3%D9%85%D9%85_%D8%A7%D9%84%D9%85%D8%AA%D8%AD%D8%AF%D8%A9_%D8%B1%D9%82%D9%85_2254",
+        "sourceLocation": "فقرة: 'خارطة الطريق وبنود القرار'",
+        "sourceQuote": "القرار 2254 الصادر عام 2015 يمثل المرجعية القانونية الدولية لمسار الحل السياسي والانتقال الدستوري بسوريا."
+      },
+      {
+        "q": "سؤال 93: ما هي المعاهدة الدولية المنظمة للعمل الدبلوماسي وحصانات السفارات والمبعوثين التي أبرمت في النمسا عام 1961 وتلتزم بها وزارة الخارجية السورية في علاقاتها الخارجية؟",
+        "options": [
+          "اتفاقية روما الدبلوماسية",
+          "اتفاقية فيينا للعلاقات الدبلوماسية لعام 1961",
+          "معاهدة باريس الدولية",
+          "ميثاق لاهاي الدبلوماسي"
+        ],
+        "correct": 1,
+        "reason": "اتفاقية فيينا للعلاقات الدبلوماسية (1961) هي المعاهدة الأم التي تقنن قواعد التعامل الدبلوماسي والحصانات القضائية والضريبية للدبلوماسيين وحرمة المقرات والوثائق والحقائب الدبلوماسية.",
+        "sourceSite": "ويكيبيديا الموسوعة الحرة",
+        "sourceArticle": "مقال: اتفاقية فيينا للعلاقات الدبلوماسية",
+        "sourceUrl": "https://ar.wikipedia.org/wiki/%D8%A7%D8%AA%D9%81%D8%A7%D9%82%D9%8A%D8%A9_%D9%81%D9%8A%D9%8A%D9%86%D8%A7_%D9%84%D9%84%D8%B9%D9%84%D8%A7%D9%82%D8%A7%D8%AA_%D8%A7%D9%84%D8%AF%D8%A8%D9%84%D9%88%D9%85%D8%A7%D8%B3%D9%8A%D8%A9",
+        "sourceLocation": "فقرة: 'الحصانات والامتيازات الدبلوماسية'",
+        "sourceQuote": "تعد اتفاقية فيينا 1961 الإطار القانوني الشامل المنظم للعلاقات والحصانات الدبلوماسية بين الدول."
+      },
+      {
+        "q": "سؤال 94: في أي قمة إسلامية تاريخية شاركت سوريا كعضو مؤسس في تأسيس 'منظمة التعاون الإسلامي' (OIC) في أيلول 1969؟",
+        "options": [
+          "قمة مكة المكرمة",
+          "قمة الرباط بالمغرب (عقب إحراق المسجد الأقصى)",
+          "قمة لاهور بباكستان",
+          "قمة القاهرة"
+        ],
+        "correct": 1,
+        "reason": "تأسست منظمة المؤتمر الإسلامي (التعاون الإسلامي لاحقاً) في قمة الرباط بتاريخ 22-25 أيلول 1969 رداً على جريمة إحراق المسجد الأقصى في القدس المحتلة، وكانت سوريا من الدول العربية المؤسسة للمنظمة.",
+        "sourceSite": "ويكيبيديا الموسوعة الحرة",
+        "sourceArticle": "مقال: منظمة التعاون الإسلامي",
+        "sourceUrl": "https://ar.wikipedia.org/wiki/%D9%85%D9%86%D8%B8%D9%85%D8%A9_%D8%A7%D9%84%D8%AA%D8%B9%D8%A7%D9%88%D9%86_%D8%A7%D9%84%D8%A5%D8%B3%D9%84%D8%A7%D9%85%D9%8A",
+        "sourceLocation": "فقرة: 'مؤتمر الرباط والتأسيس'",
+        "sourceQuote": "تأسست المنظمة بقمة الرباط في أيلول 1969 بمشاركة سوريا كدولة مؤسسة لحماية المقدسات الإسلامية."
+      },
+      {
+        "q": "سؤال 95: ما هي الاتفاقية الإقليمية متعددة الأطراف التي انطلقت عام 1995 في إسبانيا لتعزيز الشراكة الاقتصادية والسياسية بين الاتحاد الأوروبي ودول جنوب المتوسط (ومنها سوريا)؟",
+        "options": [
+          "مسار برشلونة (الشراكة الأوروبية المتوسطية)",
+          "اتفاقية شنغن",
+          "اتفاقية ماستريخت",
+          "حلف وارسو المتوسطي"
+        ],
+        "correct": 0,
+        "reason": "شاركت سوريا في مؤتمر برشلونة عام 1995 لتأسيس فضاء الشراكة الأوروبية المتوسطية، بهدف بناء منطقة تبادل تجاري حر وتعزيز الحوار السياسي والأمني والتبادل الثقافي بين ضفتي المتوسط.",
+        "sourceSite": "ويكيبيديا الموسوعة الحرة",
+        "sourceArticle": "مقال: مسار برشلونة",
+        "sourceUrl": "https://ar.wikipedia.org/wiki/%D9%85%D8%B3%D8%A7%D8%B1_%D8%A8%D8%B1%D8%B4%D9%84%D9%88%D9%86%D8%A9",
+        "sourceLocation": "فقرة: 'الأهداف والشراكة المتوسطية'",
+        "sourceQuote": "انطلق مسار برشلونة عام 1995 للشراكة بين الاتحاد الأوروبي ودول المتوسط ومن ضمنها سوريا."
+      },
+      {
+        "q": "سؤال 96: ما هي الاتفاقية الدولية الإنسانية لعام 1949 التي تؤكد كافة قرارات الجمعية العامة للأمم المتحدة ومجلس الأمن على سريانها وانطباقها القانوني الصارم على هضبة الجولان السورية المحتلة؟",
+        "options": [
+          "اتفاقية جنيف الأولى لحماية الجرحى",
+          "اتفاقية جنيف الرابعة المتعلقة بحماية المدنيين وقت الحرب",
+          "معاهدة فرساي الدولية",
+          "اتفاقية كيوتو الدولية"
+        ],
+        "correct": 1,
+        "reason": "تؤكد قرارات الأمم المتحدة السنوية (ومنها القرار 497) على أن اتفاقية جنيف الرابعة لعام 1949 بشأن حماية المدنيين في وقت الحرب تنطبق بصورة كاملة وإلزامية على الجولان والأراضي السورية المحتلة منذ 1967.",
+        "sourceSite": "ويكيبيديا الموسوعة الحرة",
+        "sourceArticle": "مقال: اتفاقية جنيف الرابعة",
+        "sourceUrl": "https://ar.wikipedia.org/wiki/%D8%A7%D8%AA%D9%81%D8%A7%D9%82%D9%8A%D8%A9_%D8%AC%D9%86%D9%8A%D9%81_%D8%A7%D9%84%D8%B1%D8%A7%D8%A8%D8%B9%D8%A9",
+        "sourceLocation": "فقرة: 'الانطباق على الأراضي المحتلة'",
+        "sourceQuote": "تنطبق اتفاقية جنيف الرابعة بحسب القرارات الدولية الصريحة على الجولان السوري المحتل لحماية حقوق سكانه."
+      },
+      {
+        "q": "سؤال 97: ما هي الحجة الدبلوماسية والقانونية الرئيسية التي رفعتها الحكومة السورية أمام 'عصبة الأمم' عام 1937 ضد سلخ لواء إسكندرون وتنازل فرنسا عنه لتركيا؟",
+        "options": [
+          "أن اللواء لم يكن يدفع الضرائب لخزينة الدولة العثمانية",
+          "أن صك الانتداب الصادر عن عصبة الأمم يلزم فرنسا صراحة باحترام سلامة الأراضي السورية ووحدتها وعدم التنازل عن أي جزء منها",
+          "أن تركيا لم تكن عضواً في عصبة الأمم آنذاك",
+          "أن سكان اللواء صوتوا في استفتاء عام لصالح الانضمام إلى بريطانيا"
+        ],
+        "correct": 1,
+        "reason": "نصت المادة الرابعة من صك الانتداب على تعهد فرنسا بضمان سلامة الأراضي السورية ومنع أي تنازل عنها أو تجزئتها، وهو ما جعل الاتفاقية الفرنسية-التركية لعام 1939 انتهاكاً صارخاً وغير شرعي للقانون الدولي.",
+        "sourceSite": "ويكيبيديا الموسوعة الحرة",
+        "sourceArticle": "مقال: لواء إسكندرون",
+        "sourceUrl": "https://ar.wikipedia.org/wiki/%D9%84%D9%88%D8%A7%D8%A1_%D8%A5%D8%B3%D9%83%D9%86%D8%AF%D8%B1%D9%88%D9%86",
+        "sourceLocation": "فقرة: 'الموقف القانوني وصك الانتداب'",
+        "sourceQuote": "احتجت سوريا بأن صك الانتداب يمنع فرنسا صراحة من التنازل عن أي جزء من الأراضي السورية."
+      },
+      {
+        "q": "سؤال 98: ما هي المعاهدة الاقتصادية الدولية الكبرى لعام 1947 المنظمة للتعريفات والتجارة التي شاركت الجمهورية السورية في تأسيسها بمؤتمر هافانا وجنيف؟",
+        "options": [
+          "اتفاقية الجات (GATT)",
+          "منظمة أوبك (OPEC)",
+          "صندوق النقد العربي",
+          "اتفاقية بازل للمصارف"
+        ],
+        "correct": 0,
+        "reason": "شاركت سوريا كدولة ذات سيادة في تأسيس 'الاتفاقية العامة للتعريفات الجمركية والتجارة' (GATT) في جنيف عام 1947 وفي مؤتمر هافانا 1948، وكانت من أوائل الموقعين عليها في مسار بناء النظام الاقتصادي العالمي.",
+        "sourceSite": "ويكيبيديا الموسوعة الحرة",
+        "sourceArticle": "مقال: الاتفاقية العامة للتعريفات الجمركية والتجارة",
+        "sourceUrl": "https://ar.wikipedia.org/wiki/%D8%A7%D9%84%D8%A7%D8%AA%D9%81%D8%A7%D9%82%D9%8A%D8%A9_%D8%A7%D9%84%D8%B9%D8%A7%D9%85%D8%A9_%D9%84%D9%84%D8%AA%D8%B9%D8%B1%D9%8A%D9%81%D8%A7%D8%AA_%D8%A7%D9%84%D8%AC%D9%85%D8%B1%D9%83%D9%8A%D8%A9_%D9%88%D8%A7%D9%84%D8%AA%D8%AC%D8%A7%D8%B1%D8%A9",
+        "sourceLocation": "فقرة: 'الأطراف الموقعة الأصلية'",
+        "sourceQuote": "وقعت سوريا على اتفاقية الجات الأصلية في جنيف عام 1947 كعضو مؤسس للتجارة الدولية."
+      },
+      {
+        "q": "سؤال 99: ما هو المسار الدبلوماسي الذي قادته الأمم المتحدة عبر مبعوثيها الخاصين بجنيف (وفق مسار جنيف واللجنة الدستورية) لصياغة دستور دائم وحل سياسي وفق القرار 2254؟",
+        "options": [
+          "مسار محادثات جنيف السورية برعاية المبعوثين الأمميين المتعاقبين",
+          "مؤتمر دايتون للسلام",
+          "محادثات لوزان التمهيدية",
+          "قمة هلسنكي للأمن والتعاون"
+        ],
+        "correct": 0,
+        "reason": "أطلقت الأمم المتحدة مسار جنيف التفاوضي منذ بيان جنيف 1 (حزيران 2012) واستمر عبر اجتماعات اللجنة الدستورية برعاية كوفي عنان ثم الإبراهيمي ودي مستورا وبيدرسن كآلية دولية لتحقيق الانتقال الديمقراطي.",
+        "sourceSite": "ويكيبيديا الموسوعة الحرة",
+        "sourceArticle": "مقال: محادثات جنيف 2 للسلام في الشرق الأوسط",
+        "sourceUrl": "https://ar.wikipedia.org/wiki/%D9%85%D8%AD%D8%A7%D8%AF%D8%AB%D8%A7%D8%AA_%D8%AC%D9%86%D9%8A%D9%81_2_%D9%84%D9%84%D8%B3%D9%84%D8%A7%D9%85_%D9%81%D9%8A_%D8%A7%D9%84%D8%B4%D8%B1%D9%82_%D8%A7%D9%84%D8%A3%D9%88%D8%B3%D8%B7",
+        "sourceLocation": "فقرة: 'مسار جنيف والقرارات الأممية'",
+        "sourceQuote": "شكل مسار جنيف برعاية الأمم المتحدة المنصة الدبلوماسية الرئيسية لمفاوضات الحل السياسي واللجنة الدستورية."
+      },
+      {
+        "q": "سؤال 100: ما هو التوجه الدبلوماسي والمبدأ الاستراتيجي الذي أعلنته الإدارة السورية الانتقالية في كانون الأول 2024 لبناء علاقات سوريا الخارجية المستقبلية؟",
+        "options": [
+          "العزلة الكاملة والانسحاب من كافة المنظمات والمعاهدات الإقليمية",
+          "الانفتاح الدبلوماسي، احترام السيادة المتبادلة، الالتزام بميثاق الأمم المتحدة والمعاهدات الدولية، وبناء علاقات متوازنة قائمة على المصالح المشتركة والعدالة والأمن الإقليمي",
+          "التبعية التامة لأحد الأحلاف العسكرية الإقليمية واستضافة القواعد الأجنبية",
+          "إلغاء التمثيل الدبلوماسي والاكتفاء بالتجارة الحدودية"
+        ],
+        "correct": 1,
+        "reason": "أكدت الإدارة السورية الانتقالية في بياناتها الرئاسية والدبلوماسية التزام سوريا بميثاق الأمم المتحدة، وتصفير المشكلات، واستعادة الحضور الفاعل في جامعة الدول العربية والمجتمع الدولي، وصون سيادة الدولة ووحدة أراضيها.",
+        "sourceSite": "ويكيبيديا الموسوعة الحرة",
+        "sourceArticle": "مقال: علاقات سوريا الخارجية",
+        "sourceUrl": "https://ar.wikipedia.org/wiki/%D8%B9%D9%84%D8%A7%D9%82%D8%A7%D8%AA_%D8%B3%D9%88%D8%B1%D9%8A%D8%A7_%D8%A7%D9%84%D8%AE%D8%A7%D8%B1%D8%AC%D9%8A%D8%A9",
+        "sourceLocation": "فقرة: 'المرحلة الانتقالية والسياسة الخارجية الجديدة 2024'",
+        "sourceQuote": "ترتكز السياسة الخارجية السورية الجديدة على الانفتاح الدبلوماسي، واحترام سيادة الدول، وصون المصالح الوطنية العليا."
+      }
+    ]
+  }
+];
+
+        let activeSection = 0;
+        let currentQuestionIdx = 0;
+        let userProgress = quizData.map(sec => new Array(sec.questions.length).fill(null));
+
+        let totalCorrect = 0;
+        let totalIncorrect = 0;
+        let wrongIndicesList = [];
+        let isSourceVisible = false;
+
+        // عناصر واجهة المستخدم
+        const quizBoxEl = document.getElementById("quiz-box");
+        const summaryBoxEl = document.getElementById("summary-box");
+        const questionTextEl = document.getElementById("question-text");
+        const optionsContainerEl = document.getElementById("options-container");
+        const explanationBoxEl = document.getElementById("explanation-box");
+        const explanationTitleEl = document.getElementById("explanation-title");
+        const explanationTextEl = document.getElementById("explanation-text");
+        const explanationIconEl = document.getElementById("explanation-icon");
+
+        const sourceBoxEl = document.getElementById("source-box");
+        const sourceSiteNameEl = document.getElementById("source-site-name");
+        const sourceUrlLinkEl = document.getElementById("source-url-link");
+        const sourceArticleTitleEl = document.getElementById("source-article-title");
+        const sourceSectionLocationEl = document.getElementById("source-section-location");
+        const sourceExactQuoteEl = document.getElementById("source-exact-quote");
+        const btnToggleSourceEl = document.getElementById("btn-toggle-source");
+
+        const sectionTagEl = document.getElementById("section-tag");
+        const qNumberTitleEl = document.getElementById("q-number-title");
+        const qTotalTitleEl = document.getElementById("q-total-title");
+
+        const headerCorrectEl = document.getElementById("header-correct");
+        const headerIncorrectEl = document.getElementById("header-incorrect");
+        const headerQIndexEl = document.getElementById("header-q-index");
+        const headerQTotalEl = document.getElementById("header-q-total");
+        const sectionProgressEl = document.getElementById("section-progress");
+
+        const prevBtn = document.getElementById("prev-btn");
+        const nextBtn = document.getElementById("next-btn");
+        const matrixModalEl = document.getElementById("matrix-modal");
+        const matrixGridEl = document.getElementById("matrix-grid");
+
+        function initApp() {
+            try {
+                const saved = localStorage.getItem("syria_diplomatic_quiz_progress_v1");
+                if (saved) {
+                    const parsed = JSON.parse(saved);
+                    if (parsed && Array.isArray(parsed) && parsed.length === quizData.length) {
+                        userProgress = parsed;
+                        recalcStats();
+                    }
+                }
+            } catch (e) {
+                console.log("No saved progress");
+            }
+
+            switchSection(0);
+        }
+
+        function switchSection(secIndex) {
+            activeSection = secIndex;
+            currentQuestionIdx = 0;
+
+            for (let i = 0; i < quizData.length; i++) {
+                const tab = document.getElementById(`sec-tab-${i}`);
+                if (tab) {
+                    if (i === secIndex) {
+                        tab.classList.add("active");
+                    } else {
+                        tab.classList.remove("active");
+                    }
+                }
+            }
+
+            resumeCurrentSection();
+            loadQuestion(0);
+        }
+
+        function loadQuestion(idx) {
+            const sec = quizData[activeSection];
+            const qItem = sec.questions[idx];
+            currentQuestionIdx = idx;
+
+            // إعادة ضبط ظهور المصدر ليكون مخفياً حتى ينقر المستخدم
+            isSourceVisible = false;
+            sourceBoxEl.classList.add("hidden");
+            btnToggleSourceEl.innerHTML = `
+                <svg class="w-3.5 h-3.5 text-sky-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+                </svg>
+                <span>📖 مصدر المعلومة والتوثيق (اضغط هنا)</span>
+            `;
+
+            // تحديث بيانات التوثيق في الصندوق
+            sourceSiteNameEl.textContent = qItem.sourceSite || "ويكيبيديا الموسوعة الحرة";
+            sourceUrlLinkEl.href = qItem.sourceUrl || "#";
+            sourceArticleTitleEl.textContent = qItem.sourceArticle || "ويكيبيديا";
+            sourceSectionLocationEl.textContent = qItem.sourceLocation || "نص المقال";
+            sourceExactQuoteEl.textContent = qItem.sourceQuote || "";
+
+            // تحديث العدادات وشريط التقدم
+            qNumberTitleEl.textContent = (idx + 1);
+            qTotalTitleEl.textContent = sec.questions.length;
+            headerQIndexEl.textContent = (idx + 1);
+            headerQTotalEl.textContent = sec.questions.length;
+            sectionTagEl.textContent = sec.sectionBadge || sec.sectionName;
+
+            const pct = Math.round(((idx + 1) / sec.questions.length) * 100);
+            sectionProgressEl.style.width = `${pct}%`;
+
+            prevBtn.disabled = (idx === 0);
+            if (idx === sec.questions.length - 1) {
+                nextBtn.textContent = "إنهاء القسم والنتيجة 🏁";
+                nextBtn.classList.replace("bg-sky-600", "bg-emerald-600");
+                nextBtn.classList.replace("hover:bg-sky-700", "hover:bg-emerald-700");
+            } else {
+                nextBtn.textContent = "التالي";
+                nextBtn.classList.replace("bg-emerald-600", "bg-sky-600");
+                nextBtn.classList.replace("hover:bg-emerald-700", "hover:bg-sky-700");
+            }
+
+            questionTextEl.textContent = qItem.q;
+
+            // الخيارات
+            optionsContainerEl.innerHTML = "";
+            const state = userProgress[activeSection][idx];
+            const optionLetters = ["أ", "ب", "ج", "د"];
+
+            qItem.options.forEach((optText, optIdx) => {
+                const btn = document.createElement("button");
+                btn.className = "option-btn w-full text-right p-3.5 sm:p-4 rounded-xl flex items-start gap-3 text-xs sm:text-sm font-medium leading-relaxed";
+                
+                const letterBadge = document.createElement("span");
+                letterBadge.className = "flex-shrink-0 w-6 h-6 rounded-md bg-[#242b38] border border-[#343e50] flex items-center justify-center font-bold text-gray-300 text-xs";
+                letterBadge.textContent = optionLetters[optIdx] || (optIdx + 1);
+
+                const textSpan = document.createElement("span");
+                textSpan.className = "flex-1";
+                textSpan.textContent = optText;
+
+                btn.appendChild(letterBadge);
+                btn.appendChild(textSpan);
+
+                if (state !== null) {
+                    btn.disabled = true;
+                    if (optIdx === qItem.correct) {
+                        btn.classList.add("correct");
+                        letterBadge.className = "flex-shrink-0 w-6 h-6 rounded-md bg-emerald-600 text-white flex items-center justify-center font-bold text-xs";
+                    }
+                    if (state.selectedIndex === optIdx && !state.isCorrect) {
+                        btn.classList.add("incorrect");
+                        letterBadge.className = "flex-shrink-0 w-6 h-6 rounded-md bg-rose-600 text-white flex items-center justify-center font-bold text-xs";
+                    }
+                } else {
+                    btn.onclick = () => handleAnswer(optIdx);
+                }
+
+                optionsContainerEl.appendChild(btn);
+            });
+
+            if (state !== null) {
+                displayExplanation(state.isCorrect, qItem.reason);
+            } else {
+                explanationBoxEl.classList.add("hidden");
+            }
+
+            updateGlobalStats();
+        }
+
+        function toggleSourceBox() {
+            isSourceVisible = !isSourceVisible;
+            if (isSourceVisible) {
+                sourceBoxEl.classList.remove("hidden");
+                btnToggleSourceEl.innerHTML = `
+                    <svg class="w-3.5 h-3.5 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                    <span>إغلاق صندوق المصدر ✖</span>
+                `;
+            } else {
+                sourceBoxEl.classList.add("hidden");
+                btnToggleSourceEl.innerHTML = `
+                    <svg class="w-3.5 h-3.5 text-sky-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+                    </svg>
+                    <span>📖 مصدر المعلومة والتوثيق (اضغط هنا)</span>
+                `;
+            }
+        }
+
+        function handleAnswer(selectedIdx) {
+            const qItem = quizData[activeSection].questions[currentQuestionIdx];
+            const isCorrect = (selectedIdx === qItem.correct);
+
+            userProgress[activeSection][currentQuestionIdx] = {
+                selectedIndex: selectedIdx,
+                isCorrect: isCorrect
+            };
+
+            try {
+                localStorage.setItem("syria_diplomatic_quiz_progress_v1", JSON.stringify(userProgress));
+            } catch (e) {}
+
+            recalcStats();
+            loadQuestion(currentQuestionIdx);
+        }
+
+        function displayExplanation(isCorrect, reason) {
+            explanationBoxEl.classList.remove("hidden");
+            if (isCorrect) {
+                explanationBoxEl.className = "rounded-xl border p-4 text-sm leading-relaxed transition-all duration-300 bg-emerald-950/40 border-emerald-700/60 text-emerald-300";
+                explanationTitleEl.textContent = "إجابة صحيحة ومطابقة للسند التاريخي والدبلوماسي! ✨";
+                explanationTitleEl.className = "font-bold text-sm mb-1 text-emerald-400";
+                explanationIconEl.textContent = "✔";
+            } else {
+                explanationBoxEl.className = "rounded-xl border p-4 text-sm leading-relaxed transition-all duration-300 bg-rose-950/40 border-rose-800/60 text-rose-300";
+                explanationTitleEl.textContent = "إجابة خاطئة! السند المعرفي المعتمد:";
+                explanationTitleEl.className = "font-bold text-sm mb-1 text-rose-400";
+                explanationIconEl.textContent = "✖";
+            }
+            explanationTextEl.textContent = reason;
+        }
+
+        function recalcStats() {
+            totalCorrect = 0;
+            totalIncorrect = 0;
+            for (let s = 0; s < quizData.length; s++) {
+                for (let q = 0; q < quizData[s].questions.length; q++) {
+                    const st = userProgress[s][q];
+                    if (st !== null) {
+                        if (st.isCorrect) totalCorrect++;
+                        else totalIncorrect++;
+                    }
+                }
+            }
+            updateGlobalStats();
+        }
+
+        function updateGlobalStats() {
+            headerCorrectEl.textContent = totalCorrect;
+            headerIncorrectEl.textContent = totalIncorrect;
+        }
+
+        function handleNext() {
+            const secTotal = quizData[activeSection].questions.length;
+            if (currentQuestionIdx < secTotal - 1) {
+                loadQuestion(currentQuestionIdx + 1);
+            } else {
+                showSectionSummary();
+            }
+        }
+
+        function handlePrev() {
+            if (currentQuestionIdx > 0) {
+                loadQuestion(currentQuestionIdx - 1);
+            }
+        }
+
+        function showSectionSummary() {
+            quizBoxEl.classList.add("hidden");
+            document.querySelector("footer").classList.add("hidden");
+            summaryBoxEl.classList.remove("hidden");
+
+            const secTotal = quizData[activeSection].questions.length;
+            let secCorrect = 0;
+            let secWrong = 0;
+            wrongIndicesList = [];
+
+            for (let i = 0; i < secTotal; i++) {
+                const item = userProgress[activeSection][i];
+                if (item !== null) {
+                    if (item.isCorrect) secCorrect++;
+                    else {
+                        secWrong++;
+                        wrongIndicesList.push(i);
+                    }
+                }
+            }
+
+            document.getElementById("summary-title").textContent = `ملخص: ${quizData[activeSection].sectionName}`;
+            document.getElementById("sum-correct").textContent = secCorrect;
+            document.getElementById("sum-wrong").textContent = secWrong;
+            const pct = Math.round((secCorrect / secTotal) * 100);
+            document.getElementById("sum-percent").textContent = `${pct}%`;
+
+            const totalExamQuestions = 100;
+            const totalAnswered = totalCorrect + totalIncorrect;
+            document.getElementById("overall-total-score").textContent = `${totalCorrect} صحيحة من أصل ${totalAnswered} مجابة (من إجمالي ${totalExamQuestions} سؤال في الاختبار الدبلوماسي)`;
+
+            const wrongBtn = document.getElementById("summary-wrong-only-btn");
+            if (wrongIndicesList.length > 0) {
+                wrongBtn.classList.remove("hidden");
+            } else {
+                wrongBtn.classList.add("hidden");
+            }
+
+            const nextSecBtn = document.getElementById("summary-next-sec-btn");
+            if (activeSection < quizData.length - 1) {
+                nextSecBtn.textContent = `الانتقال إلى القسم التالي (${quizData[activeSection + 1].sectionBadge || quizData[activeSection + 1].sectionName})`;
+                nextSecBtn.classList.remove("hidden");
+            } else {
+                nextSecBtn.textContent = "العودة للقسم الأول للمراجعة العامة";
+            }
+        }
+
+        function resumeCurrentSection() {
+            summaryBoxEl.classList.add("hidden");
+            quizBoxEl.classList.remove("hidden");
+            document.querySelector("footer").classList.remove("hidden");
+        }
+
+        function reviewWrongOnly() {
+            if (wrongIndicesList.length > 0) {
+                resumeCurrentSection();
+                loadQuestion(wrongIndicesList[0]);
+            }
+        }
+
+        function goToNextSection() {
+            if (activeSection < quizData.length - 1) {
+                switchSection(activeSection + 1);
+            } else {
+                switchSection(0);
+            }
+        }
+
+        function toggleMatrixModal() {
+            if (matrixModalEl.classList.contains("hidden")) {
+                populateMatrixGrid();
+                matrixModalEl.classList.remove("hidden");
+            } else {
+                matrixModalEl.classList.add("hidden");
+            }
+        }
+
+        function populateMatrixGrid() {
+            matrixGridEl.innerHTML = "";
+            const secTotal = quizData[activeSection].questions.length;
+            document.getElementById("matrix-title").textContent = `فهرس أسئلة: ${quizData[activeSection].sectionName}`;
+
+            for (let i = 0; i < secTotal; i++) {
+                const btn = document.createElement("button");
+                btn.className = "q-matrix-btn text-xs font-bold py-2.5 rounded-lg border text-center transition flex flex-col items-center justify-center";
+                
+                const state = userProgress[activeSection][i];
+                if (i === currentQuestionIdx) {
+                    btn.classList.add("current");
+                }
+
+                if (state === null) {
+                    btn.classList.add("bg-[#191d25]", "border-[#2b3240]", "text-gray-300", "hover:bg-[#222733]");
+                } else if (state.isCorrect) {
+                    btn.classList.add("bg-emerald-950/70", "border-emerald-600", "text-emerald-300");
+                } else {
+                    btn.classList.add("bg-rose-950/70", "border-rose-600", "text-rose-300");
+                }
+
+                btn.textContent = (i + 1);
+                btn.onclick = () => {
+                    toggleMatrixModal();
+                    resumeCurrentSection();
+                    loadQuestion(i);
+                };
+
+                matrixGridEl.appendChild(btn);
+            }
+        }
+
+        function resetCurrentQuiz() {
+            if (confirm("هل أنت متأكد من رغبتك في إعادة تصفير نتائج الاختبار بالكامل؟")) {
+                userProgress = quizData.map(sec => new Array(sec.questions.length).fill(null));
+                try {
+                    localStorage.removeItem("syria_diplomatic_quiz_progress_v1");
+                } catch (e) {}
+                totalCorrect = 0;
+                totalIncorrect = 0;
+                recalcStats();
+                switchSection(0);
+            }
+        }
+
+        function copyShareLink() {
+            const toast = document.getElementById("toast");
+            try {
+                const dummy = document.createElement("input");
+                document.body.appendChild(dummy);
+                dummy.value = window.location.href;
+                dummy.select();
+                document.execCommand("copy");
+                document.body.removeChild(dummy);
+
+                toast.classList.remove("hidden");
+                setTimeout(() => toast.classList.add("hidden"), 2500);
+            } catch (e) {
+                console.error("تعذر النسخ");
+            }
+        }
+
+        window.onload = function() {
+            initApp();
+        };
+    </script>
+</body>
+</html>
